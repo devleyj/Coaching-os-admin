@@ -1,5 +1,11 @@
 import Slidebar from "./components/Slidebar";
-import{  Bell , Search } from "lucide-react";
+import{  Bell,
+  Search,
+  Users,
+  GraduationCap,
+  Layers,
+  IndianRupee,
+ } from "lucide-react";
 
 export default function Home(){
   return(
@@ -71,15 +77,107 @@ export default function Home(){
 
         {/* Dashboard Body */}
         <section className= "p-8">
-          <div className= "rounded-2xl border border-slate-200 bg-white p-8">
-            <h2 className= "text-xl font-semibold text-slate-900">
-              Welcome to Coaching OS
-            </h2>
 
-            <p className="mt-2 text-sm text-slate-500">
-              This is your dashboard where you can manage your courses, schedule, attendance, fees, and inquiries. use the navigation on the left to access different sections of the application.
-            </p>
+          {/* KPI Cards*/}
+          <div className= "grid grid-cols1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+
+            {/* Students */}
+            <div className= "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className= "flex items-center justify-between">
+                <div className= "flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                  <Users size={24} />
+                </div>
+
+                <span className= "text-sm font-medium text-green-600">
+                  +12.5%
+                </span>
+              </div>
+
+              <p className= "mt-5 text-sm text-slate-500">
+                Total Students
+              </p>
+
+              <h2 className= "mt-1 text-3xl font-bold text-slate-900">
+                1,248
+              </h2>
+            </div>
+
+            {/* Teachers */}
+            <div className= "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className= "flex items-center justify-between">
+                <div className= "flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+                  <GraduationCap size={24} />
+                </div>
+
+                <span className= "text-sm font-medium text-green-600">
+                  +4.2%
+                </span>
+              </div>
+
+              <p className= "mt-5 text-sm text-slate-500">
+                Teachers
+              </p>
+
+              <h2 className= "mt-1 text-3xl font-bold text-slate-900">
+                42
+              </h2>
+            </div>
+
+            {/* Batches */}
+            <div className= "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className= "flex items-center justify-between">
+                <div className= "flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-50 text-yellow-600">
+                  <Layers size={24} />
+                </div>
+
+                <span className= "text-sm font-medium text-green-600">
+                  +8.1%
+                </span>
+              </div>
+
+              <p className= "mt-5 text-sm text-slate-500">
+                Active Batches
+              </p>
+
+              <h2 className= "mt-1 text-3xl font-bold text-slate-900">
+                28
+              </h2>
+            </div>
+
+            {/* Revenue*/}
+            <div className= "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className= "flex items-center justify-between">
+                <div className= "flex h-12 w-12 items-center justify-center rounded-xl bg-green-50 text-green-600">
+                  <IndianRupee size= {24} />
+                </div>
+
+                <span className= "text-sm font-medium text-green-600">
+                  +15.8%
+                </span>
+              </div>
+
+              <p className= "mt-5 text-sm text-slate-500">
+                Monthly Revenue
+              </p>
+
+              <h2 className= "mt-1 text-3xl font-bold text-slate-900">
+                ₹8.4L
+              </h2>
+            </div>
+
           </div>
+
+            {/* Welcome Card */}
+            <div className= "mt-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className= "text-xl font-semibold text-slate-900">
+                Welcome to Coaching OS
+              </h2>
+
+              <p className= "mt-2 text-sm text-slate-500">
+                Your coaching institute mangement dashboard starts here.
+              </p>
+            </div>
+
         </section>
 
       </main>
