@@ -10,6 +10,7 @@ import {
   ClipboardCheck,
   IndianRupee,
   UserPlus,
+  FileText,
 } from "lucide-react";
 
 export default function Slidebar(){
@@ -75,6 +76,11 @@ export default function Slidebar(){
             <NavItem
             icon= {<UserPlus size={19} />}
             label= "Inquiries"
+            />
+
+            <NavItem
+            icon= {<FileText size={19} />}
+            label= "Exams"
             />
 
         </div>
