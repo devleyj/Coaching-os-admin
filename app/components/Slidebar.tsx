@@ -1,52 +1,114 @@
+"use clinet";
+
+import {
+  LayoutDashboard,
+  Users,
+  GraduationCap,
+  BookOpen,
+  Layers,
+  CalendarDays,
+  ClipboardCheck,
+  IndianRupee,
+  UserPlus,
+} from "lucide-react";
+
 export default function Slidebar(){
   return(
-    <aside className= "w-64 min-h-screen bg-white boder-r boder-slate-200 p-6">
-      <h2 className = "text-2xl font-bold text-slate-900">
-        Coaching OS
-      </h2>
+    <aside className="flex min-h-screen w-64 flex-col border-r border-slate-200 bg-white p-5">
 
-      <nav className= "mt-8">
-        <p className= "text-sm font-medium text-slate-400 uppercase">
+      {/* Logo */}
+      <div className= "mb-8">
+        <h1 className= "text-2xl font-boald text-salte-900">
+          Coaching OS
+        </h1>
+        <p className= "mt-1 text-xs text-slate-400">
+          Institute Management
+        </p>
+      </div>
+
+      {/* Navigation */}
+      <nav className= "flex-1">
+        <p className= "mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
           Main Menu
         </p>
 
-        <div className= "mt-4 space-y-2">
-          <button className= "w-full roundedx1 px-4 py-3 text-left font-medium text-blue-600">
-            Dashboard
-          </button>
+        <div className= "space-y-1">
+          <NavItem
+            icon= {<LayoutDashboard size={19} />}
+            label= "Dashboard"
+            active
+            />
 
-          <button className= "w-full rounded-x1 px-4 py-3 text-left text-slate-600 haver:bg-slate-50">
-            Students
-          </button>
+            <NavItem
+            icon= {<Users size={19} />}
+            label= "Students"
+            />
+            <NavItem
+            icon= {<GraduationCap size={19} />}
+            label= "Teachers"
+            />
+            <NavItem
+            icon= {<Layers size={19} />}
+            label= "Batches"
+            />
 
-          <button className= "w-full rounded-x1 px-4 py-3 text-left text-slate-600 haver:bg-slate-50">
-            Teachers
-          </button>
+            <NavItem
+            icon= {<BookOpen size={19} />}
+            label= "Courses"
+            />
 
-          <button className= "w-full rounded-x1 px-4 py-3 text-left text-slate-600 haver:bg-slate-50">
-            Courses
-          </button>
+            <NavItem
+            icon= {<CalendarDays size={19} />}
+            label= "Schedule"
+            />
 
-          <button className= "w-full rounded-x1 px-4 py-3 text-left text-slate-600 haver:bg-slate-50">
-            Batches
-          </button>
+            <NavItem
+            icon= {<ClipboardCheck size={19} />}
+            label= "Attendence"
+            />
 
-          <button className= "w-full rounded-x1 px-4 py-3 text-left text-slate-600 haver:bg-slate-50">
-            Attendance
-          </button>
+            <NavItem
+            icon= {<IndianRupee size={19} />}
+            label= "Fees"
+            />
 
-          <button className= "w-full rounded-x1 px-4 py-3 text-left text-slate-600 haver:bg-slate-50">
-            Fees
-          </button>
-
-          <button className= "w-full rounded-x1 px-4 py-3 text-left text-slate-600 haver:bg-slate-50">
-            Inquiries
-          </button>
+            <NavItem
+            icon= {<UserPlus size={19} />}
+            label= "Inquiries"
+            />
 
         </div>
-
       </nav>
 
+      {/* Bottom */}
+      <div className= "border-t border-slate-100 pt-5">
+        <p className= "px-3 text-xs text-slate-400">
+          Coaching OS v1.0
+        </p>
+      </div>
     </aside>
-  )
+  );
+}
+
+function NavItem({
+  icon,
+  label,
+  active = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+}) {
+  return(
+    <button
+      className= {`flex w-full items-center gap-3 rounded-x1 px-3 py-2.5 text-left text-sm font-medium transition ${
+        active
+          ? "bg-blue-50 text-blue-600"
+          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+      }`}
+      >
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
 }
