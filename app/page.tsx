@@ -1,4 +1,6 @@
 import Slidebar from "./components/Slidebar";
+import StudentGrowthChart from "./components/StudentGrowthCharts";
+
 import{  Bell,
   Search,
   Users,
@@ -165,6 +167,11 @@ export default function Home(){
               </h2>
             </div>
 
+          </div>
+
+          {/* Student Growth Chart */}
+          <div className="mt-6">
+            <StudentGrowthChart />
           </div>
 
             {/* Welcome Card */}
