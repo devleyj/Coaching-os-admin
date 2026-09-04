@@ -1,5 +1,6 @@
 import Slidebar from "./components/Slidebar";
 import StudentGrowthChart from "./components/StudentGrowthCharts";
+import RevenueChart from "./components/RevenueChart";
 
 import{  Bell,
   Search,
@@ -169,9 +170,10 @@ export default function Home(){
 
           </div>
 
-          {/* Student Growth Chart */}
-          <div className="mt-6">
+          {/* Analytics Growth Chart */}
+          <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
             <StudentGrowthChart />
+            <RevenueChart />
           </div>
 
             {/* Welcome Card */}
