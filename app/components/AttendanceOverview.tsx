@@ -29,7 +29,7 @@ export default function AttendanceOverview() {
         </div>
       </div>
 
-      <div className="mt-8 flex item-center gap-8">
+      <div className="mt-6 flex item-center gap-8">
         <div>
           <p className="text-4xl font-bold text-slate-900">
             {attendanceData.percentage}%
@@ -65,7 +65,7 @@ export default function AttendanceOverview() {
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <div className="h-3 overflow-hidden rounded-full bg-slate-100">
           <div
            className="h-full rounded-full bg-green-500"

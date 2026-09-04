@@ -179,7 +179,7 @@ export default function Home(){
           </div>
 
           {/* Attendance + Today's Classes */}
-          <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 items-start gap-6 xl:grid-cols-2">
             <AttendanceOverview />
             <TodaysClasses />
           </div>
