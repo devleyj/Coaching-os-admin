@@ -2,6 +2,7 @@ import Slidebar from "./components/Slidebar";
 import StudentGrowthChart from "./components/StudentGrowthCharts";
 import RevenueChart from "./components/RevenueChart";
 import AttendanceOverview from "./components/AttendanceOverview";
+import TodaysClasses from "./components/TodaysClasses";
 
 import{  Bell,
   Search,
@@ -177,9 +178,10 @@ export default function Home(){
             <RevenueChart />
           </div>
 
-          {/* Attendance Overview*/}
-          <div className="mt-6">
+          {/* Attendance + Today's Classes */}
+          <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
             <AttendanceOverview />
+            <TodaysClasses />
           </div>
 
         </section>

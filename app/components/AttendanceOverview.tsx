@@ -2,7 +2,6 @@
 
 import { CheckCircle2,
   XCircle,
-  Clock,
  } from "lucide-react";
 
 const attendanceData = {
