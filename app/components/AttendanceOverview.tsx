@@ -12,7 +12,7 @@ const attendanceData = {
 
 export default function AttendanceOverview() {
   return(
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="self-start rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex item-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">

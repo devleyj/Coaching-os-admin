@@ -36,7 +36,7 @@ const classes = [
 export default function TodaysClasses() {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-6">
+      <div className="mb-4">
         <h2 className="text-lg font-semibold text-slate-900">
           Todays Classes
         </h2>
@@ -46,11 +46,11 @@ export default function TodaysClasses() {
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {classes.map((item) => (
           <div
             key={`${item.time}-${item.subject}`}
-            className="rounded-xl border border-slate-100 p-4 transition hover:bg-slate-50"
+            className="rounded-xl border border-slate-100 p-3 transition hover:bg-slate-50"
           >
             <div className="flex items-start justify-between gap-4">
               
@@ -70,7 +70,7 @@ export default function TodaysClasses() {
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
+            <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
               <span className="flex items-center gap-1.5">
                 <User size={14} />
                 {item.teacher}
