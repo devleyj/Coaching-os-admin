@@ -16,9 +16,12 @@ import {
   Layers,
   IndianRupee,
   ArrowUpRight,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const stats = [
   {
@@ -58,6 +61,42 @@ const stats = [
 export default function Home() {
   const [notificationsOpen, setNotificationOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(3);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(target)
+      ) {
+        setNotificationOpen(false);
+      }
+
+      if (profileRef.current && !profileRef.current.contains(target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setNotificationOpen(false);
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
@@ -79,9 +118,12 @@ export default function Home() {
 
           <div className="ml-auto flex items-center gap-4">
             {/* Notifications */}
-            <div className="relative">
+            <div ref={notificationRef} className="relative">
               <button
-                onClick={() => setNotificationOpen(!notificationsOpen)}
+                onClick={() => {
+                  setNotificationOpen(!notificationsOpen);
+                  setProfileOpen(false);
+                }}
                 className="relative rounded-xl p-2.5 text-slate-500 hover:bg-slate-100"
                 aria-label="Open notifications"
               >
@@ -92,7 +134,6 @@ export default function Home() {
                     {unreadNotifications}
                   </span>
                 )}
-
               </button>
 
               {notificationsOpen && (
@@ -103,6 +144,7 @@ export default function Home() {
                       <h3 className="text-sm font-semibold text-slate-900">
                         Notifications
                       </h3>
+
                       <p className="mt-1 text-xs text-slate-500">
                         {unreadNotifications === 0
                           ? "You're all caught up"
@@ -166,18 +208,67 @@ export default function Home() {
                 </div>
               )}
             </div>
+
+            {/*Admin Menue*/}
             <div className="hidden h-8 w-px bg-slate-200 sm:block" />
 
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                A
-              </div>
+            <div ref={profileRef} className="relative">
+              <button
+                onClick={() => {
+                  setProfileOpen(!profileOpen);
+                  setNotificationOpen(false)
+                }}
+                className="flex items-center gap-3 rounded-xl p-1.5 text-left hover:bg-slate-50"
+                aria-label="Open admin profile menu"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                  A
+                </div>
 
-              <div className="hidden sm:block">
-                <p className="text-sm font-semibold text-slate-900">Admin</p>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-semibold text-slate-900">Admin</p>
+                  <p className="text-xs text-slate-500">Super Admin</p>
+                </div>
+              </button>
 
-                <p className="text-xs text-slate-500">Super Admin</p>
-              </div>
+              {profileOpen && (
+                <div className="absolute right-0 top-14 z-50 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                  <div className="border-b border-slate-100 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Admin
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Super Admin
+                    </p>
+                  </div>
+
+                  <div className="p-2">
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50"
+                    >
+                      <User size={17} />
+                      <span>Profile</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50"
+                    >
+                      <Settings size={17} />
+                      <span>Account Settings</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-500 hover:bg-red-50"
+                    >
+                      <LogOut size={17} />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
