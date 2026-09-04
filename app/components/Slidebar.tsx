@@ -1,4 +1,5 @@
 "use client";
+import { usePathname } from "next/navigation";
 
 import {
   LayoutDashboard,
@@ -21,27 +22,29 @@ import {
 } from "lucide-react";
 
 const menuItems = [
-  { label: "Dashboard", icon: LayoutDashboard, active: true },
-  { label: "Students", icon: Users },
-  { label: "Teachers", icon: GraduationCap },
-  { label: "Staff", icon: BriefcaseBusiness },
-  { label: "Courses", icon: BookOpen },
-  { label: "Batches", icon: Layers },
-  { label: "Schedule", icon: CalendarDays },
-  { label: "Attendance", icon: ClipboardCheck },
-  { label: "Fees", icon: IndianRupee },
-  { label: "Inquiries", icon: UserRoundSearch },
-  { label: "Online Classes", icon: Video },
-  { label: "Exams", icon: FileText },
-  { label: "Notifications", icon: Bell },
-  { label: "Reports", icon: BarChart3 },
-  { label: "Settings", icon: Settings },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/" },
+  { label: "Students", icon: Users, href: "/students" },
+  { label: "Teachers", icon: GraduationCap, href: "/teachers" },
+  { label: "Staff", icon: BriefcaseBusiness, href: "/staff" },
+  { label: "Courses", icon: BookOpen, href: "/courses" },
+  { label: "Batches", icon: Layers, href: "/batches" },
+  { label: "Schedule", icon: CalendarDays, href: "/schedule" },
+  { label: "Attendance", icon: ClipboardCheck, href: "/attendance" },
+  { label: "Fees", icon: IndianRupee, href: "/fees" },
+  { label: "Inquiries", icon: UserRoundSearch, href: "/inquiries" },
+  { label: "Online Classes", icon: Video, href: "/online-classes" },
+  { label: "Exams", icon: FileText, href: "/exams" },
+  { label: "Notifications", icon: Bell, href: "/notifications" },
+  { label: "Reports", icon: BarChart3, href: "/reports" },
+  { label: "Settings", icon: Settings, href: "/settings" },
 ];
 
 export default function Slidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:flex lg:min-h-screen lg:flex-col">
-      
+
       {/* Logo */}
       <div className="flex h-20 items-center border-b border-slate-100 px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
@@ -68,53 +71,51 @@ export default function Slidebar() {
         <div className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
+            const isActive = pathname === item.href;
 
             return (
-              <button
+              <a
                 key={item.label}
-                className={`flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  item.active
+                href={item.href}
+                className={`flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition ${isActive
                     ? "bg-blue-50 text-blue-600"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                  }`}
               >
                 <Icon size={18} />
-
-                <span className="ml-3">
-                  {item.label}
-                </span>
-              </button>
+                <span className="ml-3">{item.label}</span>
+              </a>
             );
           })}
         </div>
       </nav>
 
       {/* Bottom */}
-<div className="border-t border-slate-100 p-3">
-  
-  {/* Version */}
-  <div className="mb-3 rounded-xl bg-slate-50 px-3 py-2">
-    <div className="flex items-center justify-between">
-      <span className="text-xs font-medium text-slate-500">
-        Coaching OS
-      </span>
+      <div className="border-t border-slate-100 p-3">
 
-      <span className="rounded-md bg-white px-2 py-1 text-[10px] font-semibold text-slate-500 shadow-sm">
-        v0.1.0
-      </span>
-    </div>
-  </div>
+        {/* Version */}
+        <div className="mb-3 rounded-xl bg-slate-50 px-3 py-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500">
+              Coaching OS
+            </span>
 
-  <button className="flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-    <HelpCircle size={18} />
-    <span className="ml-3">Support</span>
-  </button>
+            <span className="rounded-md bg-white px-2 py-1 text-[10px] font-semibold text-slate-500 shadow-sm">
+              v0.1.0
+            </span>
+          </div>
+        </div>
 
-  <button className="mt-1 flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50">
-    <LogOut size={18} />
-    <span className="ml-3">Logout</span>
-  </button>
-</div>
+        <button className="flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+          <HelpCircle size={18} />
+          <span className="ml-3">Support</span>
+        </button>
+
+        <button className="mt-1 flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50">
+          <LogOut size={18} />
+          <span className="ml-3">Logout</span>
+        </button>
+      </div>
     </aside>
   );
 }
