@@ -1,6 +1,7 @@
 import Slidebar from "./components/Slidebar";
 import StudentGrowthChart from "./components/StudentGrowthCharts";
 import RevenueChart from "./components/RevenueChart";
+import AttendanceOverview from "./components/AttendanceOverview";
 
 import{  Bell,
   Search,
@@ -176,16 +177,10 @@ export default function Home(){
             <RevenueChart />
           </div>
 
-            {/* Welcome Card */}
-            <div className= "mt-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-              <h2 className= "text-xl font-semibold text-slate-900">
-                Welcome to Coaching OS
-              </h2>
-
-              <p className= "mt-2 text-sm text-slate-500">
-                Your coaching institute mangement dashboard starts here.
-              </p>
-            </div>
+          {/* Attendance Overview*/}
+          <div className="mt-6">
+            <AttendanceOverview />
+          </div>
 
         </section>
 
