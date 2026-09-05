@@ -560,15 +560,38 @@ export default function StudentsPage() {
                         {student.fees}
                       </p>
                     </div>
+
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Enrollment
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        Active Student
+                      </p>
+                    </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setViewingStudentId(null)}
-                    className="mt-6 w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
-                  >
-                    Close
-                  </button>
+                  <div className="mt-6 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setViewingStudentId(null);
+                        editStudent(student.id);
+                      }}
+                      className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                    >
+                      Edit Student
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setViewingStudentId(null)}
+                      className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                    >
+                      Close
+                    </button>
+                  </div>
+
                 </div>
               </div>
             );
