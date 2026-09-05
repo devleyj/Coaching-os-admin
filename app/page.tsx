@@ -101,7 +101,7 @@ export default function Home() {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
 
-      <main className="min-w-0 flex-1">
+      <main className="ml-64 min-h-screen p-1">
         {/* Header */}
         <header className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur lg:px-8">
           <div className="hidden w-full max-w-md md:block">
