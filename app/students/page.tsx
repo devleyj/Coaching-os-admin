@@ -10,7 +10,9 @@ const initialStudents = [
     batch: "JEE Advanced",
     phone: "98XXXXXX21",
     email: "aarav@example.com",
-    fees: "₹45,000",
+    totalFees: 45000,
+    paidFees: 30000,
+    pendingFees: 15000,
     status: "Active",
   },
   {
@@ -20,7 +22,9 @@ const initialStudents = [
     batch: "NEET 2027",
     phone: "97XXXXXX45",
     email: "riya@example.com",
-    fees: "₹52,000",
+    totalFees: 52000,
+    paidFees: 40000,
+    pendingFees: 12000,
     status: "Active",
   },
   {
@@ -30,7 +34,9 @@ const initialStudents = [
     batch: "JEE Main",
     phone: "96XXXXXX78",
     email: "kabir@example.com",
-    fees: "₹38,000",
+    totalFees: 38000,
+    paidFees: 25000,
+    pendingFees: 13000,
     status: "Active",
   },
   {
@@ -40,7 +46,9 @@ const initialStudents = [
     batch: "NEET 2027",
     phone: "95XXXXXX12",
     email: "ananya@example.com",
-    fees: "₹10,000",
+    totalFees: 10000,
+    paidFees: 5000,
+    pendingFees: 5000,
     status: "Pending",
   },
 ];
@@ -62,6 +70,22 @@ export default function StudentsPage() {
   const [batchFilter, setBatchFilter] = useState("");
   const [courseFilter, setCourseFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  const getFeeProgress = (student: (typeof studentList)[number]) => {
+    if (student.totalFees <= 0) {
+      return 0;
+    }
+
+    return Math.min(
+      Math.round((student.paidFees / student.totalFees) * 100),
+      100,
+    );
+  };
+
+  const studentsPerPage = 10;
 
   const filteredStudents = studentList.filter((student) => {
     const search = searchTerm.toLowerCase();
@@ -79,6 +103,41 @@ export default function StudentsPage() {
 
     return matchesSearch && matchesBatch && matchesCourse && matchesStatus;
   });
+
+  const sortedStudents = [...filteredStudents].sort((a, b) => {
+    let comparison = 0;
+
+    if (sortBy === "name") {
+      comparison = a.name.localeCompare(b.name);
+    }
+
+    if (sortBy === "totalFees") {
+      comparison = a.totalFees - b.totalFees;
+    }
+
+    if (sortBy === "pendingFees") {
+      comparison = a.pendingFees - b.pendingFees;
+    }
+
+    if (sortBy === "feeProgress") {
+      comparison = getFeeProgress(a) - getFeeProgress(b);
+    }
+
+    if (sortBy === "status") {
+      comparison = a.status.localeCompare(b.status);
+    }
+
+    return sortOrder === "asc" ? comparison : -comparison;
+  });
+
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+
+  const startIndex = (currentPage - 1) * studentsPerPage;
+
+  const paginatedStudents = sortedStudents.slice(
+    startIndex,
+    startIndex + studentsPerPage,
+  );
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -112,7 +171,7 @@ export default function StudentsPage() {
 
   const editStudent = (studentId: string) => {
     const student = studentList.find(
-      (currentStudent) => currentStudent.id === studentId
+      (currentStudent) => currentStudent.id === studentId,
     );
 
     if (!student) {
@@ -125,7 +184,7 @@ export default function StudentsPage() {
     setStudentEmail(student.email ?? "");
     setStudentCourse(student.course);
     setStudentBatch(student.batch);
-    setStudentFees(student.fees.replace("₹", ""));
+    setStudentFees(String(student.totalFees));
     setFormError("");
     setOpenActionMenu(null);
     setShowAddStudent(true);
@@ -281,6 +340,34 @@ export default function StudentsPage() {
                 <option>Inactive</option>
                 <option>Pending</option>
               </select>
+
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="name">Sort: Name</option>
+                <option value="totalFees">Sort: Total Fees</option>
+                <option value="pendingFees">Sort: Pending Fees</option>
+                <option value="feeProgress">Sort: Fee Progress</option>
+                <option value="status">Sort: Status</option>
+              </select>
+
+              <select
+                value={sortOrder}
+                onChange={(e) => {
+                  setSortOrder(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+
             </div>
 
             <div className="col-span-4 flex justify-end pt-3">
@@ -338,7 +425,7 @@ export default function StudentsPage() {
                   </th>
 
                   <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Fees
+                    Total Fees
                   </th>
 
                   <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -352,7 +439,7 @@ export default function StudentsPage() {
               </thead>
 
               <tbody>
-                {filteredStudents.map((student) => (
+                {paginatedStudents.map((student) => (
                   <tr
                     key={student.id}
                     className="border-b border-slate-100 last:border-0 transition-colors hover:bg-blue-50/40"
@@ -391,16 +478,47 @@ export default function StudentsPage() {
                       {student.phone}
                     </td>
 
-                    <td className="px-5 py-4 text-sm font-semibold text-slate-900">
-                      {student.fees}
+                    <td className="px-5 py-4">
+                      <div className="min-w-36">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-semibold text-slate-900">
+                            ₹{student.totalFees.toLocaleString("en-IN")}
+                          </p>
+
+                          <p className="text-xs font-semibold text-slate-500">
+                            {getFeeProgress(student)}%
+                          </p>
+                        </div>
+
+                        <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className="h-full rounded-full bg-blue-500 transition-all"
+                            style={{
+                              width: `${getFeeProgress(student)}%`,
+                            }}
+                          />
+                        </div>
+
+                        <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+                          <span className="text-green-600">
+                            Paid ₹{student.paidFees.toLocaleString("en-IN")}
+                          </span>
+
+                          <span className="text-orange-600">
+                            Pending ₹
+                            {student.pendingFees.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                      </div>
                     </td>
 
                     <td className="px-5 py-4">
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${student.status === "Active"
-                          ? "bg-green-50 text-green-600"
-                          : "bg-orange-50 text-orange-600"
-                          }`}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          student.status === "Active"
+                            ? "bg-green-50 text-green-600"
+                            : "bg-orange-50 text-orange-600"
+                        }`}
                       >
                         {student.status}
                       </span>
@@ -433,7 +551,6 @@ export default function StudentsPage() {
 
                         {openActionMenu === student.id && (
                           <div className="absolute right-0 top-11 z-20 w-32 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
-
                             <button
                               type="button"
                               onClick={() => editStudent(student.id)}
@@ -457,13 +574,81 @@ export default function StudentsPage() {
                 ))}
               </tbody>
             </table>
+
+            <div className="flex items-center justify-between border-t border-slate-100 px-5 py-4">
+              <p className="text-sm text-slate-500">
+                Showing{" "}
+                <span className="font-semibold text-slate-900">
+                  {filteredStudents.length === 0 ? 0 : startIndex + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold text-slate-900">
+                  {Math.min(
+                    startIndex + studentsPerPage,
+                    filteredStudents.length,
+                  )}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-slate-900">
+                  {filteredStudents.length}
+                </span>{" "}
+                students
+              </p>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentPage((page) => Math.max(page - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Previous
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from(
+                    { length: Math.max(totalPages, 1) },
+                    (_, index) => {
+                      const page = index + 1;
+
+                      return (
+                        <button
+                          key={page}
+                          type="button"
+                          onClick={() => setCurrentPage(page)}
+                          className={`h-9 min-w-9 rounded-lg px-3 text-sm font-semibold transition ${
+                            currentPage === page
+                              ? "bg-blue-600 text-white"
+                              : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    },
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentPage((page) => Math.min(page + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         {viewingStudentId &&
           (() => {
             const student = studentList.find(
-              (currentStudent) => currentStudent.id === viewingStudentId
+              (currentStudent) => currentStudent.id === viewingStudentId,
             );
 
             if (!student) {
@@ -473,36 +658,33 @@ export default function StudentsPage() {
             return (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
                 <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+                  {/* Header */}
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-sm font-medium text-slate-500">
+                      <h2 className="text-xl font-bold text-slate-900">
                         Student Profile
-                      </p>
-
-                      <div className="mt-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-xl font-bold text-blue-600">
-                        {student.name.charAt(0)}
-                      </div>
-
-                      <h2 className="mt-1 text-xl font-bold text-slate-900">
-                        {student.name}
                       </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {student.name}
+                      </p>
                     </div>
 
                     <button
                       type="button"
                       onClick={() => setViewingStudentId(null)}
-                      className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100"
+                      className="rounded-lg px-3 py-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                     >
                       ✕
                     </button>
                   </div>
 
+                  {/* Student Details */}
                   <div className="mt-6 grid grid-cols-2 gap-4">
                     <div className="rounded-xl bg-slate-50 p-4">
                       <p className="text-xs font-medium text-slate-500">
                         Student ID
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                      <p className="mt-1 font-semibold text-slate-900">
                         {student.id}
                       </p>
                     </div>
@@ -511,7 +693,7 @@ export default function StudentsPage() {
                       <p className="text-xs font-medium text-slate-500">
                         Status
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                      <p className="mt-1 font-semibold text-green-600">
                         {student.status}
                       </p>
                     </div>
@@ -520,7 +702,7 @@ export default function StudentsPage() {
                       <p className="text-xs font-medium text-slate-500">
                         Course
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                      <p className="mt-1 font-semibold text-slate-900">
                         {student.course}
                       </p>
                     </div>
@@ -529,7 +711,7 @@ export default function StudentsPage() {
                       <p className="text-xs font-medium text-slate-500">
                         Batch
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                      <p className="mt-1 font-semibold text-slate-900">
                         {student.batch}
                       </p>
                     </div>
@@ -538,7 +720,7 @@ export default function StudentsPage() {
                       <p className="text-xs font-medium text-slate-500">
                         Phone
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                      <p className="mt-1 font-semibold text-slate-900">
                         {student.phone}
                       </p>
                     </div>
@@ -547,17 +729,36 @@ export default function StudentsPage() {
                       <p className="text-xs font-medium text-slate-500">
                         Email
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                      <p className="mt-1 break-words font-semibold text-slate-900">
                         {student.email || "Not provided"}
                       </p>
                     </div>
 
-                    <div className="rounded-xl bg-slate-50 p-4">
-                      <p className="text-xs font-medium text-slate-500">
-                        Fees
+                    {/* Fees */}
+                    <div className="rounded-xl bg-blue-50 p-4">
+                      <p className="text-xs font-medium text-blue-600">
+                        Total Fees
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
-                        {student.fees}
+                      <p className="mt-1 font-semibold text-slate-900">
+                        ₹{student.totalFees.toLocaleString("en-IN")}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-green-50 p-4">
+                      <p className="text-xs font-medium text-green-600">
+                        Paid Fees
+                      </p>
+                      <p className="mt-1 font-semibold text-slate-900">
+                        ₹{student.paidFees.toLocaleString("en-IN")}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-yellow-50 p-4">
+                      <p className="text-xs font-medium text-yellow-600">
+                        Pending Fees
+                      </p>
+                      <p className="mt-1 font-semibold text-slate-900">
+                        ₹{student.pendingFees.toLocaleString("en-IN")}
                       </p>
                     </div>
 
@@ -565,38 +766,37 @@ export default function StudentsPage() {
                       <p className="text-xs font-medium text-slate-500">
                         Enrollment
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                      <p className="mt-1 font-semibold text-slate-900">
                         Active Student
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-6 flex gap-3">
+                  {/* Actions */}
+                  <div className="mt-6 flex justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setViewingStudentId(null)}
+                      className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                      Close
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => {
                         setViewingStudentId(null);
                         editStudent(student.id);
                       }}
-                      className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                      className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
                     >
                       Edit Student
                     </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setViewingStudentId(null)}
-                      className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
-                    >
-                      Close
-                    </button>
                   </div>
-
                 </div>
               </div>
             );
           })()}
-
       </main>
 
       {showAddStudent && (
@@ -761,16 +961,19 @@ export default function StudentsPage() {
                       currentStudents.map((student) =>
                         student.id === editingStudentId
                           ? {
-                            ...student,
-                            name: studentName,
-                            phone: studentPhone,
-                            email: studentEmail,
-                            course: studentCourse,
-                            batch: studentBatch,
-                            fees: `₹${studentFees}`,
-                          }
-                          : student
-                      )
+                              ...student,
+                              name: studentName,
+                              phone: studentPhone,
+                              email: studentEmail,
+                              course: studentCourse,
+                              batch: studentBatch,
+                              totalFees: Number(studentFees),
+                              paidFees: student.paidFees,
+                              pendingFees:
+                                Number(studentFees) - student.paidFees,
+                            }
+                          : student,
+                      ),
                     );
 
                     resetForm();
@@ -786,7 +989,9 @@ export default function StudentsPage() {
                     batch: studentBatch,
                     phone: studentPhone,
                     email: studentEmail,
-                    fees: `₹${studentFees}`,
+                    totalFees: Number(studentFees),
+                    paidFees: 0,
+                    pendingFees: Number(studentFees),
                     status: "Active",
                   };
 
@@ -805,8 +1010,7 @@ export default function StudentsPage() {
             </div>
           </div>
         </div>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 }
