@@ -43,7 +43,7 @@ export default function Slidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:flex lg:min-h-screen lg:flex-col">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-slate-200 bg-white lg:flex lg:flex-col">
 
       {/* Logo */}
       <div className="flex h-20 items-center border-b border-slate-100 px-6">
