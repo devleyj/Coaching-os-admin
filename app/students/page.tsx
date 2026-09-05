@@ -44,6 +44,8 @@ const initialStudents = [
 export default function StudentsPage() {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  const [viewingStudentId, setViewingStudentId] = useState<string | null>(null);
   const [studentName, setStudentName] = useState("");
   const [studentPhone, setStudentPhone] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
@@ -102,6 +104,27 @@ export default function StudentsPage() {
     setBatchFilter("");
     setCourseFilter("");
     setStatusFilter("");
+  };
+
+  const editStudent = (studentId: string) => {
+    const student = studentList.find(
+      (currentStudent) => currentStudent.id === studentId
+    );
+
+    if (!student) {
+      return;
+    }
+
+    setEditingStudentId(student.id);
+    setStudentName(student.name);
+    setStudentPhone(student.phone);
+    setStudentEmail(student.email ?? "");
+    setStudentCourse(student.course);
+    setStudentBatch(student.batch);
+    setStudentFees(student.fees.replace("₹", ""));
+    setFormError("");
+    setOpenActionMenu(null);
+    setShowAddStudent(true);
   };
 
   const deleteStudent = (studentId: string) => {
@@ -370,11 +393,10 @@ export default function StudentsPage() {
 
                     <td className="px-5 py-4">
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          student.status === "Active"
-                            ? "bg-green-50 text-green-600"
-                            : "bg-orange-50 text-orange-600"
-                        }`}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${student.status === "Active"
+                          ? "bg-green-50 text-green-600"
+                          : "bg-orange-50 text-orange-600"
+                          }`}
                       >
                         {student.status}
                       </span>
@@ -384,6 +406,7 @@ export default function StudentsPage() {
                       <div className="relative flex items-center gap-2">
                         <button
                           type="button"
+                          onClick={() => setViewingStudentId(student.id)}
                           className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:border-blue-200 hover:bg-blue-50"
                         >
                           View
@@ -415,6 +438,7 @@ export default function StudentsPage() {
 
                             <button
                               type="button"
+                              onClick={() => editStudent(student.id)}
                               className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                             >
                               Edit
@@ -437,6 +461,108 @@ export default function StudentsPage() {
             </table>
           </div>
         </div>
+
+        {viewingStudentId &&
+          (() => {
+            const student = studentList.find(
+              (currentStudent) => currentStudent.id === viewingStudentId
+            );
+
+            if (!student) {
+              return null;
+            }
+
+            return (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+                <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-500">
+                        Student Profile
+                      </p>
+
+                      <h2 className="mt-1 text-xl font-bold text-slate-900">
+                        {student.name}
+                      </h2>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setViewingStudentId(null)}
+                      className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-2 gap-4">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Student ID
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        {student.id}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Status
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        {student.status}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Course
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        {student.course}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Batch
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        {student.batch}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Phone
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        {student.phone}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Fees
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        {student.fees}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setViewingStudentId(null)}
+                    className="mt-6 w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+
       </main>
 
       {showAddStudent && (
@@ -446,10 +572,10 @@ export default function StudentsPage() {
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">
-                  Add New Student
+                  {editingStudentId ? "Edit Student" : "Add New Student"}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Enter the student 's basic information.
+                  Enter the Student's basic information.
                 </p>
               </div>
 
@@ -596,6 +722,29 @@ export default function StudentsPage() {
                     return;
                   }
 
+                  if (editingStudentId) {
+                    setStudentList((currentStudents) =>
+                      currentStudents.map((student) =>
+                        student.id === editingStudentId
+                          ? {
+                            ...student,
+                            name: studentName,
+                            phone: studentPhone,
+                            email: studentEmail,
+                            course: studentCourse,
+                            batch: studentBatch,
+                            fees: `₹${studentFees}`,
+                          }
+                          : student
+                      )
+                    );
+
+                    resetForm();
+                    setEditingStudentId(null);
+                    setShowAddStudent(false);
+                    return;
+                  }
+
                   const newStudent = {
                     name: studentName,
                     course: studentCourse,
@@ -617,12 +766,13 @@ export default function StudentsPage() {
                 }}
                 className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
               >
-                Add Student
+                {editingStudentId ? "Update Student" : "Add Student"}
               </button>
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }
