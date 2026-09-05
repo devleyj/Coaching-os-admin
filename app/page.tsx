@@ -282,7 +282,7 @@ export default function Home() {
             </h1>
 
             <p className="mt-1 text-sm text-slate-500">
-              Heres whats happening at your institute today.
+              Here's what's happening at your institute today.
             </p>
           </div>
 
