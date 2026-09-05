@@ -44,7 +44,7 @@ export default function StudentsPage() {
     <div className="min-h-screen bg-slate-50">
       <Slidebar />
 
-      <main className="ml-64 p-8">
+      <main className="ml-64 min-h-screen p-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
