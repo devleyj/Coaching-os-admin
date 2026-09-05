@@ -9,6 +9,7 @@ const initialStudents = [
     id: "STU-1001",
     batch: "JEE Advanced",
     phone: "98XXXXXX21",
+    email: "aarav@example.com",
     fees: "₹45,000",
     status: "Active",
   },
@@ -18,6 +19,7 @@ const initialStudents = [
     id: "STU-1002",
     batch: "NEET 2027",
     phone: "97XXXXXX45",
+    email: "riya@example.com",
     fees: "₹52,000",
     status: "Active",
   },
@@ -27,6 +29,7 @@ const initialStudents = [
     id: "STU-1003",
     batch: "JEE Main",
     phone: "96XXXXXX78",
+    email: "kabir@example.com",
     fees: "₹38,000",
     status: "Active",
   },
@@ -36,6 +39,7 @@ const initialStudents = [
     id: "STU-1004",
     batch: "NEET 2027",
     phone: "95XXXXXX12",
+    email: "ananya@example.com",
     fees: "₹10,000",
     status: "Pending",
   },
@@ -429,12 +433,6 @@ export default function StudentsPage() {
 
                         {openActionMenu === student.id && (
                           <div className="absolute right-0 top-11 z-20 w-32 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
-                            <button
-                              type="button"
-                              className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-                            >
-                              View
-                            </button>
 
                             <button
                               type="button"
@@ -480,6 +478,10 @@ export default function StudentsPage() {
                       <p className="text-sm font-medium text-slate-500">
                         Student Profile
                       </p>
+
+                      <div className="mt-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-xl font-bold text-blue-600">
+                        {student.name.charAt(0)}
+                      </div>
 
                       <h2 className="mt-1 text-xl font-bold text-slate-900">
                         {student.name}
@@ -538,6 +540,15 @@ export default function StudentsPage() {
                       </p>
                       <p className="mt-1 text-sm font-semibold text-slate-900">
                         {student.phone}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-xs font-medium text-slate-500">
+                        Email
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-900">
+                        {student.email || "Not provided"}
                       </p>
                     </div>
 
