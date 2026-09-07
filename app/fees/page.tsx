@@ -182,14 +182,14 @@ export default function FeesPage() {
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-sm font-medium text-slate-500">Collected</p>
-              <p className="mt-2 text-2xl font-bold text-green-600">
+              <p className="mt-2 text-2xl font-bold text-green-500">
                 ₹{collectedFees.toLocaleString("en-IN")}
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-sm font-medium text-slate-500">Pending</p>
-              <p className="mt-2 text-2xl font-bold text-orange-600">
+              <p className="mt-2 text-2xl font-bold text-red-500">
                 ₹{pendingFees.toLocaleString("en-IN")}
               </p>
             </div>
@@ -198,7 +198,7 @@ export default function FeesPage() {
               <p className="text-sm font-medium text-slate-500">
                 Collection Rate
               </p>
-              <p className="mt-2 text-2xl font-bold text-blue-600">
+              <p className="mt-2 text-2xl font-bold text-slate-900">
                 {collectionRate}%
               </p>
             </div>
