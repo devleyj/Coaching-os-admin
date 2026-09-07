@@ -101,7 +101,7 @@ export default function Slidebar() {
             </span>
 
             <span className="rounded-md bg-white px-2 py-1 text-[10px] font-semibold text-slate-500 shadow-sm">
-              v0.1.2
+              v0.1.3
             </span>
           </div>
         </div>
