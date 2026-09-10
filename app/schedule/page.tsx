@@ -5,6 +5,115 @@ import Slidebar from "../components/Slidebar";
 
 export default function SchedulePage() {
   const [showAddSchedule, setShowAddSchedule] = useState(false);
+  const [schedules, setSchedules] = useState([
+    {
+      id: "SCH-1001",
+      batch: "JEE Advanced Morning",
+      course: "JEE Advanced",
+      teacher: "Rahul Mehta",
+      date: "2026-09-07",
+      startTime: "07:00 AM",
+      endTime: "10:00 AM",
+      room: "Room 101",
+      status: "Scheduled",
+    },
+    {
+      id: "SCH-1002",
+      batch: "NEET Evening",
+      course: "NEET",
+      teacher: "Priya Sharma",
+      date: "2026-09-07",
+      startTime: "05:00 PM",
+      endTime: "08:00 PM",
+      room: "Room 202",
+      status: "Scheduled",
+    },
+  ]);
+
+  const [newScheduleBatch, setNewScheduleBatch] = useState("");
+  const [newScheduleCourse, setNewScheduleCourse] = useState("");
+  const [newScheduleTeacher, setNewScheduleTeacher] = useState("");
+  const [newScheduleDate, setNewScheduleDate] = useState("");
+  const [newScheduleStartTime, setNewScheduleStartTime] = useState("");
+  const [newScheduleEndTime, setNewScheduleEndTime] = useState("");
+  const [newScheduleRoom, setNewScheduleRoom] = useState("");
+  const [newScheduleStatus, setNewScheduleStatus] = useState("Scheduled");
+
+  const handleSaveSchedule = () => {
+    if (!newScheduleBatch.trim()) {
+      alert("Batch is required.");
+      return;
+    }
+
+    if (!newScheduleCourse.trim()) {
+      alert("Course is required.");
+      return;
+    }
+
+    if (!newScheduleTeacher.trim()) {
+      alert("Teacher is required.");
+      return;
+    }
+
+    if (!newScheduleDate) {
+      alert("Date is required.");
+      return;
+    }
+
+    if (!newScheduleStartTime) {
+      alert("Start time is required.");
+      return;
+    }
+
+    if (!newScheduleEndTime) {
+      alert("End time is required.");
+      return;
+    }
+
+    if (newScheduleEndTime <= newScheduleStartTime) {
+      alert("End time must be later than start time.");
+      return;
+    }
+
+    if (!newScheduleRoom.trim()) {
+      alert("Room is required.");
+      return;
+    }
+
+    const formatTime = (time: string) => {
+      const [hours, minutes] = time.split(":");
+      const hour = Number(hours);
+      const suffix = hour >= 12 ? "PM" : "AM";
+      const formattedHour = hour % 12 || 12;
+
+      return `${String(formattedHour).padStart(2, "0")}:${minutes} ${suffix}`;
+    };
+
+    const newSchedule = {
+      id: `SCH-${1000 + schedules.length + 1}`,
+      batch: newScheduleBatch.trim(),
+      course: newScheduleCourse.trim(),
+      teacher: newScheduleTeacher.trim(),
+      date: newScheduleDate,
+      startTime: formatTime(newScheduleStartTime),
+      endTime: formatTime(newScheduleEndTime),
+      room: newScheduleRoom.trim(),
+      status: newScheduleStatus,
+    };
+
+    setSchedules((currentSchedules) => [...currentSchedules, newSchedule]);
+
+    setNewScheduleBatch("");
+    setNewScheduleCourse("");
+    setNewScheduleTeacher("");
+    setNewScheduleDate("");
+    setNewScheduleStartTime("");
+    setNewScheduleEndTime("");
+    setNewScheduleRoom("");
+    setNewScheduleStatus("Scheduled");
+
+    setShowAddSchedule(false);
+  };
   return (
     <div className="min-h-screen bg-slate-50">
       <Slidebar />
@@ -103,78 +212,229 @@ export default function SchedulePage() {
               </thead>
 
               <tbody>
-                <tr className="border-b border-slate-100">
-                  <td className="px-4 py-4 text-sm font-semibold text-slate-900">
-                    07:00 AM - 10:00 AM
-                  </td>
+                {schedules.map((schedule) => (
+                  <tr
+                    key={schedule.id}
+                    className="border-b border-slate-100 hover:bg-blue-50/40"
+                  >
+                    <td className="px-4 py-4 text-sm font-semibold text-slate-900">
+                      {schedule.startTime} - {schedule.endTime}
+                    </td>
 
-                  <td className="px-4 py-4 text-sm text-slate-700">
-                    JEE Advanced Morning
-                  </td>
+                    <td className="px-4 py-4 text-sm text-slate-700">
+                      {schedule.batch}
+                    </td>
 
-                  <td className="px-4 py-4 text-sm text-slate-700">
-                    JEE Advanced
-                  </td>
+                    <td className="px-4 py-4 text-sm text-slate-700">
+                      {schedule.course}
+                    </td>
 
-                  <td className="px-4 py-4 text-sm text-slate-700">
-                    Rahul Mehta
-                  </td>
+                    <td className="px-4 py-4 text-sm text-slate-700">
+                      {schedule.teacher}
+                    </td>
 
-                  <td className="px-4 py-4 text-sm text-slate-700">Room 101</td>
+                    <td className="px-4 py-4 text-sm text-slate-700">
+                      {schedule.room}
+                    </td>
 
-                  <td className="px-4 py-4">
-                    <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
-                      Scheduled
-                    </span>
-                  </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          schedule.status === "Scheduled"
+                            ? "bg-blue-100 text-blue-700"
+                            : schedule.status === "Completed"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {schedule.status}
+                      </span>
+                    </td>
 
-                  <td className="px-4 py-4">
-                    <button
-                      type="button"
-                      className="text-sm font-semibold text-blue-600 hover:text-blue-800"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-
-                <tr className="border-b border-slate-100">
-                  <td className="px-4 py-4 text-sm font-semibold text-slate-900">
-                    05:00 PM - 08:00 PM
-                  </td>
-
-                  <td className="px-4 py-4 text-sm text-slate-700">
-                    NEET Evening
-                  </td>
-
-                  <td className="px-4 py-4 text-sm text-slate-700">NEET</td>
-
-                  <td className="px-4 py-4 text-sm text-slate-700">
-                    Priya Sharma
-                  </td>
-
-                  <td className="px-4 py-4 text-sm text-slate-700">Room 202</td>
-
-                  <td className="px-4 py-4">
-                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                      Scheduled
-                    </span>
-                  </td>
-
-                  <td className="px-4 py-4">
-                    <button
-                      type="button"
-                      className="text-sm font-semibold text-blue-600 hover:text-blue-800"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
+                    <td className="px-4 py-4">
+                      <button
+                        type="button"
+                        className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
       </main>
+
+      {/* Add Schedule Modal */}
+      {showAddSchedule && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  Add New Schedule
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Create a new class schedule.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowAddSchedule(false)}
+                className="text-2xl leading-none text-slate-400 hover:text-slate-700"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {/* Batch */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Batch
+                </label>
+
+                <input
+                  type="text"
+                  value={newScheduleBatch}
+                  onChange={(e) => setNewScheduleBatch(e.target.value)}
+                  placeholder="Enter batch name"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500"
+                />
+              </div>
+
+              {/* Course */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Course
+                </label>
+
+                <input
+                  type="text"
+                  value={newScheduleCourse}
+                  onChange={(e) => setNewScheduleCourse(e.target.value)}
+                  placeholder="Enter course name"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500"
+                />
+              </div>
+
+              {/* Teacher */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Teacher
+                </label>
+
+                <input
+                  type="text"
+                  value={newScheduleTeacher}
+                  onChange={(e) => setNewScheduleTeacher(e.target.value)}
+                  placeholder="Enter teacher name"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500"
+                />
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Date
+                </label>
+
+                <input
+                  type="date"
+                  value={newScheduleDate}
+                  onChange={(e) => setNewScheduleDate(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Start Time */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Start Time
+                </label>
+
+                <input
+                  type="time"
+                  value={newScheduleStartTime}
+                  onChange={(e) => setNewScheduleStartTime(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* End Time */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  End Time
+                </label>
+
+                <input
+                  type="time"
+                  value={newScheduleEndTime}
+                  onChange={(e) => setNewScheduleEndTime(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Room */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Room
+                </label>
+
+                <input
+                  type="text"
+                  value={newScheduleRoom}
+                  onChange={(e) => setNewScheduleRoom(e.target.value)}
+                  placeholder="Enter room"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500"
+                />
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Status
+                </label>
+
+                <select
+                  value={newScheduleStatus}
+                  onChange={(e) => setNewScheduleStatus(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                >
+                  <option value="Scheduled">Scheduled</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowAddSchedule(false)}
+                className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveSchedule}
+                className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Save Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
