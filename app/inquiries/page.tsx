@@ -1,7 +1,13 @@
 "use client";
 
 import Slidebar from "../components/Slidebar";
-import { Search, Plus, UserRoundSearch } from "lucide-react";
+import {
+  Search,
+  Plus,
+  UserRoundSearch,
+  Phone,
+  MessageCircle,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 type Inquiry = {
@@ -138,87 +144,84 @@ export default function InquiriesPage() {
   );
 
   const handleAddInquiry = () => {
-  if (!inquiryName.trim()) {
-    setFormError("Full name is required.");
-    return;
-  }
+    if (!inquiryName.trim()) {
+      setFormError("Full name is required.");
+      return;
+    }
 
-  if (!inquiryPhone.trim()) {
-    setFormError("Phone number is required.");
-    return;
-  }
+    if (!inquiryPhone.trim()) {
+      setFormError("Phone number is required.");
+      return;
+    }
 
-  if (!inquiryCourse.trim()) {
-    setFormError("Interested course is required.");
-    return;
-  }
+    if (!inquiryCourse.trim()) {
+      setFormError("Interested course is required.");
+      return;
+    }
 
-  if (!inquiryFollowUpDate) {
-    setFormError("Follow-up date is required.");
-    return;
-  }
+    if (!inquiryFollowUpDate) {
+      setFormError("Follow-up date is required.");
+      return;
+    }
 
-  if (editingInquiryId) {
-    setInquiries((currentInquiries) =>
-      currentInquiries.map((inquiry) =>
-        inquiry.id === editingInquiryId
-          ? {
-              ...inquiry,
-              name: inquiryName.trim(),
-              phone: inquiryPhone.trim(),
-              email: inquiryEmail.trim(),
-              course: inquiryCourse.trim(),
-              source: inquirySource,
-              followUpDate: inquiryFollowUpDate,
-              assignedTo: inquiryAssignedTo,
-              notes: inquiryNotes.trim(),
-            }
-          : inquiry,
-      ),
-    );
-  } else {
-    const nextNumber =
-      inquiries.length > 0
-        ? Math.max(
-            ...inquiries.map((inquiry) =>
-              Number(inquiry.id.replace("INQ-", "")),
-            ),
-          ) + 1
-        : 1001;
+    if (editingInquiryId) {
+      setInquiries((currentInquiries) =>
+        currentInquiries.map((inquiry) =>
+          inquiry.id === editingInquiryId
+            ? {
+                ...inquiry,
+                name: inquiryName.trim(),
+                phone: inquiryPhone.trim(),
+                email: inquiryEmail.trim(),
+                course: inquiryCourse.trim(),
+                source: inquirySource,
+                followUpDate: inquiryFollowUpDate,
+                assignedTo: inquiryAssignedTo,
+                notes: inquiryNotes.trim(),
+              }
+            : inquiry,
+        ),
+      );
+    } else {
+      const nextNumber =
+        inquiries.length > 0
+          ? Math.max(
+              ...inquiries.map((inquiry) =>
+                Number(inquiry.id.replace("INQ-", "")),
+              ),
+            ) + 1
+          : 1001;
 
-    const newInquiry: Inquiry = {
-      id: `INQ-${nextNumber}`,
-      name: inquiryName.trim(),
-      phone: inquiryPhone.trim(),
-      email: inquiryEmail.trim(),
-      course: inquiryCourse.trim(),
-      source: inquirySource,
-      inquiryDate: new Date().toISOString().split("T")[0],
-      followUpDate: inquiryFollowUpDate,
-      status: "New",
-      assignedTo: inquiryAssignedTo,
-      notes: inquiryNotes.trim(),
-    };
+      const newInquiry: Inquiry = {
+        id: `INQ-${nextNumber}`,
+        name: inquiryName.trim(),
+        phone: inquiryPhone.trim(),
+        email: inquiryEmail.trim(),
+        course: inquiryCourse.trim(),
+        source: inquirySource,
+        inquiryDate: new Date().toISOString().split("T")[0],
+        followUpDate: inquiryFollowUpDate,
+        status: "New",
+        assignedTo: inquiryAssignedTo,
+        notes: inquiryNotes.trim(),
+      };
 
-    setInquiries((currentInquiries) => [
-      newInquiry,
-      ...currentInquiries,
-    ]);
-  }
+      setInquiries((currentInquiries) => [newInquiry, ...currentInquiries]);
+    }
 
-  setInquiryName("");
-  setInquiryPhone("");
-  setInquiryEmail("");
-  setInquiryCourse("");
-  setInquirySource("Website");
-  setInquiryFollowUpDate("");
-  setInquiryAssignedTo("Admin");
-  setInquiryNotes("");
-  setFormError("");
-  setEditingInquiryId(null);
-  setInquiryPage(1);
-  setShowAddInquiry(false);
-};
+    setInquiryName("");
+    setInquiryPhone("");
+    setInquiryEmail("");
+    setInquiryCourse("");
+    setInquirySource("Website");
+    setInquiryFollowUpDate("");
+    setInquiryAssignedTo("Admin");
+    setInquiryNotes("");
+    setFormError("");
+    setEditingInquiryId(null);
+    setInquiryPage(1);
+    setShowAddInquiry(false);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -422,6 +425,30 @@ export default function InquiriesPage() {
                         className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                       >
                         Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          window.location.href = `tel:${inquiry.phone}`;
+                        }}
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-emerald-600 transition hover:bg-emerald-50"
+                      >
+                        <Phone size={16} />
+                        Call
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const phoneNumber = inquiry.phone.replace(/\D/g, "");
+                          window.open(
+                            `https://wa.me/91${phoneNumber}`,
+                            "_blank",
+                          );
+                        }}
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-green-600 transition hover:bg-green-50"
+                      >
+                        <MessageCircle size={16} />
+                        WhatsApp
                       </button>
                     </td>
                   </tr>
