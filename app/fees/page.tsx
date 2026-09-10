@@ -20,6 +20,9 @@ export default function FeesPage() {
   const [studentSearch, setStudentSearch] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [paymentDate, setPaymentDate] = useState("");
+  const [feePage, setFeePage] = useState(1);
+  const [paymentPage, setPaymentPage] = useState(1);
+  const rowsPerPage = 10;
 
   const [feeRecords, setFeeRecords] = useState([
     {
@@ -78,6 +81,27 @@ export default function FeesPage() {
   const collectionRate =
     totalFees > 0 ? Math.round((collectedFees / totalFees) * 100) : 0;
 
+  const feeTotalPages = Math.max(1, Math.ceil(feeRecords.length / rowsPerPage));
+
+  const feeStartIndex = (feePage - 1) * rowsPerPage;
+
+  const paginatedFeeRecords = feeRecords.slice(
+    feeStartIndex,
+    feeStartIndex + rowsPerPage,
+  );
+
+  const paymentTotalPages = Math.max(
+    1,
+    Math.ceil(paymentHistory.length / rowsPerPage),
+  );
+
+  const paymentStartIndex = (paymentPage - 1) * rowsPerPage;
+
+  const paginatedPaymentHistory = paymentHistory.slice(
+    paymentStartIndex,
+    paymentStartIndex + rowsPerPage,
+  );
+
   const handleRecordPayment = () => {
     if (
       !selectedStudent ||
@@ -119,8 +143,6 @@ export default function FeesPage() {
           : record,
       ),
     );
-
-    
 
     if (student) {
       setPaymentHistory((currentHistory) => [
@@ -239,7 +261,7 @@ export default function FeesPage() {
                 </thead>
 
                 <tbody>
-                  {feeRecords.map((record) => {
+                  {paginatedFeeRecords.map((record) => {
                     const pending = record.total - record.paid;
                     const progress = Math.round(
                       (record.paid / record.total) * 100,
@@ -296,6 +318,54 @@ export default function FeesPage() {
               </table>
             </div>
 
+            <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
+              <p className="text-sm text-slate-500">
+                Showing {feeRecords.length === 0 ? 0 : feeStartIndex + 1} to{" "}
+                {Math.min(feeStartIndex + rowsPerPage, feeRecords.length)} of{" "}
+                {feeRecords.length} records
+              </p>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFeePage((page) => Math.max(page - 1, 1))}
+                  disabled={feePage === 1}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Previous
+                </button>
+
+                {Array.from(
+                  { length: feeTotalPages },
+                  (_, index) => index + 1,
+                ).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setFeePage(page)}
+                    className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+                      feePage === page
+                        ? "bg-blue-600 text-white"
+                        : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFeePage((page) => Math.min(page + 1, feeTotalPages))
+                  }
+                  disabled={feePage === feeTotalPages}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+
             <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-5">
                 <h2 className="text-lg font-bold text-slate-900">
@@ -332,7 +402,7 @@ export default function FeesPage() {
                   </thead>
 
                   <tbody>
-                    {paymentHistory.map((payment) => (
+                    {paginatedPaymentHistory.map((payment) => (
                       <tr
                         key={payment.id}
                         className="border-b border-slate-100 last:border-0"
@@ -379,6 +449,61 @@ export default function FeesPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4">
+                <p className="text-sm text-slate-500">
+                  Showing{" "}
+                  {paymentHistory.length === 0 ? 0 : paymentStartIndex + 1} to{" "}
+                  {Math.min(
+                    paymentStartIndex + rowsPerPage,
+                    paymentHistory.length,
+                  )}{" "}
+                  of {paymentHistory.length} payments
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPaymentPage((page) => Math.max(page - 1, 1))
+                    }
+                    disabled={paymentPage === 1}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+
+                  {Array.from(
+                    { length: paymentTotalPages },
+                    (_, index) => index + 1,
+                  ).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setPaymentPage(page)}
+                      className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+                        paymentPage === page
+                          ? "bg-blue-600 text-white"
+                          : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPaymentPage((page) =>
+                        Math.min(page + 1, paymentTotalPages),
+                      )
+                    }
+                    disabled={paymentPage === paymentTotalPages}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>
