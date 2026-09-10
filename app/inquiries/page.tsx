@@ -93,12 +93,13 @@ export default function InquiriesPage() {
   const [inquiryPage, setInquiryPage] = useState(1);
   const rowsPerPage = 10;
   useEffect(() => {
-  setInquiryPage(1);
-}, [searchQuery, statusFilter]);
-  
+    setInquiryPage(1);
+  }, [searchQuery, statusFilter]);
 
   const [showAddInquiry, setShowAddInquiry] = useState(false);
   const [formError, setFormError] = useState("");
+  const [viewingInquiryId, setViewingInquiryId] = useState<string | null>(null);
+  const [editingInquiryId, setEditingInquiryId] = useState<string | null>(null);
 
   const [inquiryName, setInquiryName] = useState("");
   const [inquiryPhone, setInquiryPhone] = useState("");
@@ -137,28 +138,47 @@ export default function InquiriesPage() {
   );
 
   const handleAddInquiry = () => {
-    if (!inquiryName.trim()) {
-      setFormError("Full name is required.");
-      return;
-    }
+  if (!inquiryName.trim()) {
+    setFormError("Full name is required.");
+    return;
+  }
 
-    if (!inquiryPhone.trim()) {
-      setFormError("Phone number is required.");
-      return;
-    }
+  if (!inquiryPhone.trim()) {
+    setFormError("Phone number is required.");
+    return;
+  }
 
-    if (!inquiryCourse.trim()) {
-      setFormError("Interested course is required.");
-      return;
-    }
+  if (!inquiryCourse.trim()) {
+    setFormError("Interested course is required.");
+    return;
+  }
 
-    if (!inquiryFollowUpDate) {
-      setFormError("Follow-up date is required.");
-      return;
-    }
+  if (!inquiryFollowUpDate) {
+    setFormError("Follow-up date is required.");
+    return;
+  }
 
+  if (editingInquiryId) {
+    setInquiries((currentInquiries) =>
+      currentInquiries.map((inquiry) =>
+        inquiry.id === editingInquiryId
+          ? {
+              ...inquiry,
+              name: inquiryName.trim(),
+              phone: inquiryPhone.trim(),
+              email: inquiryEmail.trim(),
+              course: inquiryCourse.trim(),
+              source: inquirySource,
+              followUpDate: inquiryFollowUpDate,
+              assignedTo: inquiryAssignedTo,
+              notes: inquiryNotes.trim(),
+            }
+          : inquiry,
+      ),
+    );
+  } else {
     const nextNumber =
-      initialInquiries.length > 0
+      inquiries.length > 0
         ? Math.max(
             ...inquiries.map((inquiry) =>
               Number(inquiry.id.replace("INQ-", "")),
@@ -180,20 +200,25 @@ export default function InquiriesPage() {
       notes: inquiryNotes.trim(),
     };
 
-    setInquiries((currentInquiries) => [newInquiry, ...currentInquiries]);
+    setInquiries((currentInquiries) => [
+      newInquiry,
+      ...currentInquiries,
+    ]);
+  }
 
-    setInquiryName("");
-    setInquiryPhone("");
-    setInquiryEmail("");
-    setInquiryCourse("");
-    setInquirySource("Website");
-    setInquiryFollowUpDate("");
-    setInquiryAssignedTo("Admin");
-    setInquiryNotes("");
-    setFormError("");
-    setInquiryPage(1);
-    setShowAddInquiry(false);
-  };
+  setInquiryName("");
+  setInquiryPhone("");
+  setInquiryEmail("");
+  setInquiryCourse("");
+  setInquirySource("Website");
+  setInquiryFollowUpDate("");
+  setInquiryAssignedTo("Admin");
+  setInquiryNotes("");
+  setFormError("");
+  setEditingInquiryId(null);
+  setInquiryPage(1);
+  setShowAddInquiry(false);
+};
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -312,6 +337,9 @@ export default function InquiriesPage() {
                   <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Status
                   </th>
+                  <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
@@ -365,13 +393,44 @@ export default function InquiriesPage() {
                         {inquiry.status}
                       </span>
                     </td>
+                    <td className="px-5 py-4">
+                      <button
+                        type="button"
+                        onClick={() => setViewingInquiryId(inquiry.id)}
+                        className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                      >
+                        View
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingInquiryId(inquiry.id);
+                          setViewingInquiryId(null);
+
+                          setInquiryName(inquiry.name);
+                          setInquiryPhone(inquiry.phone);
+                          setInquiryEmail(inquiry.email);
+                          setInquiryCourse(inquiry.course);
+                          setInquirySource(inquiry.source);
+                          setInquiryFollowUpDate(inquiry.followUpDate);
+                          setInquiryAssignedTo(inquiry.assignedTo);
+                          setInquiryNotes(inquiry.notes);
+                          setFormError("");
+                          setShowAddInquiry(true);
+                        }}
+                        className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Edit
+                      </button>
+                    </td>
                   </tr>
                 ))}
 
                 {filteredInquiries.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-6 py-12 text-center text-sm text-slate-500"
                     >
                       No inquiries found.
@@ -436,6 +495,172 @@ export default function InquiriesPage() {
           </div>
         </div>
       </main>
+      {/* View Inquiry Modal */}
+      {viewingInquiryId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
+            {(() => {
+              const inquiry = inquiries.find(
+                (item) => item.id === viewingInquiryId,
+              );
+
+              if (!inquiry) return null;
+
+              return (
+                <>
+                  {/* Modal Header */}
+                  <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900">
+                        Inquiry Details
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Complete information about this inquiry.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setViewingInquiryId(null)}
+                      className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="px-6 py-6">
+                    <div className="mb-6 flex items-center gap-4">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-700">
+                        {inquiry.name.charAt(0).toUpperCase()}
+                      </div>
+
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-900">
+                          {inquiry.name}
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {inquiry.id}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`ml-auto rounded-full px-3 py-1 text-xs font-semibold ${
+                          inquiry.status === "New"
+                            ? "bg-blue-50 text-blue-700"
+                            : inquiry.status === "Contacted"
+                              ? "bg-slate-100 text-slate-700"
+                              : inquiry.status === "Follow-up"
+                                ? "bg-amber-50 text-amber-700"
+                                : inquiry.status === "Converted"
+                                  ? "bg-emerald-50 text-emerald-700"
+                                  : "bg-red-50 text-red-700"
+                        }`}
+                      >
+                        {inquiry.status}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Phone
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {inquiry.phone}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Email
+                        </p>
+                        <p className="mt-1 break-all text-sm font-semibold text-slate-900">
+                          {inquiry.email || "Not provided"}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Interested Course
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {inquiry.course}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Lead Source
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {inquiry.source}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Inquiry Date
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {inquiry.inquiryDate}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Follow-up Date
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {inquiry.followUpDate}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Assigned Staff
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {inquiry.assignedTo}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Inquiry ID
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">
+                          {inquiry.id}
+                        </p>
+                      </div>
+
+                      <div className="col-span-2 rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Notes
+                        </p>
+                        <p className="mt-1 text-sm font-medium leading-6 text-slate-700">
+                          {inquiry.notes || "No notes added."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="flex justify-end border-t border-slate-200 px-6 py-4">
+                    <button
+                      type="button"
+                      onClick={() => setViewingInquiryId(null)}
+                      className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
       {/* Add Inquiry Modal */}
       {showAddInquiry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
@@ -444,7 +669,7 @@ export default function InquiriesPage() {
             <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">
-                  Add New Inquiry
+                  {editingInquiryId ? "Edit Inquiry" : "Add New Inquiry"}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Enter the lead's inquiry information.
@@ -621,7 +846,7 @@ export default function InquiriesPage() {
                 onClick={handleAddInquiry}
                 className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
               >
-                Add Inquiry
+                {editingInquiryId ? "Save Changes" : "Add Inquiry"}
               </button>
             </div>
           </div>
