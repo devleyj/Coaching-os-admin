@@ -63,15 +63,15 @@ export default function BatchesPage() {
   >(null);
 
   const [showEditBatch, setShowEditBatch] = useState(false);
-const [editBatchName, setEditBatchName] = useState("");
-const [editBatchCourse, setEditBatchCourse] = useState("");
-const [editBatchTeacher, setEditBatchTeacher] = useState("");
-const [editBatchStartTime, setEditBatchStartTime] = useState("");
-const [editBatchEndTime, setEditBatchEndTime] = useState("");
-const [editBatchDays, setEditBatchDays] = useState("");
-const [editBatchRoom, setEditBatchRoom] = useState("");
-const [editBatchStudents, setEditBatchStudents] = useState("");
-const [editBatchStatus, setEditBatchStatus] = useState("Active");
+  const [editBatchName, setEditBatchName] = useState("");
+  const [editBatchCourse, setEditBatchCourse] = useState("");
+  const [editBatchTeacher, setEditBatchTeacher] = useState("");
+  const [editBatchStartTime, setEditBatchStartTime] = useState("");
+  const [editBatchEndTime, setEditBatchEndTime] = useState("");
+  const [editBatchDays, setEditBatchDays] = useState("");
+  const [editBatchRoom, setEditBatchRoom] = useState("");
+  const [editBatchStudents, setEditBatchStudents] = useState("");
+  const [editBatchStatus, setEditBatchStatus] = useState("Active");
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -294,23 +294,57 @@ const [editBatchStatus, setEditBatchStatus] = useState("Active");
                           View
                         </button>
                         <button
+                          type="button"
+                          onClick={() => {
+                            setEditBatchName(batch.name);
+                            setEditBatchCourse(batch.course);
+                            setEditBatchTeacher(batch.teacher);
+                            setEditBatchStartTime(
+                              new Date(
+                                `1970-01-01 ${batch.startTime}`,
+                              ).toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              }),
+                            );
+
+                            setEditBatchEndTime(
+                              new Date(
+                                `1970-01-01 ${batch.endTime}`,
+                              ).toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              }),
+                            );
+                            setEditBatchDays(batch.days);
+                            setEditBatchRoom(batch.room);
+                            setEditBatchStudents(String(batch.students));
+                            setEditBatchStatus(batch.status);
+                            setSelectedBatch(batch);
+                            setShowEditBatch(true);
+                          }}
+                          className="ml-4 text-sm font-semibold text-slate-600 hover:text-slate-900"
+                        >
+                          Edit
+                        </button>
+                        <button
   type="button"
   onClick={() => {
-    setEditBatchName(batch.name);
-    setEditBatchCourse(batch.course);
-    setEditBatchTeacher(batch.teacher);
-    setEditBatchStartTime(batch.startTime);
-    setEditBatchEndTime(batch.endTime);
-    setEditBatchDays(batch.days);
-    setEditBatchRoom(batch.room);
-    setEditBatchStudents(String(batch.students));
-    setEditBatchStatus(batch.status);
-    setSelectedBatch(batch);
-    setShowEditBatch(true);
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${batch.name}"?`,
+    );
+
+    if (!confirmed) return;
+
+    setBatches((currentBatches) =>
+      currentBatches.filter((currentBatch) => currentBatch.id !== batch.id),
+    );
   }}
-  className="ml-4 text-sm font-semibold text-slate-600 hover:text-slate-900"
+  className="ml-4 text-sm font-semibold text-red-600 hover:text-red-800"
 >
-  Edit
+  Delete
 </button>
                       </td>
                     </tr>
@@ -663,6 +697,239 @@ const [editBatchStatus, setEditBatchStatus] = useState("Active");
                 className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditBatch && selectedBatch && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Edit Batch</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Update the batch information.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowEditBatch(false)}
+                className="text-2xl leading-none text-slate-400 hover:text-slate-700"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Batch Name
+                </label>
+                <input
+                  type="text"
+                  value={editBatchName}
+                  onChange={(e) => setEditBatchName(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Course
+                </label>
+                <input
+                  type="text"
+                  value={editBatchCourse}
+                  onChange={(e) => setEditBatchCourse(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Teacher
+                </label>
+                <input
+                  type="text"
+                  value={editBatchTeacher}
+                  onChange={(e) => setEditBatchTeacher(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Room
+                </label>
+                <input
+                  type="text"
+                  value={editBatchRoom}
+                  onChange={(e) => setEditBatchRoom(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Start Time
+                </label>
+                <input
+                  type="time"
+                  value={editBatchStartTime}
+                  onChange={(e) => setEditBatchStartTime(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  End Time
+                </label>
+                <input
+                  type="time"
+                  value={editBatchEndTime}
+                  onChange={(e) => setEditBatchEndTime(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Days
+                </label>
+                <input
+                  type="text"
+                  value={editBatchDays}
+                  onChange={(e) => setEditBatchDays(e.target.value)}
+                  placeholder="Mon, Wed, Fri"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Students
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={editBatchStudents}
+                  onChange={(e) => setEditBatchStudents(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Status
+                </label>
+                <select
+                  value={editBatchStatus}
+                  onChange={(e) => setEditBatchStatus(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowEditBatch(false)}
+                className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!editBatchName.trim()) {
+                    alert("Batch name is required.");
+                    return;
+                  }
+
+                  if (!editBatchCourse.trim()) {
+                    alert("Course is required.");
+                    return;
+                  }
+
+                  if (!editBatchTeacher.trim()) {
+                    alert("Teacher is required.");
+                    return;
+                  }
+
+                  if (!editBatchStartTime) {
+                    alert("Start time is required.");
+                    return;
+                  }
+
+                  if (!editBatchEndTime) {
+                    alert("End time is required.");
+                    return;
+                  }
+
+                  if (editBatchEndTime <= editBatchStartTime) {
+                    alert("End time must be later than start time.");
+                    return;
+                  }
+
+                  if (!editBatchDays.trim()) {
+                    alert("Days are required.");
+                    return;
+                  }
+
+                  if (!editBatchRoom.trim()) {
+                    alert("Room is required.");
+                    return;
+                  }
+
+                  const students = Number(editBatchStudents);
+
+                  if (students < 0 || Number.isNaN(students)) {
+                    alert("Students cannot be negative.");
+                    return;
+                  }
+
+                  const formatTime = (time: string) => {
+                    const [hours, minutes] = time.split(":");
+                    const hour = Number(hours);
+                    const suffix = hour >= 12 ? "PM" : "AM";
+                    const formattedHour = hour % 12 || 12;
+
+                    return `${String(formattedHour).padStart(2, "0")}:${minutes} ${suffix}`;
+                  };
+
+                  setBatches((currentBatches) =>
+                    currentBatches.map((batch) =>
+                      batch.id === selectedBatch.id
+                        ? {
+                            ...batch,
+                            name: editBatchName.trim(),
+                            course: editBatchCourse.trim(),
+                            teacher: editBatchTeacher.trim(),
+                            startTime: formatTime(editBatchStartTime),
+                            endTime: formatTime(editBatchEndTime),
+                            days: editBatchDays.trim(),
+                            room: editBatchRoom.trim(),
+                            students,
+                            status: editBatchStatus,
+                          }
+                        : batch,
+                    ),
+                  );
+
+                  setSelectedBatch(null);
+                  setShowEditBatch(false);
+                }}
+                className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Save Changes
               </button>
             </div>
           </div>
