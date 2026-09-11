@@ -19,6 +19,7 @@ type Inquiry = {
   source: string;
   inquiryDate: string;
   followUpDate: string;
+  lastFollowUpDate: string;
   status: "New" | "Contacted" | "Follow-up" | "Converted" | "Lost";
   assignedTo: string;
   notes: string;
@@ -44,6 +45,7 @@ const initialInquiries: Inquiry[] = [
     source: "Website",
     inquiryDate: "2026-09-01",
     followUpDate: "2026-09-04",
+    lastFollowUpDate: "",
     status: "New",
     assignedTo: "Admin",
     notes: "Interested in JEE Advanced batch.",
@@ -57,6 +59,7 @@ const initialInquiries: Inquiry[] = [
     source: "WhatsApp",
     inquiryDate: "2026-08-30",
     followUpDate: "2026-09-03",
+    lastFollowUpDate: "",
     status: "Follow-up",
     assignedTo: "Admin",
     notes: "Parent requested fee details.",
@@ -70,6 +73,7 @@ const initialInquiries: Inquiry[] = [
     source: "Walk-in",
     inquiryDate: "2026-08-28",
     followUpDate: "2026-09-05",
+    lastFollowUpDate: "",
     status: "Contacted",
     assignedTo: "Admin",
     notes: "Student visited the institute.",
@@ -83,6 +87,7 @@ const initialInquiries: Inquiry[] = [
     source: "Instagram",
     inquiryDate: "2026-08-26",
     followUpDate: "2026-09-02",
+    lastFollowUpDate: "",
     status: "Converted",
     assignedTo: "Admin",
     notes: "Successfully registered for NEET batch.",
@@ -96,6 +101,7 @@ const initialInquiries: Inquiry[] = [
     source: "Referral",
     inquiryDate: "2026-08-24",
     followUpDate: "2026-09-06",
+    lastFollowUpDate: "",
     status: "Lost",
     assignedTo: "Admin",
     notes: "Joined another institute.",
@@ -393,7 +399,7 @@ export default function InquiriesPage() {
                     Source
                   </th>
                   <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Follow-up
+                   Last Follow-up
                   </th>
                   <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Status
@@ -434,7 +440,7 @@ export default function InquiriesPage() {
                     </td>
 
                     <td className="px-5 py-4 text-sm text-slate-600">
-                      {inquiry.followUpDate}
+                      {inquiry.lastFollowUpDate || "—"}
                     </td>
 
                     <td className="px-5 py-4">
@@ -554,7 +560,7 @@ export default function InquiriesPage() {
                 {filteredInquiries.length === 0 && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className="px-6 py-12 text-center text-sm text-slate-500"
                     >
                       No inquiries found.
@@ -1158,6 +1164,9 @@ export default function InquiriesPage() {
                                     ? {
                                         ...inquiry,
                                         followUpDate: followUpNextDate,
+                                        lastFollowUpDate: new Date()
+                                          .toISOString()
+                                          .split("T")[0],
                                         status:
                                           followUpOutcome === "Converted"
                                             ? "Converted"
