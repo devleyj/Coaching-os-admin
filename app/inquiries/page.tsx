@@ -1152,6 +1152,23 @@ export default function InquiriesPage() {
                                 ...currentFollowUps,
                               ]);
 
+                              setInquiries((currentInquiries) =>
+                                currentInquiries.map((inquiry) =>
+                                  inquiry.id === followUpInquiryId
+                                    ? {
+                                        ...inquiry,
+                                        followUpDate: followUpNextDate,
+                                        status:
+                                          followUpOutcome === "Converted"
+                                            ? "Converted"
+                                            : inquiry.status === "New"
+                                              ? "Follow-up"
+                                              : inquiry.status,
+                                      }
+                                    : inquiry,
+                                ),
+                              );
+
                               setFollowUpNotes("");
                               setFollowUpOutcome("Interested");
                               setFollowUpNextDate("");
