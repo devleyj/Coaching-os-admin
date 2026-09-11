@@ -134,6 +134,20 @@ export default function InquiriesPage() {
     return matchesSearch && matchesStatus;
   });
 
+  const totalInquiries = inquiries.length;
+
+  const newInquiries = inquiries.filter(
+    (inquiry) => inquiry.status === "New",
+  ).length;
+
+  const followUpInquiries = inquiries.filter(
+    (inquiry) => inquiry.status === "Follow-up",
+  ).length;
+
+  const convertedInquiries = inquiries.filter(
+    (inquiry) => inquiry.status === "Converted",
+  ).length;
+
   const inquiryTotalPages = Math.max(
     1,
     Math.ceil(filteredInquiries.length / rowsPerPage),
@@ -261,22 +275,22 @@ export default function InquiriesPage() {
             <p className="text-sm font-medium text-slate-500">
               Total Inquiries
             </p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">156</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{totalInquiries}</p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-500">New Inquiries</p>
-            <p className="mt-2 text-2xl font-bold text-blue-600">32</p>
+            <p className="mt-2 text-2xl font-bold text-blue-600">{newInquiries}</p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-500">Follow-ups</p>
-            <p className="mt-2 text-2xl font-bold text-amber-500">18</p>
+            <p className="mt-2 text-2xl font-bold text-amber-500">{followUpInquiries}</p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-500">Converted</p>
-            <p className="mt-2 text-2xl font-bold text-emerald-600">74</p>
+            <p className="mt-2 text-2xl font-bold text-emerald-600">{convertedInquiries}</p>
           </div>
         </div>
 
