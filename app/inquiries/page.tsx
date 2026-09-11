@@ -605,7 +605,12 @@ export default function InquiriesPage() {
                         }}
                         className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
                       >
-                        Follow-up
+                        {getFollowUpStatus(inquiry.followUpDate) === "Overdue"
+                          ? "Follow-up · Overdue"
+                          : getFollowUpStatus(inquiry.followUpDate) ===
+                              "Due Today"
+                            ? "Follow-up · Today"
+                            : "Follow-up"}
                       </button>
                     </td>
                   </tr>
