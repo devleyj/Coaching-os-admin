@@ -106,6 +106,9 @@ export default function InquiriesPage() {
   const [formError, setFormError] = useState("");
   const [viewingInquiryId, setViewingInquiryId] = useState<string | null>(null);
   const [editingInquiryId, setEditingInquiryId] = useState<string | null>(null);
+  const [changingStatusInquiryId, setChangingStatusInquiryId] = useState<
+    string | null
+  >(null);
 
   const [inquiryName, setInquiryName] = useState("");
   const [inquiryPhone, setInquiryPhone] = useState("");
@@ -380,8 +383,28 @@ export default function InquiriesPage() {
                     </td>
 
                     <td className="px-5 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                      <select
+                        value={inquiry.status}
+                        onChange={(event) => {
+                          setChangingStatusInquiryId(inquiry.id);
+
+                          setInquiries((currentInquiries) =>
+                            currentInquiries.map((item) =>
+                              item.id === inquiry.id
+                                ? {
+                                    ...item,
+                                    status: event.target
+                                      .value as Inquiry["status"],
+                                  }
+                                : item,
+                            ),
+                          );
+
+                          setTimeout(() => {
+                            setChangingStatusInquiryId(null);
+                          }, 300);
+                        }}
+                        className={`rounded-full border-0 px-3 py-1.5 text-xs font-semibold outline-none ${
                           inquiry.status === "New"
                             ? "bg-blue-50 text-blue-700"
                             : inquiry.status === "Contacted"
@@ -393,8 +416,18 @@ export default function InquiriesPage() {
                                   : "bg-red-50 text-red-700"
                         }`}
                       >
-                        {inquiry.status}
-                      </span>
+                        <option value="New">New</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="Follow-up">Follow-up</option>
+                        <option value="Converted">Converted</option>
+                        <option value="Lost">Lost</option>
+                      </select>
+
+                      {changingStatusInquiryId === inquiry.id && (
+                        <span className="ml-2 text-xs font-medium text-emerald-600">
+                          Saved
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <button
