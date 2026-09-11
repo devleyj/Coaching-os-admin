@@ -123,11 +123,13 @@ export default function InquiriesPage() {
   ]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [followUpFilter, setFollowUpFilter] = useState("All");
   const [inquiryPage, setInquiryPage] = useState(1);
   const rowsPerPage = 10;
+
   useEffect(() => {
     setInquiryPage(1);
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter, followUpFilter]);
 
   const [showAddInquiry, setShowAddInquiry] = useState(false);
   const [formError, setFormError] = useState("");
@@ -166,7 +168,11 @@ export default function InquiriesPage() {
     const matchesStatus =
       statusFilter === "All" || inquiry.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const matchesFollowUp =
+      followUpFilter === "All" ||
+      getFollowUpStatus(inquiry.followUpDate) === followUpFilter;
+
+    return matchesSearch && matchesStatus && matchesFollowUp;
   });
 
   const totalInquiries = inquiries.length;
@@ -197,6 +203,24 @@ export default function InquiriesPage() {
 
   const getInquiryFollowUps = (inquiryId: string) => {
     return followUps.filter((followUp) => followUp.inquiryId === inquiryId);
+  };
+
+  const getFollowUpStatus = (followUpDate: string) => {
+    if (!followUpDate) {
+      return "No Follow-up";
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    if (followUpDate < today) {
+      return "Overdue";
+    }
+
+    if (followUpDate === today) {
+      return "Due Today";
+    }
+
+    return "Upcoming";
   };
 
   const handleAddInquiry = () => {
@@ -379,6 +403,16 @@ export default function InquiriesPage() {
               <option value="Converted">Converted</option>
               <option value="Lost">Lost</option>
             </select>
+            <select
+              value={followUpFilter}
+              onChange={(event) => setFollowUpFilter(event.target.value)}
+              className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="All">All Follow-ups</option>
+              <option value="Overdue">Overdue</option>
+              <option value="Due Today">Due Today</option>
+              <option value="Upcoming">Upcoming</option>
+            </select>
           </div>
 
           {/* Inquiry Table */}
@@ -399,7 +433,7 @@ export default function InquiriesPage() {
                     Source
                   </th>
                   <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                   Last Follow-up
+                    Last Follow-up
                   </th>
                   <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Status
@@ -439,8 +473,28 @@ export default function InquiriesPage() {
                       {inquiry.source}
                     </td>
 
-                    <td className="px-5 py-4 text-sm text-slate-600">
-                      {inquiry.lastFollowUpDate || "—"}
+                    <td className="px-5 py-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-semibold text-slate-700">
+                          {inquiry.followUpDate || "—"}
+                        </span>
+
+                        {inquiry.followUpDate && (
+                          <span
+                            className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${
+                              getFollowUpStatus(inquiry.followUpDate) ===
+                              "Overdue"
+                                ? "bg-red-50 text-red-700"
+                                : getFollowUpStatus(inquiry.followUpDate) ===
+                                    "Due Today"
+                                  ? "bg-amber-50 text-amber-700"
+                                  : "bg-blue-50 text-blue-700"
+                            }`}
+                          >
+                            {getFollowUpStatus(inquiry.followUpDate)}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     <td className="px-5 py-4">
