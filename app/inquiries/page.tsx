@@ -223,6 +223,18 @@ export default function InquiriesPage() {
     return "Upcoming";
   };
 
+  const overdueFollowUps = inquiries.filter(
+    (inquiry) => getFollowUpStatus(inquiry.followUpDate) === "Overdue",
+  ).length;
+
+  const dueTodayFollowUps = inquiries.filter(
+    (inquiry) => getFollowUpStatus(inquiry.followUpDate) === "Due Today",
+  ).length;
+
+  const upcomingFollowUps = inquiries.filter(
+    (inquiry) => getFollowUpStatus(inquiry.followUpDate) === "Upcoming",
+  ).length;
+
   const handleAddInquiry = () => {
     if (!inquiryName.trim()) {
       setFormError("Full name is required.");
@@ -361,6 +373,42 @@ export default function InquiriesPage() {
             <p className="text-sm font-medium text-slate-500">Converted</p>
             <p className="mt-2 text-2xl font-bold text-emerald-600">
               {convertedInquiries}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-red-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-slate-500">
+              Overdue Follow-ups
+            </p>
+            <p className="mt-2 text-2xl font-bold text-red-600">
+              {overdueFollowUps}
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              Follow-ups that need attention
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-slate-500">Due Today</p>
+            <p className="mt-2 text-2xl font-bold text-amber-600">
+              {dueTodayFollowUps}
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              Follow-ups scheduled for today
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-slate-500">
+              Upcoming Follow-ups
+            </p>
+            <p className="mt-2 text-2xl font-bold text-blue-600">
+              {upcomingFollowUps}
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              Future scheduled follow-ups
             </p>
           </div>
         </div>
