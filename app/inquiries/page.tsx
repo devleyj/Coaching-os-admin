@@ -24,6 +24,16 @@ type Inquiry = {
   notes: string;
 };
 
+type FollowUp = {
+  id: string;
+  inquiryId: string;
+  date: string;
+  notes: string;
+  outcome: string;
+  nextFollowUpDate: string;
+  assignedTo: string;
+};
+
 const initialInquiries: Inquiry[] = [
   {
     id: "INQ-1001",
@@ -94,6 +104,17 @@ const initialInquiries: Inquiry[] = [
 
 export default function InquiriesPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>(initialInquiries);
+  const [followUps, setFollowUps] = useState<FollowUp[]>([
+    {
+      id: "FU-1001",
+      inquiryId: "INQ-1002",
+      date: "2026-09-03",
+      notes: "Discussed NEET batch timings and fee structure.",
+      outcome: "Interested",
+      nextFollowUpDate: "2026-09-06",
+      assignedTo: "Admin",
+    },
+  ]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [inquiryPage, setInquiryPage] = useState(1);
@@ -109,6 +130,14 @@ export default function InquiriesPage() {
   const [changingStatusInquiryId, setChangingStatusInquiryId] = useState<
     string | null
   >(null);
+  const [followUpInquiryId, setFollowUpInquiryId] = useState<string | null>(
+    null,
+  );
+  const [showFollowUpForm, setShowFollowUpForm] = useState(false);
+  const [followUpNotes, setFollowUpNotes] = useState("");
+  const [followUpOutcome, setFollowUpOutcome] = useState("Interested");
+  const [followUpNextDate, setFollowUpNextDate] = useState("");
+  const [followUpFormError, setFollowUpFormError] = useState("");
 
   const [inquiryName, setInquiryName] = useState("");
   const [inquiryPhone, setInquiryPhone] = useState("");
@@ -159,6 +188,10 @@ export default function InquiriesPage() {
     inquiryStartIndex,
     inquiryStartIndex + rowsPerPage,
   );
+
+  const getInquiryFollowUps = (inquiryId: string) => {
+    return followUps.filter((followUp) => followUp.inquiryId === inquiryId);
+  };
 
   const handleAddInquiry = () => {
     if (!inquiryName.trim()) {
@@ -275,22 +308,30 @@ export default function InquiriesPage() {
             <p className="text-sm font-medium text-slate-500">
               Total Inquiries
             </p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{totalInquiries}</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">
+              {totalInquiries}
+            </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-500">New Inquiries</p>
-            <p className="mt-2 text-2xl font-bold text-blue-600">{newInquiries}</p>
+            <p className="mt-2 text-2xl font-bold text-blue-600">
+              {newInquiries}
+            </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-500">Follow-ups</p>
-            <p className="mt-2 text-2xl font-bold text-amber-500">{followUpInquiries}</p>
+            <p className="mt-2 text-2xl font-bold text-amber-500">
+              {followUpInquiries}
+            </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-500">Converted</p>
-            <p className="mt-2 text-2xl font-bold text-emerald-600">{convertedInquiries}</p>
+            <p className="mt-2 text-2xl font-bold text-emerald-600">
+              {convertedInquiries}
+            </p>
           </div>
         </div>
 
@@ -496,6 +537,15 @@ export default function InquiriesPage() {
                       >
                         <MessageCircle size={16} />
                         WhatsApp
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFollowUpInquiryId(inquiry.id);
+                        }}
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                      >
+                        Follow-up
                       </button>
                     </td>
                   </tr>
@@ -923,6 +973,262 @@ export default function InquiriesPage() {
                 {editingInquiryId ? "Save Changes" : "Add Inquiry"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {followUpInquiryId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
+            {(() => {
+              const inquiry = inquiries.find(
+                (item) => item.id === followUpInquiryId,
+              );
+
+              if (!inquiry) return null;
+
+              const inquiryFollowUps = getInquiryFollowUps(inquiry.id);
+
+              return (
+                <>
+                  <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900">
+                        Follow-up History
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {inquiry.name} · {inquiry.id}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowFollowUpForm(true);
+                        }}
+                        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                      >
+                        + Add Follow-up
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setFollowUpInquiryId(null)}
+                        className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="max-h-[60vh] overflow-y-auto p-6">
+                    {showFollowUpForm && (
+                      <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50/50 p-5">
+                        <div className="mb-4">
+                          <h3 className="text-sm font-bold text-slate-900">
+                            Add Follow-up
+                          </h3>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Record the conversation and schedule the next
+                            follow-up.
+                          </p>
+                        </div>
+
+                        {followUpFormError && (
+                          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                            {followUpFormError}
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <div>
+                            <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                              Outcome
+                            </label>
+
+                            <select
+                              value={followUpOutcome}
+                              onChange={(event) =>
+                                setFollowUpOutcome(event.target.value)
+                              }
+                              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                            >
+                              <option value="Interested">Interested</option>
+                              <option value="Not Interested">
+                                Not Interested
+                              </option>
+                              <option value="Call Back">Call Back</option>
+                              <option value="Requested Details">
+                                Requested Details
+                              </option>
+                              <option value="Converted">Converted</option>
+                              <option value="No Response">No Response</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                              Next Follow-up Date
+                            </label>
+
+                            <input
+                              type="date"
+                              value={followUpNextDate}
+                              onChange={(event) =>
+                                setFollowUpNextDate(event.target.value)
+                              }
+                              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                            />
+                          </div>
+
+                          <div className="md:col-span-2">
+                            <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                              Notes
+                            </label>
+
+                            <textarea
+                              value={followUpNotes}
+                              onChange={(event) =>
+                                setFollowUpNotes(event.target.value)
+                              }
+                              rows={4}
+                              placeholder="What was discussed with the inquiry?"
+                              className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowFollowUpForm(false);
+                              setFollowUpFormError("");
+                            }}
+                            className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!followUpInquiryId) return;
+
+                              if (!followUpNotes.trim()) {
+                                setFollowUpFormError("Notes are required.");
+                                return;
+                              }
+
+                              if (!followUpNextDate) {
+                                setFollowUpFormError(
+                                  "Next follow-up date is required.",
+                                );
+                                return;
+                              }
+
+                              const nextNumber =
+                                followUps.length > 0
+                                  ? Math.max(
+                                      ...followUps.map((followUp) =>
+                                        Number(followUp.id.replace("FU-", "")),
+                                      ),
+                                    ) + 1
+                                  : 1001;
+
+                              const newFollowUp: FollowUp = {
+                                id: `FU-${nextNumber}`,
+                                inquiryId: followUpInquiryId,
+                                date: new Date().toISOString().split("T")[0],
+                                notes: followUpNotes.trim(),
+                                outcome: followUpOutcome,
+                                nextFollowUpDate: followUpNextDate,
+                                assignedTo: "Admin",
+                              };
+
+                              setFollowUps((currentFollowUps) => [
+                                newFollowUp,
+                                ...currentFollowUps,
+                              ]);
+
+                              setFollowUpNotes("");
+                              setFollowUpOutcome("Interested");
+                              setFollowUpNextDate("");
+                              setFollowUpFormError("");
+                              setShowFollowUpForm(false);
+                            }}
+                            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                          >
+                            Save Follow-up
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {inquiryFollowUps.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center">
+                        <p className="text-sm font-semibold text-slate-700">
+                          No follow-ups recorded yet.
+                        </p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          Follow-up activity will appear here.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {inquiryFollowUps.map((followUp) => (
+                          <div
+                            key={followUp.id}
+                            className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                          >
+                            <div className="flex items-center justify-between gap-4">
+                              <p className="text-sm font-bold text-slate-900">
+                                {followUp.date}
+                              </p>
+
+                              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                                {followUp.outcome}
+                              </span>
+                            </div>
+
+                            <p className="mt-3 text-sm leading-6 text-slate-600">
+                              {followUp.notes}
+                            </p>
+
+                            <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
+                              <span>
+                                Next follow-up:{" "}
+                                <span className="font-semibold text-slate-700">
+                                  {followUp.nextFollowUpDate}
+                                </span>
+                              </span>
+
+                              <span>
+                                Assigned to:{" "}
+                                <span className="font-semibold text-slate-700">
+                                  {followUp.assignedTo}
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end border-t border-slate-200 px-6 py-4">
+                    <button
+                      type="button"
+                      onClick={() => setFollowUpInquiryId(null)}
+                      className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}
