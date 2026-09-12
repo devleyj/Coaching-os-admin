@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
 import { batches as fallbackBatches } from "../data/batches";
+import { courses as sharedCourses } from "../data/courses";
 import { getCollection, setCollection, subscribeToStore } from "../data/store";
 import {
   AlertTriangle,
@@ -44,8 +45,11 @@ type ViewMode = "Day" | "Week" | "Month";
 type Schedule = {
   id: string;
   batch: string;
+  batchId?: string;
   course: string;
+  courseId?: string;
   teacher: string;
+  teacherId?: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -210,8 +214,11 @@ const weekDays = [
 
 const emptyForm = {
   batch: "",
+  batchId: "",
   course: "",
+  courseId: "",
   teacher: "",
+  teacherId: "",
   date: "",
   startTime: "",
   endTime: "",
@@ -271,20 +278,76 @@ function getStatusClass(status: ScheduleStatus) {
   }
 }
 
+type SharedBatch = (typeof fallbackBatches)[number] & {
+  courseId?: string;
+  teacherId?: string;
+};
+
+type SharedTeacher = {
+  id: string;
+  name: string;
+};
+
+function resolveCourseId(courseName: string) {
+  return (
+    sharedCourses.find(
+      (course) => course.name.trim().toLowerCase() === courseName.trim().toLowerCase(),
+    )?.id ?? ""
+  );
+}
+
+function resolveTeacherId(teacherName: string, teachers: SharedTeacher[]) {
+  return (
+    teachers.find(
+      (teacher) => teacher.name.trim().toLowerCase() === teacherName.trim().toLowerCase(),
+    )?.id ?? ""
+  );
+}
+
+function normalizeScheduleRelationships(
+  schedule: Schedule,
+  batches: SharedBatch[],
+  teachers: SharedTeacher[],
+): Schedule {
+  const batch = batches.find(
+    (item) =>
+      String(item.id) === String(schedule.batchId) ||
+      item.name.trim().toLowerCase() === schedule.batch.trim().toLowerCase(),
+  );
+
+  const courseName = batch?.course ?? schedule.course;
+  const teacherName = batch?.teacher ?? schedule.teacher;
+
+  return {
+    ...schedule,
+    batch: batch?.name ?? schedule.batch,
+    batchId: batch?.id ?? schedule.batchId ?? "",
+    course: courseName,
+    courseId: batch?.courseId ?? schedule.courseId ?? resolveCourseId(courseName),
+    teacher: teacherName,
+    teacherId: batch?.teacherId ?? schedule.teacherId ?? resolveTeacherId(teacherName, teachers),
+    capacity: batch && Number.isFinite(batch.capacity) ? batch.capacity : schedule.capacity,
+    enrolled: batch && Number.isFinite(batch.students) ? batch.students : schedule.enrolled,
+  };
+}
+
 export default function SchedulePage() {
   const [schedules, setSchedules] = useState<Schedule[]>(initialSchedules);
-  const [availableBatches, setAvailableBatches] = useState(fallbackBatches);
+  const [availableBatches, setAvailableBatches] = useState<SharedBatch[]>(fallbackBatches);
+  const [availableTeachers, setAvailableTeachers] = useState<SharedTeacher[]>([]);
 
   useEffect(() => {
     const storedSchedules = getCollection<Schedule>("schedule");
-    const storedBatches = getCollection<typeof fallbackBatches[number]>("batches");
+    const storedBatches = getCollection<SharedBatch>("batches");
+    const storedTeachers = getCollection<SharedTeacher>("teachers");
+    const batchesSource = storedBatches.length > 0 ? storedBatches : fallbackBatches;
+    const sourceSchedules = storedSchedules.length > 0 ? storedSchedules : initialSchedules;
+    const normalizedSchedules = sourceSchedules.map((schedule) =>
+      normalizeScheduleRelationships(schedule, batchesSource, storedTeachers),
+    );
 
-    if (storedSchedules.length > 0) {
-      setSchedules(storedSchedules);
-    } else {
-      setCollection("schedule", initialSchedules);
-      setSchedules(initialSchedules);
-    }
+    setSchedules(normalizedSchedules);
+    setCollection("schedule", normalizedSchedules);
 
     if (storedBatches.length > 0) {
       setAvailableBatches(storedBatches);
@@ -293,20 +356,24 @@ export default function SchedulePage() {
       setAvailableBatches(fallbackBatches);
     }
 
-    const unsubscribe = subscribeToStore(() => {
-      const nextSchedules = getCollection<Schedule>("schedule");
-      const nextBatches = getCollection<typeof fallbackBatches[number]>("batches");
+    setAvailableTeachers(storedTeachers);
 
-      setSchedules((current) =>
-        JSON.stringify(current) === JSON.stringify(nextSchedules)
-          ? current
-          : nextSchedules,
+    const unsubscribe = subscribeToStore(() => {
+      const latestSchedules = getCollection<Schedule>("schedule");
+      const latestBatches = getCollection<SharedBatch>("batches");
+      const latestTeachers = getCollection<SharedTeacher>("teachers");
+      const normalized = latestSchedules.map((schedule) =>
+        normalizeScheduleRelationships(schedule, latestBatches, latestTeachers),
       );
 
+      setSchedules((current) =>
+        JSON.stringify(current) === JSON.stringify(normalized) ? current : normalized,
+      );
       setAvailableBatches((current) =>
-        JSON.stringify(current) === JSON.stringify(nextBatches)
-          ? current
-          : nextBatches,
+        JSON.stringify(current) === JSON.stringify(latestBatches) ? current : latestBatches,
+      );
+      setAvailableTeachers((current) =>
+        JSON.stringify(current) === JSON.stringify(latestTeachers) ? current : latestTeachers,
       );
     });
 
@@ -353,11 +420,12 @@ export default function SchedulePage() {
     () =>
       Array.from(
         new Set([
+          ...availableTeachers.map((teacher) => teacher.name),
           ...availableBatches.map((batch) => batch.teacher),
           ...schedules.map((schedule) => schedule.teacher),
         ]),
       ).filter(Boolean),
-    [availableBatches, schedules],
+    [availableTeachers, availableBatches, schedules],
   );
 
   const rooms = useMemo(
@@ -490,6 +558,12 @@ export default function SchedulePage() {
 
   const conflicts = useMemo(() => findConflicts(schedules), [schedules]);
 
+  const selectedBatch = useMemo(() => {
+    const name = form.batch.trim().toLowerCase();
+    if (!name) return undefined;
+    return availableBatches.find((batch) => batch.name.trim().toLowerCase() === name);
+  }, [availableBatches, form.batch]);
+
   function findConflicts(items: Schedule[]) {
     const results: {
       first: Schedule;
@@ -545,23 +619,31 @@ export default function SchedulePage() {
   };
 
   const applyBatchDetails = (batchName: string) => {
-    const selectedBatch = availableBatches.find(
+    const selected = availableBatches.find(
       (batch) => batch.name.trim().toLowerCase() === batchName.trim().toLowerCase(),
     );
 
+    if (!selected) {
+      setForm((current) => ({
+        ...current,
+        batch: batchName,
+        batchId: "",
+        courseId: "",
+        teacherId: "",
+      }));
+      return;
+    }
+
     setForm((current) => ({
       ...current,
-      batch: batchName,
-      course: selectedBatch?.course ?? current.course,
-      teacher: selectedBatch?.teacher ?? current.teacher,
-      capacity:
-        selectedBatch && Number.isFinite(selectedBatch.capacity)
-          ? String(selectedBatch.capacity)
-          : current.capacity,
-      enrolled:
-        selectedBatch && Number.isFinite(selectedBatch.students)
-          ? String(selectedBatch.students)
-          : current.enrolled,
+      batch: selected.name,
+      batchId: String(selected.id),
+      course: selected.course,
+      courseId: selected.courseId ?? resolveCourseId(selected.course),
+      teacher: selected.teacher,
+      teacherId: selected.teacherId ?? resolveTeacherId(selected.teacher, availableTeachers),
+      capacity: String(selected.capacity),
+      enrolled: String(selected.students),
     }));
   };
 
@@ -573,6 +655,14 @@ export default function SchedulePage() {
   const validateForm = () => {
     if (!form.batch.trim()) {
       return "Batch is required.";
+    }
+
+    const selectedBatch = availableBatches.find(
+      (batch) => batch.name.trim().toLowerCase() === form.batch.trim().toLowerCase(),
+    );
+
+    if (!selectedBatch) {
+      return "Please select a valid batch from the batch list.";
     }
 
     if (!form.course.trim()) {
@@ -679,8 +769,11 @@ export default function SchedulePage() {
     const newSchedule: Schedule = {
       id: generateScheduleId(),
       batch: form.batch.trim(),
+      batchId: form.batchId || selectedBatch?.id,
       course: form.course.trim(),
+      courseId: form.courseId || resolveCourseId(form.course),
       teacher: form.teacher.trim(),
+      teacherId: form.teacherId || resolveTeacherId(form.teacher, availableTeachers),
       date: form.date,
       startTime: form.startTime,
       endTime: form.endTime,
@@ -710,8 +803,11 @@ export default function SchedulePage() {
 
     setForm({
       batch: schedule.batch,
+      batchId: schedule.batchId ?? "",
       course: schedule.course,
+      courseId: schedule.courseId ?? resolveCourseId(schedule.course),
       teacher: schedule.teacher,
+      teacherId: schedule.teacherId ?? resolveTeacherId(schedule.teacher, availableTeachers),
       date: schedule.date,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
@@ -752,8 +848,11 @@ export default function SchedulePage() {
         ? {
             ...schedule,
             batch: form.batch.trim(),
+            batchId: form.batchId || selectedBatch?.id,
             course: form.course.trim(),
+            courseId: form.courseId || resolveCourseId(form.course),
             teacher: form.teacher.trim(),
+            teacherId: form.teacherId || resolveTeacherId(form.teacher, availableTeachers),
             date: form.date,
             startTime: form.startTime,
             endTime: form.endTime,
@@ -1764,6 +1863,7 @@ export default function SchedulePage() {
               teachers={teachers}
               rooms={rooms}
               onBatchChange={applyBatchDetails}
+              selectedBatchDetails={selectedBatch}
             />
 
             <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 p-6">
@@ -1828,6 +1928,7 @@ export default function SchedulePage() {
               teachers={teachers}
               rooms={rooms}
               onBatchChange={applyBatchDetails}
+              selectedBatchDetails={selectedBatch}
             />
 
             <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 p-6">
@@ -2024,11 +2125,15 @@ function ScheduleForm({
   teachers,
   rooms,
   onBatchChange,
+  selectedBatchDetails,
 }: {
   form: {
     batch: string;
+    batchId: string;
     course: string;
+    courseId: string;
     teacher: string;
+    teacherId: string;
     date: string;
     startTime: string;
     endTime: string;
@@ -2044,8 +2149,11 @@ function ScheduleForm({
   setForm: React.Dispatch<
     React.SetStateAction<{
       batch: string;
+      batchId: string;
       course: string;
+      courseId: string;
       teacher: string;
+      teacherId: string;
       date: string;
       startTime: string;
       endTime: string;
@@ -2066,6 +2174,14 @@ function ScheduleForm({
   teachers: string[];
   rooms: string[];
   onBatchChange: (batchName: string) => void;
+  selectedBatchDetails?: {
+    id: string;
+    name: string;
+    course: string;
+    teacher: string;
+    capacity: number;
+    students: number;
+  };
 }) {
   return (
     <div className="p-6">
@@ -2092,6 +2208,20 @@ function ScheduleForm({
               <option key={batch} value={batch} />
             ))}
           </datalist>
+
+          {selectedBatchDetails && (
+            <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/60 p-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-700">
+                <CheckCircle2 className="h-4 w-4" />
+                Batch linked automatically
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+                <div><p className="text-slate-500">Course</p><p className="mt-0.5 font-semibold text-slate-800">{selectedBatchDetails.course}</p></div>
+                <div><p className="text-slate-500">Teacher</p><p className="mt-0.5 font-semibold text-slate-800">{selectedBatchDetails.teacher}</p></div>
+                <div><p className="text-slate-500">Students</p><p className="mt-0.5 font-semibold text-slate-800">{selectedBatchDetails.students} / {selectedBatchDetails.capacity}</p></div>
+              </div>
+            </div>
+          )}
         </FormField>
 
         <FormField label="Course" required>
@@ -2106,7 +2236,8 @@ function ScheduleForm({
               }))
             }
             placeholder="Enter course name"
-            className="form-input"
+            readOnly={Boolean(selectedBatchDetails)}
+             className={`form-input ${selectedBatchDetails ? "form-input-readonly" : ""}`}
           />
 
           <datalist id="schedule-courses">
@@ -2128,7 +2259,8 @@ function ScheduleForm({
               }))
             }
             placeholder="Enter teacher name"
-            className="form-input"
+            readOnly={Boolean(selectedBatchDetails)}
+             className={`form-input ${selectedBatchDetails ? "form-input-readonly" : ""}`}
           />
 
           <datalist id="schedule-teachers">
@@ -2225,13 +2357,14 @@ function ScheduleForm({
             type="number"
             min="1"
             value={form.capacity}
+            readOnly={Boolean(selectedBatchDetails)}
             onChange={(event) =>
               setForm((current) => ({
                 ...current,
                 capacity: event.target.value,
               }))
             }
-            className="form-input"
+            className={`form-input ${selectedBatchDetails ? "form-input-readonly" : ""}`}
           />
         </FormField>
 
@@ -2240,13 +2373,14 @@ function ScheduleForm({
             type="number"
             min="0"
             value={form.enrolled}
+            readOnly={Boolean(selectedBatchDetails)}
             onChange={(event) =>
               setForm((current) => ({
                 ...current,
                 enrolled: event.target.value,
               }))
             }
-            className="form-input"
+            className={`form-input ${selectedBatchDetails ? "form-input-readonly" : ""}`}
           />
         </FormField>
 
@@ -2361,6 +2495,12 @@ function ScheduleForm({
         .form-input:focus {
           border-color: rgb(59 130 246);
           box-shadow: 0 0 0 1px rgb(59 130 246);
+        }
+
+        .form-input-readonly {
+          background: rgb(248 250 252);
+          color: rgb(71 85 105);
+          cursor: not-allowed;
         }
       `}</style>
     </div>
