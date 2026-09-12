@@ -1,8 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import {
+  getCollection,
+  setCollection,
+  subscribeToStore,
+} from "../data/store";
 import {
   AlertTriangle,
   ArrowDown,
@@ -285,6 +290,10 @@ const inputClass =
 
 export default function TeachersPage() {
   const [teachers, setTeachers] = useState<Teacher[]>(initialTeachers);
+  const saveTeachers = (nextTeachers: Teacher[]) => {
+    setTeachers(nextTeachers);
+    setCollection("teachers", nextTeachers);
+  };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("All Subjects");
@@ -326,6 +335,30 @@ export default function TeachersPage() {
   };
 
   const [form, setForm] = useState(emptyForm);
+
+  useEffect(() => {
+    const storedTeachers = getCollection<Teacher>("teachers");
+
+    if (storedTeachers.length > 0) {
+      setTeachers(storedTeachers);
+    } else {
+      setCollection("teachers", initialTeachers);
+      setTeachers(initialTeachers);
+    }
+
+    return subscribeToStore(() => {
+      const nextTeachers = getCollection<Teacher>("teachers");
+
+      if (nextTeachers.length === 0) return;
+
+      setTeachers((currentTeachers) => {
+        const currentJson = JSON.stringify(currentTeachers);
+        const nextJson = JSON.stringify(nextTeachers);
+
+        return currentJson === nextJson ? currentTeachers : nextTeachers;
+      });
+    });
+  }, []);
 
   const showToast = (message: string) => {
     setToast(message);
@@ -515,25 +548,24 @@ export default function TeachersPage() {
     }
 
     if (editingTeacher) {
-      setTeachers((currentTeachers) =>
-        currentTeachers.map((teacher) =>
-          teacher.id === editingTeacher.id
-            ? {
-                ...teacher,
-                name: form.name.trim(),
-                subject: form.subject.trim(),
-                phone: form.phone.trim(),
-                email: form.email.trim(),
-                experience: form.experience.trim(),
-                qualification: form.qualification.trim(),
-                specialization: form.specialization.trim() || "General Faculty",
-                status: form.status,
-                salary: salaryNumber,
-              }
-            : teacher,
-        ),
+      const nextTeachers = teachers.map((teacher) =>
+        teacher.id === editingTeacher.id
+          ? {
+              ...teacher,
+              name: form.name.trim(),
+              subject: form.subject.trim(),
+              phone: form.phone.trim(),
+              email: form.email.trim(),
+              experience: form.experience.trim(),
+              qualification: form.qualification.trim(),
+              specialization: form.specialization.trim() || "General Faculty",
+              status: form.status,
+              salary: salaryNumber,
+            }
+          : teacher,
       );
 
+      saveTeachers(nextTeachers);
       showToast("Teacher updated successfully.");
     } else {
       const nextNumber =
@@ -561,8 +593,7 @@ export default function TeachersPage() {
         joiningDate: "Today",
       };
 
-      setTeachers((currentTeachers) => [...currentTeachers, newTeacher]);
-
+      saveTeachers([...teachers, newTeacher]);
       showToast("Teacher added successfully.");
     }
 
@@ -578,9 +609,8 @@ export default function TeachersPage() {
       return;
     }
 
-    setTeachers((currentTeachers) =>
-      currentTeachers.filter((item) => item.id !== teacher.id),
-    );
+    const nextTeachers = teachers.filter((item) => item.id !== teacher.id);
+    saveTeachers(nextTeachers);
 
     setSelectedTeacher(null);
     setActionMenuId(null);

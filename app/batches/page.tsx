@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import { courses } from "../data/courses";
+import { batches as sharedBatches, type Batch } from "../data/batches";
 import {
   AlertTriangle,
   BarChart3,
@@ -30,233 +32,6 @@ import {
 
 type BatchStatus = "Active" | "Full" | "Completed" | "Inactive";
 
-type Batch = {
-  id: string;
-  name: string;
-  course: string;
-  teacher: string;
-  startDate: string;
-  endDate: string;
-  startTime: string;
-  endTime: string;
-  days: string[];
-  room: string;
-  capacity: number;
-  students: number;
-  status: BatchStatus;
-  attendanceRate: number;
-  performanceScore: number;
-};
-
-const initialBatches: Batch[] = [
-  {
-    id: "BAT-1001",
-    name: "JEE Advanced Morning",
-    course: "JEE Advanced",
-    teacher: "Rahul Mehta",
-    startDate: "2026-04-01",
-    endDate: "2027-03-31",
-    startTime: "07:00",
-    endTime: "10:00",
-    days: ["Mon", "Wed", "Fri"],
-    room: "Room 101",
-    capacity: 50,
-    students: 42,
-    status: "Active",
-    attendanceRate: 94,
-    performanceScore: 91,
-  },
-  {
-    id: "BAT-1002",
-    name: "NEET Evening",
-    course: "NEET",
-    teacher: "Priya Sharma",
-    startDate: "2026-04-01",
-    endDate: "2027-03-31",
-    startTime: "17:00",
-    endTime: "20:00",
-    days: ["Tue", "Thu", "Sat"],
-    room: "Room 202",
-    capacity: 40,
-    students: 36,
-    status: "Active",
-    attendanceRate: 91,
-    performanceScore: 88,
-  },
-  {
-    id: "BAT-1003",
-    name: "Foundation Weekend",
-    course: "Foundation",
-    teacher: "Amit Verma",
-    startDate: "2026-06-01",
-    endDate: "2027-02-28",
-    startTime: "09:00",
-    endTime: "12:00",
-    days: ["Sat", "Sun"],
-    room: "Room 103",
-    capacity: 35,
-    students: 28,
-    status: "Active",
-    attendanceRate: 87,
-    performanceScore: 84,
-  },
-  {
-    id: "BAT-1004",
-    name: "JEE Main Evening",
-    course: "JEE Main",
-    teacher: "Vikram Singh",
-    startDate: "2026-04-15",
-    endDate: "2027-01-31",
-    startTime: "17:30",
-    endTime: "20:30",
-    days: ["Mon", "Wed", "Fri"],
-    room: "Room 105",
-    capacity: 45,
-    students: 45,
-    status: "Full",
-    attendanceRate: 89,
-    performanceScore: 86,
-  },
-  {
-    id: "BAT-1005",
-    name: "NEET Intensive",
-    course: "NEET",
-    teacher: "Sneha Kapoor",
-    startDate: "2026-05-01",
-    endDate: "2027-03-15",
-    startTime: "08:00",
-    endTime: "11:00",
-    days: ["Mon", "Tue", "Thu", "Fri"],
-    room: "Room 201",
-    capacity: 40,
-    students: 31,
-    status: "Active",
-    attendanceRate: 93,
-    performanceScore: 90,
-  },
-  {
-    id: "BAT-1006",
-    name: "Foundation Evening",
-    course: "Foundation",
-    teacher: "Amit Verma",
-    startDate: "2026-04-10",
-    endDate: "2026-12-31",
-    startTime: "16:00",
-    endTime: "18:00",
-    days: ["Tue", "Thu"],
-    room: "Room 104",
-    capacity: 30,
-    students: 18,
-    status: "Active",
-    attendanceRate: 85,
-    performanceScore: 81,
-  },
-  {
-    id: "BAT-1007",
-    name: "JEE Revision Sprint",
-    course: "JEE Advanced",
-    teacher: "Rahul Mehta",
-    startDate: "2026-09-01",
-    endDate: "2026-11-30",
-    startTime: "18:00",
-    endTime: "21:00",
-    days: ["Mon", "Wed", "Fri", "Sat"],
-    room: "Room 106",
-    capacity: 30,
-    students: 30,
-    status: "Full",
-    attendanceRate: 96,
-    performanceScore: 94,
-  },
-  {
-    id: "BAT-1008",
-    name: "Summer Foundation",
-    course: "Foundation",
-    teacher: "Neha Joshi",
-    startDate: "2026-05-15",
-    endDate: "2026-07-31",
-    startTime: "10:00",
-    endTime: "12:00",
-    days: ["Mon", "Wed", "Fri"],
-    room: "Room 102",
-    capacity: 25,
-    students: 25,
-    status: "Completed",
-    attendanceRate: 90,
-    performanceScore: 87,
-  },
-  {
-    id: "BAT-1009",
-    name: "NEET Morning Batch",
-    course: "NEET",
-    teacher: "Priya Sharma",
-    startDate: "2026-07-01",
-    endDate: "2027-03-31",
-    startTime: "07:30",
-    endTime: "10:30",
-    days: ["Mon", "Wed", "Fri"],
-    room: "Room 203",
-    capacity: 40,
-    students: 34,
-    status: "Active",
-    attendanceRate: 92,
-    performanceScore: 89,
-  },
-  {
-    id: "BAT-1010",
-    name: "JEE Main Weekend",
-    course: "JEE Main",
-    teacher: "Vikram Singh",
-    startDate: "2026-08-01",
-    endDate: "2027-02-28",
-    startTime: "09:00",
-    endTime: "13:00",
-    days: ["Sat", "Sun"],
-    room: "Room 107",
-    capacity: 50,
-    students: 39,
-    status: "Active",
-    attendanceRate: 88,
-    performanceScore: 85,
-  },
-  {
-    id: "BAT-1011",
-    name: "Physics Advanced",
-    course: "JEE Advanced",
-    teacher: "Karan Malhotra",
-    startDate: "2026-06-15",
-    endDate: "2027-02-15",
-    startTime: "14:00",
-    endTime: "16:00",
-    days: ["Tue", "Thu"],
-    room: "Room 108",
-    capacity: 25,
-    students: 19,
-    status: "Active",
-    attendanceRate: 90,
-    performanceScore: 92,
-  },
-  {
-    id: "BAT-1012",
-    name: "Biology Masterclass",
-    course: "NEET",
-    teacher: "Dr. Riya Gupta",
-    startDate: "2026-08-10",
-    endDate: "2027-02-10",
-    startTime: "15:00",
-    endTime: "17:00",
-    days: ["Mon", "Thu"],
-    room: "Room 204",
-    capacity: 30,
-    students: 22,
-    status: "Active",
-    attendanceRate: 95,
-    performanceScore: 93,
-  },
-];
-
-const courses = ["JEE Advanced", "JEE Main", "NEET", "Foundation"];
-
 const teachers = [
   "Rahul Mehta",
   "Priya Sharma",
@@ -267,6 +42,15 @@ const teachers = [
   "Karan Malhotra",
   "Dr. Riya Gupta",
 ];
+
+const courseOptions = courses.map((course) => course.id);
+
+function getCourseName(courseId: string) {
+  return (
+    courses.find((course) => course.id === courseId)?.name ??
+    "Unknown Course"
+  );
+}
 
 const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -321,7 +105,7 @@ function getCapacityPercentage(batch: Batch) {
 }
 
 export default function BatchesPage() {
-  const [batches, setBatches] = useState<Batch[]>(initialBatches);
+  const [batches, setBatches] = useState<Batch[]>(sharedBatches);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -347,7 +131,7 @@ export default function BatchesPage() {
 
   const emptyForm = {
     name: "",
-    course: courses[0],
+    courseId: courseOptions[0] ?? "",
     teacher: teachers[0],
     startDate: "",
     endDate: "",
@@ -378,7 +162,7 @@ export default function BatchesPage() {
         !normalizedSearch ||
         batch.name.toLowerCase().includes(normalizedSearch) ||
         batch.id.toLowerCase().includes(normalizedSearch) ||
-        batch.course.toLowerCase().includes(normalizedSearch) ||
+        getCourseName(batch.courseId).toLowerCase().includes(normalizedSearch) ||
         batch.teacher.toLowerCase().includes(normalizedSearch) ||
         batch.room.toLowerCase().includes(normalizedSearch);
 
@@ -386,7 +170,7 @@ export default function BatchesPage() {
         statusFilter === "All" || batch.status === statusFilter;
 
       const matchesCourse =
-        courseFilter === "All" || batch.course === courseFilter;
+        courseFilter === "All" || batch.courseId === courseFilter;
 
       const matchesTeacher =
         teacherFilter === "All" || batch.teacher === teacherFilter;
@@ -411,7 +195,7 @@ export default function BatchesPage() {
           break;
 
         case "Course":
-          comparison = a.course.localeCompare(b.course);
+          comparison = getCourseName(a.courseId).localeCompare(getCourseName(b.courseId));
           break;
 
         case "Teacher":
@@ -515,7 +299,7 @@ export default function BatchesPage() {
       return false;
     }
 
-    if (!form.course) {
+    if (!form.courseId) {
       showToast("Please select a course.");
       return false;
     }
@@ -604,7 +388,7 @@ export default function BatchesPage() {
     const newBatch: Batch = {
       id: generateBatchId(),
       name: form.name.trim(),
-      course: form.course,
+      courseId: form.courseId,
       teacher: form.teacher,
       startDate: form.startDate,
       endDate: form.endDate,
@@ -632,7 +416,7 @@ export default function BatchesPage() {
 
     setForm({
       name: batch.name,
-      course: batch.course,
+      courseId: batch.courseId,
       teacher: batch.teacher,
       startDate: batch.startDate,
       endDate: batch.endDate,
@@ -669,7 +453,7 @@ export default function BatchesPage() {
           ? {
               ...batch,
               name: form.name.trim(),
-              course: form.course,
+              courseId: form.courseId,
               teacher: form.teacher,
               startDate: form.startDate,
               endDate: form.endDate,
@@ -755,17 +539,19 @@ export default function BatchesPage() {
         </label>
 
         <select
-          value={form.course}
+          value={form.courseId}
           onChange={(event) =>
             setForm((current) => ({
               ...current,
-              course: event.target.value,
+              courseId: event.target.value,
             }))
           }
           className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
         >
           {courses.map((course) => (
-            <option key={course}>{course}</option>
+            <option key={course.id} value={course.id}>
+              {course.name}
+            </option>
           ))}
         </select>
       </div>
@@ -1218,7 +1004,9 @@ export default function BatchesPage() {
                 <option value="All">All Courses</option>
 
                 {courses.map((course) => (
-                  <option key={course}>{course}</option>
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
                 ))}
               </select>
 
@@ -1396,7 +1184,7 @@ export default function BatchesPage() {
 
                         <td className="px-6 py-4">
                           <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700">
-                            {batch.course}
+                            {getCourseName(batch.courseId)}
                           </span>
                         </td>
 
@@ -1818,7 +1606,7 @@ export default function BatchesPage() {
                     </div>
 
                     <p className="mt-1 text-sm text-slate-500">
-                      {selectedBatch.id} · {selectedBatch.course}
+                      {selectedBatch.id} · {getCourseName(selectedBatch.courseId)}
                     </p>
                   </div>
                 </div>
@@ -2045,7 +1833,7 @@ export default function BatchesPage() {
                     </h3>
 
                     <p className="mt-1 text-sm text-slate-500">
-                      {selectedBatch.id} · {selectedBatch.course}
+                      {selectedBatch.id} · {getCourseName(selectedBatch.courseId)}
                     </p>
                   </div>
 

@@ -27,7 +27,8 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
 
 type FeeRecord = {
   name: string;
@@ -54,7 +55,23 @@ type Payment = {
   remainingBalance: number;
 };
 
-const initialFeeRecords: FeeRecord[] = [
+type SharedStudent = {
+  name: string;
+  course: string;
+  id: string;
+  batch: string;
+  phone: string;
+  totalFees: number;
+  paidFees: number;
+  pendingFees: number;
+  status: "Active" | "Inactive" | "Pending";
+  lastPayment: string;
+};
+
+const LEGACY_STUDENTS_KEY = "coaching-os-students";
+const PAYMENTS_STORAGE_KEY = "coaching-os-fee-payments";
+
+const legacyFeeRecords: FeeRecord[] = [
   {
     name: "Aarav Sharma",
     id: "STU-1001",
@@ -136,6 +153,33 @@ const initialFeeRecords: FeeRecord[] = [
     dueDate: "2026-09-12",
   },
 ];
+
+function readLegacyStudents(): SharedStudent[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const raw = window.localStorage.getItem(LEGACY_STUDENTS_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as SharedStudent[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function buildFeeRecords(students: SharedStudent[]): FeeRecord[] {
+  return students.map((student) => ({
+    name: student.name,
+    id: student.id,
+    course: student.course,
+    batch: student.batch,
+    phone: student.phone,
+    total: Number(student.totalFees) || 0,
+    paid: Number(student.paidFees) || 0,
+    dueDate: student.lastPayment || new Date().toISOString().split("T")[0],
+  }));
+}
 
 const initialPayments: Payment[] = [
   {
@@ -265,10 +309,30 @@ function numberToWords(num: number): string {
 }
 
 export default function FeesPage() {
-  const [feeRecords, setFeeRecords] = useState<FeeRecord[]>(initialFeeRecords);
+  const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
 
-  const [paymentHistory, setPaymentHistory] =
-    useState<Payment[]>(initialPayments);
+  const [paymentHistory, setPaymentHistory] = useState<Payment[]>(() => {
+    if (typeof window === "undefined") return initialPayments;
+
+    try {
+      const raw = window.localStorage.getItem(PAYMENTS_STORAGE_KEY);
+      if (!raw) return initialPayments;
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as Payment[]) : initialPayments;
+    } catch {
+      return initialPayments;
+    }
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    window.localStorage.setItem(
+      PAYMENTS_STORAGE_KEY,
+      JSON.stringify(paymentHistory),
+    );
+  }, [paymentHistory]);
 
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
@@ -293,6 +357,27 @@ export default function FeesPage() {
   const [showAI, setShowAI] = useState(false);
 
   const rowsPerPage = 6;
+
+  useEffect(() => {
+    const loadStudents = () => {
+      let students = getCollection<SharedStudent>("students");
+
+      // Compatibility migration for older student data.
+      if (students.length === 0) {
+        const legacyStudents = readLegacyStudents();
+        if (legacyStudents.length > 0) {
+          students = legacyStudents;
+          setCollection("students", students);
+        }
+      }
+
+      setFeeRecords(buildFeeRecords(students));
+    };
+
+    loadStudents();
+
+    return subscribeToStore(loadStudents);
+  }, []);
 
   const totalFees = feeRecords.reduce((sum, record) => sum + record.total, 0);
   const collectedFees = feeRecords.reduce(
@@ -455,16 +540,25 @@ export default function FeesPage() {
       remainingBalance,
     };
 
-    setFeeRecords((records) =>
-      records.map((record) =>
-        record.id === student.id
+    const updatedStudents = getCollection<SharedStudent>("students").map(
+      (item) =>
+        item.id === student.id
           ? {
-              ...record,
-              paid: record.paid + amount,
+              ...item,
+              paidFees: item.paidFees + amount,
+              pendingFees: Math.max(
+                item.totalFees - (item.paidFees + amount),
+                0,
+              ),
+              lastPayment: paymentDate,
             }
-          : record,
-      ),
+          : item,
     );
+
+    setCollection("students", updatedStudents);
+
+    // Update the local fee view immediately as well as the shared Students data.
+    setFeeRecords(buildFeeRecords(updatedStudents));
 
     setPaymentHistory((history) => [newPayment, ...history]);
 

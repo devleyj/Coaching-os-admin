@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import {
   AlertTriangle,
@@ -40,6 +40,11 @@ import {
 } from "lucide-react";
 
 import Slidebar from "../components/Slidebar";
+import {
+  getCollection,
+  setCollection,
+  subscribeToStore,
+} from "../data/store";
 
 type AttendanceStatus = "Present" | "Absent" | "Late" | "Leave";
 
@@ -70,7 +75,7 @@ type Student = {
   batch: string;
 };
 
-const initialStudents: Student[] = [
+const fallbackStudents: Student[] = [
   {
     id: "STU-1001",
     name: "Aarav Mehta",
@@ -371,8 +376,17 @@ const methodIcon = (method: AttendanceMethod) => {
 };
 
 export default function AttendancePage() {
+  const [students, setStudents] =
+    useState<Student[]>(fallbackStudents);
+
   const [attendance, setAttendance] =
-    useState<AttendanceRecord[]>(initialAttendance);
+    useState<AttendanceRecord[]>([]);
+
+  const [studentsHydrated, setStudentsHydrated] =
+    useState(false);
+
+  const [attendanceHydrated, setAttendanceHydrated] =
+    useState(false);
 
   const [selectedDate, setSelectedDate] =
     useState("2026-09-11");
@@ -438,7 +452,7 @@ export default function AttendancePage() {
     useState<AttendanceRecord | null>(null);
 
   const [markForm, setMarkForm] = useState({
-    studentId: initialStudents[0].id,
+    studentId: students[0].id,
     status: "Present" as AttendanceStatus,
     method: "Manual" as AttendanceMethod,
     checkIn: "09:00",
@@ -452,25 +466,96 @@ export default function AttendancePage() {
     useState<AttendanceStatus>("Present");
 
   const [leaveStudentId, setLeaveStudentId] =
-    useState(initialStudents[0].id);
+    useState(students[0].id);
 
   const [leaveReason, setLeaveReason] =
     useState("");
 
+  useEffect(() => {
+    const storedStudents = getCollection<Student>("students");
+    const activeStudents =
+      storedStudents.length > 0
+        ? storedStudents
+        : fallbackStudents;
+
+    setStudents(activeStudents);
+    setStudentsHydrated(true);
+
+    const storedAttendance =
+      getCollection<AttendanceRecord>("attendance");
+
+    const activeStudentIds = new Set(
+      activeStudents.map((student) => student.id),
+    );
+
+    const seededAttendance = initialAttendance.filter((record) =>
+      activeStudentIds.has(record.studentId),
+    );
+
+    setAttendance(
+      storedAttendance.length > 0
+        ? storedAttendance
+        : seededAttendance,
+    );
+    setAttendanceHydrated(true);
+
+    return subscribeToStore(() => {
+      const nextStudents = getCollection<Student>("students");
+      if (nextStudents.length > 0) {
+        setStudents(nextStudents);
+      }
+
+      const nextAttendance =
+        getCollection<AttendanceRecord>("attendance");
+
+      setAttendance((current) => {
+        const currentJson = JSON.stringify(current);
+        const nextJson = JSON.stringify(nextAttendance);
+
+        return currentJson === nextJson
+          ? current
+          : nextAttendance;
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!studentsHydrated) return;
+
+    const storedStudents = getCollection<Student>("students");
+    if (storedStudents.length === 0) {
+      setCollection("students", students);
+    }
+  }, [students, studentsHydrated]);
+
+  useEffect(() => {
+    if (!attendanceHydrated) return;
+
+    const storedAttendance =
+      getCollection<AttendanceRecord>("attendance");
+
+    if (
+      JSON.stringify(storedAttendance) !==
+      JSON.stringify(attendance)
+    ) {
+      setCollection("attendance", attendance);
+    }
+  }, [attendance, attendanceHydrated]);
+
   const batches = useMemo(
     () =>
       Array.from(
-        new Set(initialStudents.map((item) => item.batch))
+        new Set(students.map((item) => item.batch))
       ).sort(),
-    []
+    [students]
   );
 
   const courses = useMemo(
     () =>
       Array.from(
-        new Set(initialStudents.map((item) => item.course))
+        new Set(students.map((item) => item.course))
       ).sort(),
-    []
+    [students]
   );
 
   const stats = useMemo(() => {
@@ -502,20 +587,20 @@ export default function AttendancePage() {
     ).length;
 
     const unmarked = Math.max(
-      initialStudents.length - dayRecords.length,
+      students.length - dayRecords.length,
       0
     );
 
     const percentage =
-      initialStudents.length > 0
+      students.length > 0
         ? Math.round(
-            ((present + late) / initialStudents.length) *
+            ((present + late) / students.length) *
               100
           )
         : 0;
 
     return {
-      total: initialStudents.length,
+      total: students.length,
       records: dayRecords.length,
       present,
       absent,
@@ -606,7 +691,7 @@ export default function AttendancePage() {
       startIndex + rowsPerPage
     );
 
-  const selectedStudent = initialStudents.find(
+  const selectedStudent = students.find(
     (student) =>
       student.id === markForm.studentId
   );
@@ -669,7 +754,7 @@ export default function AttendancePage() {
   }, [attendance, historyStudent]);
 
   const aiRiskStudents = useMemo(() => {
-    return initialStudents
+    return students
       .map((student) => {
         const records = attendance.filter(
           (item) =>
@@ -755,7 +840,7 @@ export default function AttendancePage() {
 
   const openMarkModal = () => {
     setMarkForm({
-      studentId: initialStudents[0].id,
+      studentId: students[0].id,
       status: "Present",
       method: "Manual",
       checkIn: "09:00",
@@ -791,7 +876,7 @@ export default function AttendancePage() {
   ) => {
     event.preventDefault();
 
-    const student = initialStudents.find(
+    const student = students.find(
       (item) =>
         item.id === markForm.studentId
     );
@@ -920,7 +1005,7 @@ export default function AttendancePage() {
     event.preventDefault();
 
     const studentsInBatch =
-      initialStudents.filter(
+      students.filter(
         (student) =>
           student.batch === bulkBatch
       );
@@ -1129,7 +1214,7 @@ export default function AttendancePage() {
   };
 
   const openHistory = (studentId: string) => {
-    const student = initialStudents.find(
+    const student = students.find(
       (item) => item.id === studentId
     );
 
@@ -1168,7 +1253,7 @@ export default function AttendancePage() {
   ) => {
     event.preventDefault();
 
-    const student = initialStudents.find(
+    const student = students.find(
       (item) =>
         item.id === leaveStudentId
     );
@@ -2547,7 +2632,7 @@ export default function AttendancePage() {
                   }
                   className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
-                  {initialStudents.map(
+                  {students.map(
                     (student) => (
                       <option
                         key={student.id}
@@ -3422,7 +3507,7 @@ export default function AttendancePage() {
                   }
                   className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-900"
                 >
-                  {initialStudents.map(
+                  {students.map(
                     (student) => (
                       <option
                         key={student.id}

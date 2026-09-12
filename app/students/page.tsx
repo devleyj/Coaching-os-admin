@@ -1,8 +1,84 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import { courses } from "../data/courses";
+import { batches as sharedBatches } from "../data/batches";
+import {
+  getCollection,
+  setCollection,
+  subscribeToStore,
+} from "../data/store";
+type StudentStatus = "Active" | "Inactive" | "Pending";
+
+type Student = {
+  name: string;
+  course: string;
+  id: string;
+  batch: string;
+  phone: string;
+  email: string;
+  totalFees: number;
+  paidFees: number;
+  pendingFees: number;
+  status: StudentStatus;
+  enrollmentDate: string;
+  parentName: string;
+  parentPhone: string;
+  attendance: number;
+  performance: number;
+  lastPayment: string;
+  notes: string;
+};
+
+const STUDENTS_STORAGE_KEY = "coaching-os-students";
+
+const initialStudents: Student[] = [
+  { name: "Aarav Mehta", course: "JEE Advanced", id: "STU-1001", batch: "JEE Advanced Morning", phone: "98XXXXXX21", email: "aarav@example.com", totalFees: 45000, paidFees: 30000, pendingFees: 15000, status: "Active", enrollmentDate: "2026-04-12", parentName: "Rajesh Mehta", parentPhone: "99XXXXXX11", attendance: 92, performance: 88, lastPayment: "2026-08-20", notes: "Strong mathematical ability." },
+  { name: "Riya Sharma", course: "NEET", id: "STU-1002", batch: "NEET Morning Batch", phone: "97XXXXXX45", email: "riya@example.com", totalFees: 52000, paidFees: 40000, pendingFees: 12000, status: "Active", enrollmentDate: "2026-03-18", parentName: "Suresh Sharma", parentPhone: "98XXXXXX34", attendance: 95, performance: 91, lastPayment: "2026-08-18", notes: "Consistent performer. Good biology scores." },
+  { name: "Kabir Patel", course: "JEE Main", id: "STU-1003", batch: "JEE Main Evening", phone: "96XXXXXX78", email: "kabir@example.com", totalFees: 38000, paidFees: 25000, pendingFees: 13000, status: "Active", enrollmentDate: "2026-05-05", parentName: "Amit Patel", parentPhone: "97XXXXXX55", attendance: 84, performance: 76, lastPayment: "2026-08-10", notes: "Attendance has dropped recently. Needs mentor follow-up." },
+  { name: "Ananya Singh", course: "NEET", id: "STU-1004", batch: "NEET Evening", phone: "95XXXXXX12", email: "ananya@example.com", totalFees: 10000, paidFees: 5000, pendingFees: 5000, status: "Pending", enrollmentDate: "2026-08-21", parentName: "Vikram Singh", parentPhone: "96XXXXXX67", attendance: 72, performance: 69, lastPayment: "2026-08-21", notes: "New admission. Initial academic assessment recommended." },
+  { name: "Dev Verma", course: "Foundation", id: "STU-1005", batch: "Foundation Weekend", phone: "94XXXXXX31", email: "dev@example.com", totalFees: 30000, paidFees: 30000, pendingFees: 0, status: "Active", enrollmentDate: "2026-02-10", parentName: "Manoj Verma", parentPhone: "93XXXXXX44", attendance: 97, performance: 94, lastPayment: "2026-07-28", notes: "Excellent attendance and academic progress." },
+  { name: "Ishita Rao", course: "JEE Advanced", id: "STU-1006", batch: "JEE Advanced Morning", phone: "93XXXXXX88", email: "ishita@example.com", totalFees: 45000, paidFees: 21000, pendingFees: 24000, status: "Active", enrollmentDate: "2026-06-02", parentName: "Nitin Rao", parentPhone: "92XXXXXX10", attendance: 81, performance: 73, lastPayment: "2026-07-12", notes: "Fee follow-up required. Academic performance is improving." },
+];
+
+function readLegacyStudents(): Student[] {
+  if (typeof window === "undefined") return initialStudents;
+
+  try {
+    const stored = window.localStorage.getItem(STUDENTS_STORAGE_KEY);
+    if (!stored) return initialStudents;
+
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? (parsed as Student[]) : initialStudents;
+  } catch {
+    return initialStudents;
+  }
+}
+
+function readSharedStudents(): Student[] {
+  const shared = getCollection<Student>("students");
+
+  if (shared.length > 0) {
+    return shared;
+  }
+
+  const legacy = readLegacyStudents();
+  setCollection("students", legacy);
+  return legacy;
+}
+
+function saveSharedStudents(students: Student[]) {
+  setCollection("students", students);
+
+  // Keep the previous key temporarily so the existing Fees page can continue
+  // reading the same student records during the migration.
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
+  }
+}
 
 import {
   Activity,
@@ -41,148 +117,23 @@ import {
   X,
 } from "lucide-react";
 
-type StudentStatus = "Active" | "Inactive" | "Pending";
+const studentCourses = courses.filter((course) => course.status === "Active");
 
-type Student = {
-  name: string;
-  course: string;
-  id: string;
-  batch: string;
-  phone: string;
-  email: string;
-  totalFees: number;
-  paidFees: number;
-  pendingFees: number;
-  status: StudentStatus;
-  enrollmentDate: string;
-  parentName: string;
-  parentPhone: string;
-  attendance: number;
-  performance: number;
-  lastPayment: string;
-  notes: string;
-};
+function getBatchesForCourse(courseName: string) {
+  const course = studentCourses.find((item) => item.name === courseName);
 
-const initialStudents: Student[] = [
-  {
-    name: "Aarav Mehta",
-    course: "JEE Preparation",
-    id: "STU-1001",
-    batch: "JEE Advanced",
-    phone: "98XXXXXX21",
-    email: "aarav@example.com",
-    totalFees: 45000,
-    paidFees: 30000,
-    pendingFees: 15000,
-    status: "Active",
-    enrollmentDate: "2026-04-12",
-    parentName: "Rajesh Mehta",
-    parentPhone: "99XXXXXX11",
-    attendance: 92,
-    performance: 88,
-    lastPayment: "2026-08-20",
-    notes: "Strong mathematics performance. Needs additional physics practice.",
-  },
-  {
-    name: "Riya Sharma",
-    course: "NEET Preparation",
-    id: "STU-1002",
-    batch: "NEET 2027",
-    phone: "97XXXXXX45",
-    email: "riya@example.com",
-    totalFees: 52000,
-    paidFees: 40000,
-    pendingFees: 12000,
-    status: "Active",
-    enrollmentDate: "2026-03-18",
-    parentName: "Suresh Sharma",
-    parentPhone: "98XXXXXX34",
-    attendance: 95,
-    performance: 91,
-    lastPayment: "2026-08-18",
-    notes: "Consistent performer. Good biology scores.",
-  },
-  {
-    name: "Kabir Patel",
-    course: "JEE Preparation",
-    id: "STU-1003",
-    batch: "JEE Main",
-    phone: "96XXXXXX78",
-    email: "kabir@example.com",
-    totalFees: 38000,
-    paidFees: 25000,
-    pendingFees: 13000,
-    status: "Active",
-    enrollmentDate: "2026-05-05",
-    parentName: "Amit Patel",
-    parentPhone: "97XXXXXX55",
-    attendance: 84,
-    performance: 76,
-    lastPayment: "2026-08-10",
-    notes: "Attendance has dropped recently. Needs mentor follow-up.",
-  },
-  {
-    name: "Ananya Singh",
-    course: "NEET Preparation",
-    id: "STU-1004",
-    batch: "NEET 2027",
-    phone: "95XXXXXX12",
-    email: "ananya@example.com",
-    totalFees: 10000,
-    paidFees: 5000,
-    pendingFees: 5000,
-    status: "Pending",
-    enrollmentDate: "2026-08-21",
-    parentName: "Vikram Singh",
-    parentPhone: "96XXXXXX67",
-    attendance: 72,
-    performance: 69,
-    lastPayment: "2026-08-21",
-    notes: "New admission. Initial academic assessment recommended.",
-  },
-  {
-    name: "Dev Verma",
-    course: "Foundation",
-    id: "STU-1005",
-    batch: "Foundation 2027",
-    phone: "94XXXXXX31",
-    email: "dev@example.com",
-    totalFees: 30000,
-    paidFees: 30000,
-    pendingFees: 0,
-    status: "Active",
-    enrollmentDate: "2026-02-10",
-    parentName: "Manoj Verma",
-    parentPhone: "93XXXXXX44",
-    attendance: 97,
-    performance: 94,
-    lastPayment: "2026-07-28",
-    notes: "Excellent attendance and academic progress.",
-  },
-  {
-    name: "Ishita Rao",
-    course: "JEE Preparation",
-    id: "STU-1006",
-    batch: "JEE Advanced",
-    phone: "93XXXXXX88",
-    email: "ishita@example.com",
-    totalFees: 45000,
-    paidFees: 21000,
-    pendingFees: 24000,
-    status: "Active",
-    enrollmentDate: "2026-06-02",
-    parentName: "Nitin Rao",
-    parentPhone: "92XXXXXX10",
-    attendance: 81,
-    performance: 73,
-    lastPayment: "2026-07-12",
-    notes: "Fee follow-up required. Academic performance is improving.",
-  },
-];
+  if (!course) {
+    return [];
+  }
 
-const courses = ["JEE Preparation", "NEET Preparation", "Foundation"];
+  return sharedBatches.filter((batch) => batch.courseId === course.id);
+}
 
-const batches = ["JEE Advanced", "JEE Main", "NEET 2027", "Foundation 2027"];
+function isValidCourseBatch(courseName: string, batchName: string) {
+  return getBatchesForCourse(courseName).some(
+    (batch) => batch.name === batchName,
+  );
+}
 
 const statuses: StudentStatus[] = ["Active", "Inactive", "Pending"];
 
@@ -239,6 +190,16 @@ function getInitials(name: string) {
 export default function StudentsPage() {
   const [studentList, setStudentList] = useState<Student[]>(initialStudents);
 
+  useEffect(() => {
+    const students = readSharedStudents();
+    setStudentList(students);
+
+    return subscribeToStore(() => {
+      const latestStudents = getCollection<Student>("students");
+      setStudentList(latestStudents);
+    });
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
   const [courseFilter, setCourseFilter] = useState("");
@@ -277,6 +238,12 @@ export default function StudentsPage() {
   const [studentEmail, setStudentEmail] = useState("");
   const [studentCourse, setStudentCourse] = useState("");
   const [studentBatch, setStudentBatch] = useState("");
+
+  const availableStudentBatches = useMemo(
+    () => getBatchesForCourse(studentCourse),
+    [studentCourse],
+  );
+
   const [studentFees, setStudentFees] = useState("");
   const [studentParentName, setStudentParentName] = useState("");
   const [studentParentPhone, setStudentParentPhone] = useState("");
@@ -488,6 +455,16 @@ export default function StudentsPage() {
       return;
     }
 
+    const selectedCourseBatches = getBatchesForCourse(studentCourse);
+    const selectedBatchExists = selectedCourseBatches.some(
+      (batch) => batch.name === studentBatch,
+    );
+
+    if (!selectedBatchExists) {
+      setFormError("Please select a valid batch for the selected course.");
+      return;
+    }
+
     const fees = Number(studentFees);
 
     if (!studentFees.trim() || Number.isNaN(fees) || fees < 0) {
@@ -496,31 +473,31 @@ export default function StudentsPage() {
     }
 
     if (editingStudentId) {
-      setStudentList((currentStudents) =>
-        currentStudents.map((student) => {
-          if (student.id !== editingStudentId) {
-            return student;
-          }
+      const nextStudents = studentList.map((student) => {
+        if (student.id !== editingStudentId) {
+          return student;
+        }
 
-          const pendingFees = Math.max(fees - student.paidFees, 0);
+        const pendingFees = Math.max(fees - student.paidFees, 0);
 
-          return {
-            ...student,
-            name: studentName.trim(),
-            phone: studentPhone.trim(),
-            email: studentEmail.trim(),
-            course: studentCourse,
-            batch: studentBatch,
-            totalFees: fees,
-            pendingFees,
-            parentName: studentParentName.trim(),
-            parentPhone: studentParentPhone.trim(),
-            enrollmentDate: studentEnrollmentDate || student.enrollmentDate,
-            notes: studentNotes.trim(),
-          };
-        }),
-      );
+        return {
+          ...student,
+          name: studentName.trim(),
+          phone: studentPhone.trim(),
+          email: studentEmail.trim(),
+          course: studentCourse,
+          batch: studentBatch,
+          totalFees: fees,
+          pendingFees,
+          parentName: studentParentName.trim(),
+          parentPhone: studentParentPhone.trim(),
+          enrollmentDate: studentEnrollmentDate || student.enrollmentDate,
+          notes: studentNotes.trim(),
+        };
+      });
 
+      setStudentList(nextStudents);
+      saveSharedStudents(nextStudents);
       showToast("Student updated successfully.");
     } else {
       const highestId = studentList.reduce((highest, student) => {
@@ -550,7 +527,10 @@ export default function StudentsPage() {
         notes: studentNotes.trim(),
       };
 
-      setStudentList((currentStudents) => [...currentStudents, newStudent]);
+      const nextStudents = [...studentList, newStudent];
+
+      setStudentList(nextStudents);
+      saveSharedStudents(nextStudents);
 
       showToast("Student added successfully.");
     }
@@ -560,9 +540,12 @@ export default function StudentsPage() {
   };
 
   const deleteStudent = (studentId: string) => {
-    setStudentList((currentStudents) =>
-      currentStudents.filter((student) => student.id !== studentId),
+    const nextStudents = studentList.filter(
+      (student) => student.id !== studentId,
     );
+
+    setStudentList(nextStudents);
+    saveSharedStudents(nextStudents);
 
     setSelectedStudents((current) => current.filter((id) => id !== studentId));
 
@@ -598,13 +581,14 @@ export default function StudentsPage() {
       return;
     }
 
-    setStudentList((currentStudents) =>
-      currentStudents.map((student) =>
-        selectedStudents.includes(student.id)
-          ? { ...student, status }
-          : student,
-      ),
+    const nextStudents = studentList.map((student) =>
+      selectedStudents.includes(student.id)
+        ? { ...student, status }
+        : student,
     );
+
+    setStudentList(nextStudents);
+    saveSharedStudents(nextStudents);
 
     showToast(`${selectedStudents.length} student(s) updated.`);
 
@@ -667,8 +651,11 @@ export default function StudentsPage() {
   };
 
   const refreshStudents = () => {
-    setStudentList([...studentList]);
-    showToast("Student data refreshed.");
+    const latestStudents = getCollection<Student>("students");
+    setStudentList(
+      latestStudents.length > 0 ? latestStudents : readSharedStudents(),
+    );
+    showToast("Student data refreshed from shared data.");
   };
 
   const selectedStudent = aiStudentId
@@ -733,6 +720,31 @@ export default function StudentsPage() {
             </>
           }
         />
+
+        {/* Connected Modules */}
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Connected
+          </span>
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+          >
+            Courses
+          </Link>
+          <Link
+            href="/batches"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+          >
+            Batches
+          </Link>
+          <Link
+            href="/fees"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+          >
+            Fees
+          </Link>
+        </div>
 
         {/* KPI Cards */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -864,9 +876,10 @@ export default function StudentsPage() {
                 </div>
 
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-                  Identify attendance risk, academic risk and fee-risk patterns
-                  now. Real AI recommendations can be connected to the backend
-                  later.
+                  Course and batch assignments come from the shared course and
+                  batch data, while fee totals and payments stay synchronized
+                  through the shared student record. Real AI recommendations can
+                  be connected to the backend later.
                 </p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -933,9 +946,9 @@ export default function StudentsPage() {
                 className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All Batches</option>
-                {batches.map((batch) => (
-                  <option key={batch} value={batch}>
-                    {batch}
+                {sharedBatches.map((batch) => (
+                  <option key={batch.id} value={batch.name}>
+                    {batch.name}
                   </option>
                 ))}
               </select>
@@ -949,9 +962,9 @@ export default function StudentsPage() {
                 className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All Courses</option>
-                {courses.map((course) => (
-                  <option key={course} value={course}>
-                    {course}
+                {studentCourses.map((course) => (
+                  <option key={course.id} value={course.name}>
+                    {course.name}
                   </option>
                 ))}
               </select>
@@ -1689,14 +1702,18 @@ export default function StudentsPage() {
 
                   <select
                     value={studentCourse}
-                    onChange={(event) => setStudentCourse(event.target.value)}
+                    onChange={(event) => {
+                      const selectedCourse = event.target.value;
+                      setStudentCourse(selectedCourse);
+                      setStudentBatch("");
+                    }}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
                     <option value="">Select Course</option>
 
-                    {courses.map((course) => (
-                      <option key={course} value={course}>
-                        {course}
+                    {studentCourses.map((course) => (
+                      <option key={course.id} value={course.name}>
+                        {course.name}
                       </option>
                     ))}
                   </select>
@@ -1710,13 +1727,16 @@ export default function StudentsPage() {
                   <select
                     value={studentBatch}
                     onChange={(event) => setStudentBatch(event.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    disabled={!studentCourse}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
                   >
-                    <option value="">Select Batch</option>
+                    <option value="">
+                      {studentCourse ? "Select Batch" : "Select Course First"}
+                    </option>
 
-                    {batches.map((batch) => (
-                      <option key={batch} value={batch}>
-                        {batch}
+                    {availableStudentBatches.map((batch) => (
+                      <option key={batch.id} value={batch.name}>
+                        {batch.name}
                       </option>
                     ))}
                   </select>
@@ -2328,10 +2348,17 @@ export default function StudentsPage() {
         </div>
       )}
 
-      {/* AI Overview Panel */}
+      {/* AI Overview Modal - centered in the viewport */}
       {showAiPanel && (
-        <div className="fixed inset-0 z-[55] flex items-center justify-end bg-slate-950/30 backdrop-blur-[2px]">
-          <div className="h-full w-full max-w-xl overflow-y-auto bg-white shadow-2xl">
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-[2px] sm:p-6"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setShowAiPanel(false);
+            }
+          }}
+        >
+          <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-purple-100 bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-purple-100 bg-gradient-to-r from-purple-50 to-blue-50 px-6 py-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white">
