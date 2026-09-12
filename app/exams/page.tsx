@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   Search,
   Plus,
@@ -522,9 +523,7 @@ export default function ExamsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"All" | ExamStatus>(
-    "All"
-  );
+  const [statusFilter, setStatusFilter] = useState<"All" | ExamStatus>("All");
   const [courseFilter, setCourseFilter] = useState("All");
   const [batchFilter, setBatchFilter] = useState("All");
   const [modeFilter, setModeFilter] = useState<"All" | ExamMode>("All");
@@ -558,40 +557,36 @@ export default function ExamsPage() {
   } | null>(null);
 
   const [calendarDate, setCalendarDate] = useState(
-    new Date("2026-09-01T00:00:00")
+    new Date("2026-09-01T00:00:00"),
   );
 
   const courses = useMemo(
     () => Array.from(new Set(exams.map((exam) => exam.course))),
-    [exams]
+    [exams],
   );
 
   const batches = useMemo(
     () => Array.from(new Set(exams.map((exam) => exam.batch))),
-    [exams]
+    [exams],
   );
 
   const subjects = useMemo(
     () => Array.from(new Set(exams.map((exam) => exam.subject))),
-    [exams]
+    [exams],
   );
 
   const stats = useMemo(() => {
-    const completed = exams.filter(
-      (exam) => exam.status === "Completed"
-    );
+    const completed = exams.filter((exam) => exam.status === "Completed");
 
     const completedWithScore = completed.filter(
-      (exam) => exam.averageScore > 0
+      (exam) => exam.averageScore > 0,
     );
 
     const averagePassRate =
       completedWithScore.length > 0
         ? Math.round(
-            completedWithScore.reduce(
-              (sum, exam) => sum + exam.passRate,
-              0
-            ) / completedWithScore.length
+            completedWithScore.reduce((sum, exam) => sum + exam.passRate, 0) /
+              completedWithScore.length,
           )
         : 0;
 
@@ -600,8 +595,8 @@ export default function ExamsPage() {
         ? Math.round(
             completedWithScore.reduce(
               (sum, exam) => sum + exam.attendanceRate,
-              0
-            ) / completedWithScore.length
+              0,
+            ) / completedWithScore.length,
           )
         : 0;
 
@@ -610,10 +605,7 @@ export default function ExamsPage() {
       upcoming: exams.filter((exam) => exam.status === "Upcoming").length,
       ongoing: exams.filter((exam) => exam.status === "Ongoing").length,
       completed: completed.length,
-      totalStudents: exams.reduce(
-        (sum, exam) => sum + exam.students,
-        0
-      ),
+      totalStudents: exams.reduce((sum, exam) => sum + exam.students, 0),
       averagePassRate,
       averageAttendance,
       completedCount: completed.length,
@@ -624,24 +616,23 @@ export default function ExamsPage() {
     () =>
       exams
         .filter((exam) => exam.status === "Upcoming")
-        .sort(
-          (a, b) =>
-            `${a.examDate}${a.startTime}`.localeCompare(
-              `${b.examDate}${b.startTime}`
-            )
+        .sort((a, b) =>
+          `${a.examDate}${a.startTime}`.localeCompare(
+            `${b.examDate}${b.startTime}`,
+          ),
         )
         .slice(0, 5),
-    [exams]
+    [exams],
   );
 
   const ongoingExams = useMemo(
     () => exams.filter((exam) => exam.status === "Ongoing"),
-    [exams]
+    [exams],
   );
 
   const completedExams = useMemo(
     () => exams.filter((exam) => exam.status === "Completed"),
-    [exams]
+    [exams],
   );
 
   const filteredExams = useMemo(() => {
@@ -662,11 +653,9 @@ export default function ExamsPage() {
       const matchesCourse =
         courseFilter === "All" || exam.course === courseFilter;
 
-      const matchesBatch =
-        batchFilter === "All" || exam.batch === batchFilter;
+      const matchesBatch = batchFilter === "All" || exam.batch === batchFilter;
 
-      const matchesMode =
-        modeFilter === "All" || exam.mode === modeFilter;
+      const matchesMode = modeFilter === "All" || exam.mode === modeFilter;
 
       const matchesSubject =
         subjectFilter === "All" || exam.subject === subjectFilter;
@@ -686,7 +675,7 @@ export default function ExamsPage() {
 
       if (sortBy === "date") {
         comparison = `${a.examDate} ${a.startTime}`.localeCompare(
-          `${b.examDate} ${b.startTime}`
+          `${b.examDate} ${b.startTime}`,
         );
       }
 
@@ -722,21 +711,18 @@ export default function ExamsPage() {
     sortOrder,
   ]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredExams.length / rowsPerPage)
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredExams.length / rowsPerPage));
 
   const safePage = Math.min(currentPage, totalPages);
 
   const paginatedExams = filteredExams.slice(
     (safePage - 1) * rowsPerPage,
-    safePage * rowsPerPage
+    safePage * rowsPerPage,
   );
 
   const showToast = (
     message: string,
-    type: "success" | "info" | "error" = "success"
+    type: "success" | "info" | "error" = "success",
   ) => {
     setToast({ message, type });
 
@@ -748,48 +734,39 @@ export default function ExamsPage() {
   const formatDate = (date: string) => {
     if (!date) return "-";
 
-    return new Date(`${date}T00:00:00`).toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
+    return new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   const formatShortDate = (date: string) => {
     if (!date) return "-";
 
-    return new Date(`${date}T00:00:00`).toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-      }
-    );
+    return new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+    });
   };
 
   const getStatusStyle = (status: ExamStatus) => {
     if (status === "Upcoming") {
       return {
-        className:
-          "border-blue-100 bg-blue-50 text-blue-700",
+        className: "border-blue-100 bg-blue-50 text-blue-700",
         icon: Clock3,
       };
     }
 
     if (status === "Ongoing") {
       return {
-        className:
-          "border-amber-100 bg-amber-50 text-amber-700",
+        className: "border-amber-100 bg-amber-50 text-amber-700",
         icon: CircleDot,
       };
     }
 
     return {
-      className:
-        "border-emerald-100 bg-emerald-50 text-emerald-700",
+      className: "border-emerald-100 bg-emerald-50 text-emerald-700",
       icon: CheckCircle2,
     };
   };
@@ -851,8 +828,7 @@ export default function ExamsPage() {
       negativeMarks: String(exam.negativeMarks),
       randomizeQuestions: exam.randomizeQuestions,
       randomizeOptions: exam.randomizeOptions,
-      publishResultsAutomatically:
-        exam.publishResultsAutomatically,
+      publishResultsAutomatically: exam.publishResultsAutomatically,
       proctoring: exam.proctoring,
       allowReattempt: exam.allowReattempt,
     });
@@ -910,8 +886,7 @@ export default function ExamsPage() {
 
     if (
       form.negativeMarking &&
-      (!Number(form.negativeMarks) ||
-        Number(form.negativeMarks) <= 0)
+      (!Number(form.negativeMarks) || Number(form.negativeMarks) <= 0)
     ) {
       return "Enter a valid negative marking value.";
     }
@@ -955,17 +930,14 @@ export default function ExamsPage() {
                 negativeMarks: form.negativeMarking
                   ? Number(form.negativeMarks)
                   : 0,
-                randomizeQuestions:
-                  form.randomizeQuestions,
-                randomizeOptions:
-                  form.randomizeOptions,
-                publishResultsAutomatically:
-                  form.publishResultsAutomatically,
+                randomizeQuestions: form.randomizeQuestions,
+                randomizeOptions: form.randomizeOptions,
+                publishResultsAutomatically: form.publishResultsAutomatically,
                 proctoring: form.proctoring,
                 allowReattempt: form.allowReattempt,
               }
-            : exam
-        )
+            : exam,
+        ),
       );
 
       showToast("Exam updated successfully.");
@@ -973,15 +945,11 @@ export default function ExamsPage() {
       const newNumber =
         Math.max(
           ...exams.map((exam) => {
-            const number = Number(
-              exam.id.replace("EXM-", "")
-            );
+            const number = Number(exam.id.replace("EXM-", ""));
 
-            return Number.isFinite(number)
-              ? number
-              : 1000;
+            return Number.isFinite(number) ? number : 1000;
           }),
-          1000
+          1000,
         ) + 1;
 
       const newExam: Exam = {
@@ -1002,13 +970,10 @@ export default function ExamsPage() {
         instructions: form.instructions.trim(),
 
         negativeMarking: form.negativeMarking,
-        negativeMarks: form.negativeMarking
-          ? Number(form.negativeMarks)
-          : 0,
+        negativeMarks: form.negativeMarking ? Number(form.negativeMarks) : 0,
         randomizeQuestions: form.randomizeQuestions,
         randomizeOptions: form.randomizeOptions,
-        publishResultsAutomatically:
-          form.publishResultsAutomatically,
+        publishResultsAutomatically: form.publishResultsAutomatically,
         proctoring: form.proctoring,
         allowReattempt: form.allowReattempt,
         difficulty: form.difficulty,
@@ -1018,9 +983,7 @@ export default function ExamsPage() {
         passRate: 0,
         topScore: 0,
 
-        createdAt: new Date()
-          .toISOString()
-          .split("T")[0],
+        createdAt: new Date().toISOString().split("T")[0],
       };
 
       setExams((current) => [newExam, ...current]);
@@ -1038,9 +1001,7 @@ export default function ExamsPage() {
   const handleDeleteExam = () => {
     if (!deleteExamId) return;
 
-    setExams((current) =>
-      current.filter((exam) => exam.id !== deleteExamId)
-    );
+    setExams((current) => current.filter((exam) => exam.id !== deleteExamId));
 
     setDeleteExamId(null);
     setActionMenuId(null);
@@ -1055,11 +1016,10 @@ export default function ExamsPage() {
           ? {
               ...exam,
               status: "Ongoing",
-              attendanceRate:
-                exam.attendanceRate || 88,
+              attendanceRate: exam.attendanceRate || 88,
             }
-          : exam
-      )
+          : exam,
+      ),
     );
 
     setActionMenuId(null);
@@ -1076,17 +1036,13 @@ export default function ExamsPage() {
               ...exam,
               status: "Completed",
               averageScore:
-                exam.averageScore ||
-                Math.round(exam.totalMarks * 0.68),
-              attendanceRate:
-                exam.attendanceRate || 91,
+                exam.averageScore || Math.round(exam.totalMarks * 0.68),
+              attendanceRate: exam.attendanceRate || 91,
               passRate: exam.passRate || 74,
-              topScore:
-                exam.topScore ||
-                Math.round(exam.totalMarks * 0.94),
+              topScore: exam.topScore || Math.round(exam.totalMarks * 0.94),
             }
-          : exam
-      )
+          : exam,
+      ),
     );
 
     setActionMenuId(null);
@@ -1098,10 +1054,8 @@ export default function ExamsPage() {
   const handleDuplicateExam = (exam: Exam) => {
     const newNumber =
       Math.max(
-        ...exams.map((item) =>
-          Number(item.id.replace("EXM-", "")) || 1000
-        ),
-        1000
+        ...exams.map((item) => Number(item.id.replace("EXM-", "")) || 1000),
+        1000,
       ) + 1;
 
     const duplicate: Exam = {
@@ -1114,9 +1068,7 @@ export default function ExamsPage() {
       passRate: 0,
       topScore: 0,
       students: 0,
-      createdAt: new Date()
-        .toISOString()
-        .split("T")[0],
+      createdAt: new Date().toISOString().split("T")[0],
     };
 
     setExams((current) => [duplicate, ...current]);
@@ -1126,9 +1078,7 @@ export default function ExamsPage() {
   };
 
   const handlePublishResults = (exam: Exam) => {
-    showToast(
-      `Results published for ${exam.name}.`
-    );
+    showToast(`Results published for ${exam.name}.`);
   };
 
   const clearFilters = () => {
@@ -1194,10 +1144,8 @@ export default function ExamsPage() {
       headers.join(","),
       ...rows.map((row) =>
         row
-          .map((value) =>
-            `"${String(value).replaceAll('"', '""')}"`
-          )
-          .join(",")
+          .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+          .join(","),
       ),
     ].join("\n");
 
@@ -1217,37 +1165,31 @@ export default function ExamsPage() {
     showToast("Exam report exported.");
   };
 
-  const monthName = calendarDate.toLocaleDateString(
-    "en-IN",
-    {
-      month: "long",
-      year: "numeric",
-    }
-  );
+  const monthName = calendarDate.toLocaleDateString("en-IN", {
+    month: "long",
+    year: "numeric",
+  });
 
   const daysInMonth = new Date(
     calendarDate.getFullYear(),
     calendarDate.getMonth() + 1,
-    0
+    0,
   ).getDate();
 
   const firstDay = new Date(
     calendarDate.getFullYear(),
     calendarDate.getMonth(),
-    1
+    1,
   ).getDay();
 
   const calendarDays = Array.from(
     { length: firstDay + daysInMonth },
-    (_, index) =>
-      index < firstDay ? null : index - firstDay + 1
+    (_, index) => (index < firstDay ? null : index - firstDay + 1),
   );
 
   const examsForCalendarDay = (day: number) => {
     const year = calendarDate.getFullYear();
-    const month = String(
-      calendarDate.getMonth() + 1
-    ).padStart(2, "0");
+    const month = String(calendarDate.getMonth() + 1).padStart(2, "0");
     const date = String(day).padStart(2, "0");
 
     const target = `${year}-${month}-${date}`;
@@ -1258,32 +1200,20 @@ export default function ExamsPage() {
   const changeCalendarMonth = (offset: number) => {
     setCalendarDate(
       (current) =>
-        new Date(
-          current.getFullYear(),
-          current.getMonth() + offset,
-          1
-        )
+        new Date(current.getFullYear(), current.getMonth() + offset, 1),
     );
   };
 
   const aiInsights = useMemo(() => {
-    const completed = exams.filter(
-      (exam) => exam.status === "Completed"
-    );
+    const completed = exams.filter((exam) => exam.status === "Completed");
 
     const hardExams = completed.filter(
-      (exam) =>
-        exam.difficulty === "Hard" &&
-        exam.passRate < 75
+      (exam) => exam.difficulty === "Hard" && exam.passRate < 75,
     );
 
-    const lowAttendance = completed.filter(
-      (exam) => exam.attendanceRate < 92
-    );
+    const lowAttendance = completed.filter((exam) => exam.attendanceRate < 92);
 
-    const strongest = [...completed].sort(
-      (a, b) => b.passRate - a.passRate
-    )[0];
+    const strongest = [...completed].sort((a, b) => b.passRate - a.passRate)[0];
 
     return {
       hardExams,
@@ -1307,20 +1237,14 @@ export default function ExamsPage() {
 
       if (existing) {
         existing.score +=
-          exam.totalMarks > 0
-            ? (exam.averageScore /
-                exam.totalMarks) *
-              100
-            : 0;
+          exam.totalMarks > 0 ? (exam.averageScore / exam.totalMarks) * 100 : 0;
         existing.pass += exam.passRate;
         existing.count += 1;
       } else {
         map.set(exam.subject, {
           score:
             exam.totalMarks > 0
-              ? (exam.averageScore /
-                  exam.totalMarks) *
-                100
+              ? (exam.averageScore / exam.totalMarks) * 100
               : 0,
           pass: exam.passRate,
           count: 1,
@@ -1343,81 +1267,62 @@ export default function ExamsPage() {
 
       <main className="ml-0 min-h-screen p-4 lg:ml-64 lg:p-8">
         {/* Header */}
-        <div className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <div className="mb-2 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
-                <FileText size={21} />
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                    Exams
-                  </h1>
-
-                  <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600">
-                    AI READY
-                  </span>
-                </div>
-
-                <p className="text-sm text-slate-500">
-                  Plan, conduct, analyze and improve examinations.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              {(
-                [
-                  "Overview",
-                  "Exams",
-                  "Calendar",
-                  "Analytics",
-                  "Results",
-                ] as Tab[]
-              ).map((tab) => (
+        <div className="mb-7">
+          <PageHeader
+            title="Exams"
+            description="Plan, conduct, analyze and improve examinations."
+            icon={<FileText size={20} />}
+            actions={
+              <>
                 <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                    activeTab === tab
-                      ? "bg-slate-900 text-white shadow-sm"
-                      : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
+                  type="button"
+                  onClick={() => {
+                    setShowAI(true);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:border-purple-300 hover:bg-purple-100"
                 >
-                  {tab}
+                  <Sparkles size={16} />
+                  AI Insights
                 </button>
-              ))}
-            </div>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => {
-                setShowAI(true);
-              }}
-              className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-bold text-purple-700 transition hover:bg-purple-100"
-            >
-              <Sparkles size={17} />
-              AI Insights
-            </button>
+                <button
+                  type="button"
+                  onClick={exportCSV}
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                >
+                  <Download size={16} />
+                  Export
+                </button>
 
-            <button
-              onClick={exportCSV}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-            >
-              <Download size={17} />
-              Export
-            </button>
+                <button
+                  type="button"
+                  onClick={openAddForm}
+                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                >
+                  <Plus size={17} />
+                  Create Exam
+                </button>
+              </>
+            }
+          />
 
-            <button
-              onClick={openAddForm}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
-            >
-              <Plus size={18} />
-              Create Exam
-            </button>
+          {/* Exam Navigation Tabs */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {(
+              ["Overview", "Exams", "Calendar", "Analytics", "Results"] as Tab[]
+            ).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  activeTab === tab
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -1435,14 +1340,12 @@ export default function ExamsPage() {
                 </div>
 
                 <h2 className="max-w-2xl text-2xl font-bold tracking-tight lg:text-3xl">
-                  Run smarter examinations with
-                  data-driven decisions.
+                  Run smarter examinations with data-driven decisions.
                 </h2>
 
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                  Monitor schedules, student participation,
-                  assessment quality and performance signals
-                  from one place.
+                  Monitor schedules, student participation, assessment quality
+                  and performance signals from one place.
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -1473,13 +1376,9 @@ export default function ExamsPage() {
                     </span>
                   </div>
 
-                  <p className="text-2xl font-bold">
-                    {stats.upcoming}
-                  </p>
+                  <p className="text-2xl font-bold">{stats.upcoming}</p>
 
-                  <p className="mt-1 text-xs text-slate-400">
-                    Scheduled exams
-                  </p>
+                  <p className="mt-1 text-xs text-slate-400">Scheduled exams</p>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
@@ -1490,9 +1389,7 @@ export default function ExamsPage() {
                     </span>
                   </div>
 
-                  <p className="text-2xl font-bold">
-                    {stats.ongoing}
-                  </p>
+                  <p className="text-2xl font-bold">{stats.ongoing}</p>
 
                   <p className="mt-1 text-xs text-slate-400">
                     Exams in progress
@@ -1507,13 +1404,9 @@ export default function ExamsPage() {
                     </span>
                   </div>
 
-                  <p className="text-2xl font-bold">
-                    {stats.averagePassRate}%
-                  </p>
+                  <p className="text-2xl font-bold">{stats.averagePassRate}%</p>
 
-                  <p className="mt-1 text-xs text-slate-400">
-                    Completed exams
-                  </p>
+                  <p className="mt-1 text-xs text-slate-400">Completed exams</p>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
@@ -1634,9 +1527,7 @@ export default function ExamsPage() {
                         <Zap size={17} />
                       </div>
 
-                      <h2 className="font-bold text-slate-900">
-                        Live Exams
-                      </h2>
+                      <h2 className="font-bold text-slate-900">Live Exams</h2>
                     </div>
 
                     <p className="mt-1 text-xs text-slate-500">
@@ -1660,7 +1551,8 @@ export default function ExamsPage() {
                     </p>
 
                     <p className="mt-1 max-w-sm text-sm text-slate-500">
-                      Your active examinations will appear here while students are taking them.
+                      Your active examinations will appear here while students
+                      are taking them.
                     </p>
                   </div>
                 ) : (
@@ -1681,8 +1573,7 @@ export default function ExamsPage() {
                             </div>
 
                             <p className="mt-1 text-xs text-slate-500">
-                              {exam.course} · {exam.batch} ·{" "}
-                              {exam.subject}
+                              {exam.course} · {exam.batch} · {exam.subject}
                             </p>
 
                             <div className="mt-3 flex flex-wrap gap-2">
@@ -1698,9 +1589,7 @@ export default function ExamsPage() {
 
                               <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600">
                                 <ShieldCheck size={13} />
-                                {exam.proctoring
-                                  ? "Proctored"
-                                  : "Standard"}
+                                {exam.proctoring ? "Proctored" : "Standard"}
                               </span>
                             </div>
                           </div>
@@ -1722,9 +1611,7 @@ export default function ExamsPage() {
               <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-100 p-5">
                   <div>
-                    <h2 className="font-bold text-slate-900">
-                      Upcoming Exams
-                    </h2>
+                    <h2 className="font-bold text-slate-900">Upcoming Exams</h2>
 
                     <p className="mt-1 text-xs text-slate-500">
                       Your next scheduled assessments.
@@ -1749,16 +1636,14 @@ export default function ExamsPage() {
                       <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-blue-50 text-blue-700">
                         <span className="text-[10px] font-bold uppercase">
                           {new Date(
-                            `${exam.examDate}T00:00:00`
+                            `${exam.examDate}T00:00:00`,
                           ).toLocaleDateString("en-IN", {
                             month: "short",
                           })}
                         </span>
 
                         <span className="text-base font-bold leading-none">
-                          {new Date(
-                            `${exam.examDate}T00:00:00`
-                          ).getDate()}
+                          {new Date(`${exam.examDate}T00:00:00`).getDate()}
                         </span>
                       </div>
 
@@ -1768,8 +1653,7 @@ export default function ExamsPage() {
                         </p>
 
                         <p className="mt-1 truncate text-xs text-slate-500">
-                          {exam.batch} · {exam.startTime} ·{" "}
-                          {exam.duration} min
+                          {exam.batch} · {exam.startTime} · {exam.duration} min
                         </p>
                       </div>
 
@@ -1803,9 +1687,8 @@ export default function ExamsPage() {
                     </div>
 
                     <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                      AI can identify performance risks, attendance
-                      patterns, difficult assessments and useful
-                      next actions.
+                      AI can identify performance risks, attendance patterns,
+                      difficult assessments and useful next actions.
                     </p>
                   </div>
                 </div>
@@ -1822,10 +1705,7 @@ export default function ExamsPage() {
               <div className="mt-5 grid gap-3 md:grid-cols-3">
                 <div className="rounded-2xl border border-red-100 bg-white p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <CircleAlert
-                      size={18}
-                      className="text-red-500"
-                    />
+                    <CircleAlert size={18} className="text-red-500" />
 
                     <span className="text-[10px] font-bold uppercase tracking-wider text-red-500">
                       Attention
@@ -1843,10 +1723,7 @@ export default function ExamsPage() {
 
                 <div className="rounded-2xl border border-amber-100 bg-white p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <TrendingDown
-                      size={18}
-                      className="text-amber-500"
-                    />
+                    <TrendingDown size={18} className="text-amber-500" />
 
                     <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">
                       Risk
@@ -1864,10 +1741,7 @@ export default function ExamsPage() {
 
                 <div className="rounded-2xl border border-emerald-100 bg-white p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <Trophy
-                      size={18}
-                      className="text-emerald-500"
-                    />
+                    <Trophy size={18} className="text-emerald-500" />
 
                     <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
                       Best
@@ -1875,8 +1749,7 @@ export default function ExamsPage() {
                   </div>
 
                   <p className="truncate text-sm font-bold text-slate-900">
-                    {aiInsights.strongest?.name ||
-                      "No completed exams"}
+                    {aiInsights.strongest?.name || "No completed exams"}
                   </p>
 
                   <p className="mt-1 text-xs leading-5 text-slate-500">
@@ -1899,10 +1772,7 @@ export default function ExamsPage() {
                     </p>
                   </div>
 
-                  <BarChart3
-                    size={19}
-                    className="text-blue-600"
-                  />
+                  <BarChart3 size={19} className="text-blue-600" />
                 </div>
 
                 <div className="space-y-5">
@@ -1956,11 +1826,7 @@ export default function ExamsPage() {
 
                       <span className="font-bold text-slate-900">
                         {stats.total
-                          ? Math.round(
-                              (stats.completed /
-                                stats.total) *
-                                100
-                            )
+                          ? Math.round((stats.completed / stats.total) * 100)
                           : 0}
                         %
                       </span>
@@ -1973,9 +1839,7 @@ export default function ExamsPage() {
                           width: `${
                             stats.total
                               ? Math.round(
-                                  (stats.completed /
-                                    stats.total) *
-                                    100
+                                  (stats.completed / stats.total) * 100,
                                 )
                               : 0
                           }%`,
@@ -1998,37 +1862,32 @@ export default function ExamsPage() {
                     </p>
                   </div>
 
-                  <Target
-                    size={19}
-                    className="text-purple-600"
-                  />
+                  <Target size={19} className="text-purple-600" />
                 </div>
 
                 <div className="space-y-4">
-                  {subjectPerformance
-                    .slice(0, 5)
-                    .map((item) => (
-                      <div key={item.subject}>
-                        <div className="mb-1.5 flex items-center justify-between">
-                          <span className="text-xs font-semibold text-slate-600">
-                            {item.subject}
-                          </span>
+                  {subjectPerformance.slice(0, 5).map((item) => (
+                    <div key={item.subject}>
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-600">
+                          {item.subject}
+                        </span>
 
-                          <span className="text-xs font-bold text-slate-900">
-                            {item.score}%
-                          </span>
-                        </div>
-
-                        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            className="h-full rounded-full bg-blue-500"
-                            style={{
-                              width: `${item.score}%`,
-                            }}
-                          />
-                        </div>
+                        <span className="text-xs font-bold text-slate-900">
+                          {item.score}%
+                        </span>
                       </div>
-                    ))}
+
+                      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className="h-full rounded-full bg-blue-500"
+                          style={{
+                            width: `${item.score}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
 
                   {subjectPerformance.length === 0 && (
                     <p className="py-8 text-center text-sm text-slate-400">
@@ -2041,19 +1900,14 @@ export default function ExamsPage() {
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-5 flex items-center justify-between">
                   <div>
-                    <h2 className="font-bold text-slate-900">
-                      Quick Actions
-                    </h2>
+                    <h2 className="font-bold text-slate-900">Quick Actions</h2>
 
                     <p className="mt-1 text-xs text-slate-500">
                       Frequently used exam operations.
                     </p>
                   </div>
 
-                  <Zap
-                    size={19}
-                    className="text-amber-500"
-                  />
+                  <Zap size={19} className="text-amber-500" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -2066,14 +1920,12 @@ export default function ExamsPage() {
                     {
                       label: "Calendar",
                       icon: CalendarDays,
-                      action: () =>
-                        setActiveTab("Calendar"),
+                      action: () => setActiveTab("Calendar"),
                     },
                     {
                       label: "Analytics",
                       icon: BarChart3,
-                      action: () =>
-                        setActiveTab("Analytics"),
+                      action: () => setActiveTab("Analytics"),
                     },
                     {
                       label: "Export",
@@ -2089,10 +1941,7 @@ export default function ExamsPage() {
                         onClick={item.action}
                         className="flex min-h-[88px] flex-col items-start justify-between rounded-xl border border-slate-200 bg-slate-50 p-3 text-left transition hover:border-blue-200 hover:bg-blue-50"
                       >
-                        <Icon
-                          size={18}
-                          className="text-slate-600"
-                        />
+                        <Icon size={18} className="text-slate-600" />
 
                         <span className="text-xs font-bold text-slate-800">
                           {item.label}
@@ -2159,11 +2008,7 @@ export default function ExamsPage() {
                 <select
                   value={statusFilter}
                   onChange={(event) => {
-                    setStatusFilter(
-                      event.target.value as
-                        | "All"
-                        | ExamStatus
-                    );
+                    setStatusFilter(event.target.value as "All" | ExamStatus);
                     setCurrentPage(1);
                   }}
                   className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500"
@@ -2211,11 +2056,7 @@ export default function ExamsPage() {
                 <select
                   value={modeFilter}
                   onChange={(event) => {
-                    setModeFilter(
-                      event.target.value as
-                        | "All"
-                        | ExamMode
-                    );
+                    setModeFilter(event.target.value as "All" | ExamMode);
                     setCurrentPage(1);
                   }}
                   className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500"
@@ -2269,7 +2110,7 @@ export default function ExamsPage() {
                           | "name"
                           | "marks"
                           | "students"
-                          | "score"
+                          | "score",
                       );
                       setCurrentPage(1);
                     }}
@@ -2278,16 +2119,14 @@ export default function ExamsPage() {
                     <option value="date">Sort by Date</option>
                     <option value="name">Sort by Name</option>
                     <option value="marks">Sort by Marks</option>
-                    <option value="students">
-                      Sort by Students
-                    </option>
+                    <option value="students">Sort by Students</option>
                     <option value="score">Sort by Score</option>
                   </select>
 
                   <button
                     onClick={() =>
                       setSortOrder((current) =>
-                        current === "asc" ? "desc" : "asc"
+                        current === "asc" ? "desc" : "asc",
                       )
                     }
                     className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -2318,8 +2157,8 @@ export default function ExamsPage() {
                   </h3>
 
                   <p className="mt-1 max-w-md text-sm text-slate-500">
-                    Try changing your search or filters, or create
-                    a new examination.
+                    Try changing your search or filters, or create a new
+                    examination.
                   </p>
 
                   <button
@@ -2372,11 +2211,9 @@ export default function ExamsPage() {
 
                       <tbody>
                         {paginatedExams.map((exam) => {
-                          const statusStyle =
-                            getStatusStyle(exam.status);
+                          const statusStyle = getStatusStyle(exam.status);
 
-                          const StatusIcon =
-                            statusStyle.icon;
+                          const StatusIcon = statusStyle.icon;
 
                           return (
                             <tr
@@ -2401,7 +2238,7 @@ export default function ExamsPage() {
 
                                       <span
                                         className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${getDifficultyStyle(
-                                          exam.difficulty
+                                          exam.difficulty,
                                         )}`}
                                       >
                                         {exam.difficulty}
@@ -2437,8 +2274,7 @@ export default function ExamsPage() {
 
                                 <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
                                   <Clock3 size={13} />
-                                  {exam.startTime} ·{" "}
-                                  {exam.duration} min
+                                  {exam.startTime} · {exam.duration} min
                                 </div>
                               </td>
 
@@ -2448,15 +2284,13 @@ export default function ExamsPage() {
                                 </p>
 
                                 <p className="mt-1 text-xs text-slate-500">
-                                  Pass:{" "}
-                                  {exam.passingMarks} ·{" "}
-                                  {exam.questions} Qs
+                                  Pass: {exam.passingMarks} · {exam.questions}{" "}
+                                  Qs
                                 </p>
 
                                 {exam.status === "Completed" && (
                                   <p className="mt-1 text-xs font-bold text-emerald-600">
-                                    Avg:{" "}
-                                    {exam.averageScore}
+                                    Avg: {exam.averageScore}
                                   </p>
                                 )}
                               </td>
@@ -2482,7 +2316,7 @@ export default function ExamsPage() {
                               <td className="px-5 py-4">
                                 <span
                                   className={`inline-flex rounded-lg border px-2.5 py-1 text-xs font-bold ${getModeStyle(
-                                    exam.mode
+                                    exam.mode,
                                   )}`}
                                 >
                                   {exam.mode}
@@ -2514,9 +2348,7 @@ export default function ExamsPage() {
                               <td className="relative px-5 py-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
                                   <button
-                                    onClick={() =>
-                                      setViewingExam(exam)
-                                    }
+                                    onClick={() => setViewingExam(exam)}
                                     className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
                                   >
                                     <Eye size={15} />
@@ -2526,26 +2358,21 @@ export default function ExamsPage() {
                                   <button
                                     onClick={() =>
                                       setActionMenuId(
-                                        actionMenuId ===
-                                          exam.id
+                                        actionMenuId === exam.id
                                           ? null
-                                          : exam.id
+                                          : exam.id,
                                       )
                                     }
                                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                                   >
-                                    <MoreHorizontal
-                                      size={18}
-                                    />
+                                    <MoreHorizontal size={18} />
                                   </button>
                                 </div>
 
                                 {actionMenuId === exam.id && (
                                   <div className="absolute right-5 top-14 z-30 w-52 rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-xl">
                                     <button
-                                      onClick={() =>
-                                        openEditForm(exam)
-                                      }
+                                      onClick={() => openEditForm(exam)}
                                       className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                     >
                                       <Pencil size={16} />
@@ -2553,25 +2380,16 @@ export default function ExamsPage() {
                                     </button>
 
                                     <button
-                                      onClick={() =>
-                                        handleDuplicateExam(
-                                          exam
-                                        )
-                                      }
+                                      onClick={() => handleDuplicateExam(exam)}
                                       className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                     >
                                       <Copy size={16} />
                                       Duplicate
                                     </button>
 
-                                    {exam.status ===
-                                      "Upcoming" && (
+                                    {exam.status === "Upcoming" && (
                                       <button
-                                        onClick={() =>
-                                          handleStartExam(
-                                            exam.id
-                                          )
-                                        }
+                                        onClick={() => handleStartExam(exam.id)}
                                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50"
                                       >
                                         <Play size={16} />
@@ -2579,13 +2397,10 @@ export default function ExamsPage() {
                                       </button>
                                     )}
 
-                                    {exam.status ===
-                                      "Ongoing" && (
+                                    {exam.status === "Ongoing" && (
                                       <button
                                         onClick={() =>
-                                          handleCompleteExam(
-                                            exam.id
-                                          )
+                                          handleCompleteExam(exam.id)
                                         }
                                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
                                       >
@@ -2594,29 +2409,18 @@ export default function ExamsPage() {
                                       </button>
                                     )}
 
-                                    {exam.status ===
-                                      "Completed" && (
+                                    {exam.status === "Completed" && (
                                       <button
-                                        onClick={() =>
-                                          setShowResults(
-                                            exam
-                                          )
-                                        }
+                                        onClick={() => setShowResults(exam)}
                                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-50"
                                       >
-                                        <FileBarChart
-                                          size={16}
-                                        />
+                                        <FileBarChart size={16} />
                                         View Results
                                       </button>
                                     )}
 
                                     <button
-                                      onClick={() =>
-                                        setDeleteExamId(
-                                          exam.id
-                                        )
-                                      }
+                                      onClick={() => setDeleteExamId(exam.id)}
                                       className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50"
                                     >
                                       <Trash2 size={16} />
@@ -2635,17 +2439,12 @@ export default function ExamsPage() {
                   {/* Mobile Cards */}
                   <div className="divide-y divide-slate-100 lg:hidden">
                     {paginatedExams.map((exam) => {
-                      const statusStyle =
-                        getStatusStyle(exam.status);
+                      const statusStyle = getStatusStyle(exam.status);
 
-                      const StatusIcon =
-                        statusStyle.icon;
+                      const StatusIcon = statusStyle.icon;
 
                       return (
-                        <div
-                          key={exam.id}
-                          className="p-4"
-                        >
+                        <div key={exam.id} className="p-4">
                           <div className="flex gap-3">
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                               <FileText size={18} />
@@ -2688,10 +2487,8 @@ export default function ExamsPage() {
                                   </p>
 
                                   <p className="mt-1 text-xs font-bold text-slate-800">
-                                    {formatShortDate(
-                                      exam.examDate
-                                    )}{" "}
-                                    · {exam.startTime}
+                                    {formatShortDate(exam.examDate)} ·{" "}
+                                    {exam.startTime}
                                   </p>
                                 </div>
 
@@ -2718,18 +2515,14 @@ export default function ExamsPage() {
 
                               <div className="mt-3 flex gap-2">
                                 <button
-                                  onClick={() =>
-                                    setViewingExam(exam)
-                                  }
+                                  onClick={() => setViewingExam(exam)}
                                   className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700"
                                 >
                                   View
                                 </button>
 
                                 <button
-                                  onClick={() =>
-                                    openEditForm(exam)
-                                  }
+                                  onClick={() => openEditForm(exam)}
                                   className="flex-1 rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white"
                                 >
                                   Edit
@@ -2749,16 +2542,11 @@ export default function ExamsPage() {
                       <span className="font-bold text-slate-800">
                         {filteredExams.length === 0
                           ? 0
-                          : (safePage - 1) *
-                              rowsPerPage +
-                            1}
+                          : (safePage - 1) * rowsPerPage + 1}
                       </span>{" "}
                       to{" "}
                       <span className="font-bold text-slate-800">
-                        {Math.min(
-                          safePage * rowsPerPage,
-                          filteredExams.length
-                        )}
+                        {Math.min(safePage * rowsPerPage, filteredExams.length)}
                       </span>{" "}
                       of{" "}
                       <span className="font-bold text-slate-800">
@@ -2771,9 +2559,7 @@ export default function ExamsPage() {
                       <button
                         disabled={safePage === 1}
                         onClick={() =>
-                          setCurrentPage((page) =>
-                            Math.max(1, page - 1)
-                          )
+                          setCurrentPage((page) => Math.max(1, page - 1))
                         }
                         className="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
                       >
@@ -2789,10 +2575,7 @@ export default function ExamsPage() {
                         disabled={safePage === totalPages}
                         onClick={() =>
                           setCurrentPage((page) =>
-                            Math.min(
-                              totalPages,
-                              page + 1
-                            )
+                            Math.min(totalPages, page + 1),
                           )
                         }
                         className="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
@@ -2847,22 +2630,16 @@ export default function ExamsPage() {
               <div className="overflow-x-auto p-4 lg:p-5">
                 <div className="min-w-[760px]">
                   <div className="grid grid-cols-7 border-b border-slate-200">
-                    {[
-                      "Sun",
-                      "Mon",
-                      "Tue",
-                      "Wed",
-                      "Thu",
-                      "Fri",
-                      "Sat",
-                    ].map((day) => (
-                      <div
-                        key={day}
-                        className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-wide text-slate-400"
-                      >
-                        {day}
-                      </div>
-                    ))}
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                      (day) => (
+                        <div
+                          key={day}
+                          className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-wide text-slate-400"
+                        >
+                          {day}
+                        </div>
+                      ),
+                    )}
                   </div>
 
                   <div className="grid grid-cols-7">
@@ -2876,8 +2653,7 @@ export default function ExamsPage() {
                         );
                       }
 
-                      const dayExams =
-                        examsForCalendarDay(day);
+                      const dayExams = examsForCalendarDay(day);
 
                       return (
                         <div
@@ -2887,8 +2663,7 @@ export default function ExamsPage() {
                           <div className="mb-2 flex items-center justify-between">
                             <span
                               className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ${
-                                day ===
-                                calendarDate.getDate()
+                                day === calendarDate.getDate()
                                   ? "bg-blue-600 text-white"
                                   : "text-slate-600"
                               }`}
@@ -2904,34 +2679,27 @@ export default function ExamsPage() {
                           </div>
 
                           <div className="space-y-1.5">
-                            {dayExams
-                              .slice(0, 3)
-                              .map((exam) => (
-                                <button
-                                  key={exam.id}
-                                  onClick={() =>
-                                    setViewingExam(exam)
-                                  }
-                                  className={`w-full rounded-lg border p-2 text-left transition hover:shadow-sm ${
-                                    exam.status ===
-                                    "Completed"
-                                      ? "border-emerald-100 bg-emerald-50"
-                                      : exam.status ===
-                                        "Ongoing"
+                            {dayExams.slice(0, 3).map((exam) => (
+                              <button
+                                key={exam.id}
+                                onClick={() => setViewingExam(exam)}
+                                className={`w-full rounded-lg border p-2 text-left transition hover:shadow-sm ${
+                                  exam.status === "Completed"
+                                    ? "border-emerald-100 bg-emerald-50"
+                                    : exam.status === "Ongoing"
                                       ? "border-amber-100 bg-amber-50"
                                       : "border-blue-100 bg-blue-50"
-                                  }`}
-                                >
-                                  <p className="truncate text-[10px] font-bold text-slate-800">
-                                    {exam.name}
-                                  </p>
+                                }`}
+                              >
+                                <p className="truncate text-[10px] font-bold text-slate-800">
+                                  {exam.name}
+                                </p>
 
-                                  <p className="mt-0.5 text-[9px] font-semibold text-slate-500">
-                                    {exam.startTime} ·{" "}
-                                    {exam.duration}m
-                                  </p>
-                                </button>
-                              ))}
+                                <p className="mt-0.5 text-[9px] font-semibold text-slate-500">
+                                  {exam.startTime} · {exam.duration}m
+                                </p>
+                              </button>
+                            ))}
 
                             {dayExams.length > 3 && (
                               <p className="px-1 text-[9px] font-bold text-blue-600">
@@ -2951,10 +2719,7 @@ export default function ExamsPage() {
             <div className="grid gap-6 xl:grid-cols-3">
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
-                  <CalendarClock
-                    size={18}
-                    className="text-blue-600"
-                  />
+                  <CalendarClock size={18} className="text-blue-600" />
 
                   <h3 className="font-bold text-slate-900">
                     Upcoming schedule
@@ -2971,16 +2736,14 @@ export default function ExamsPage() {
                       <div className="text-center">
                         <p className="text-[10px] font-bold uppercase text-blue-600">
                           {new Date(
-                            `${exam.examDate}T00:00:00`
+                            `${exam.examDate}T00:00:00`,
                           ).toLocaleDateString("en-IN", {
                             month: "short",
                           })}
                         </p>
 
                         <p className="text-lg font-bold text-slate-900">
-                          {new Date(
-                            `${exam.examDate}T00:00:00`
-                          ).getDate()}
+                          {new Date(`${exam.examDate}T00:00:00`).getDate()}
                         </p>
                       </div>
 
@@ -3000,14 +2763,9 @@ export default function ExamsPage() {
 
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
-                  <AlertCircle
-                    size={18}
-                    className="text-amber-500"
-                  />
+                  <AlertCircle size={18} className="text-amber-500" />
 
-                  <h3 className="font-bold text-slate-900">
-                    Schedule watch
-                  </h3>
+                  <h3 className="font-bold text-slate-900">Schedule watch</h3>
                 </div>
 
                 <div className="space-y-3">
@@ -3017,8 +2775,8 @@ export default function ExamsPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-amber-700">
-                      Multiple assessments are scheduled within
-                      the next two weeks. Review student workload.
+                      Multiple assessments are scheduled within the next two
+                      weeks. Review student workload.
                     </p>
                   </div>
 
@@ -3028,8 +2786,8 @@ export default function ExamsPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-blue-700">
-                      Ensure online students receive joining
-                      instructions before each scheduled test.
+                      Ensure online students receive joining instructions before
+                      each scheduled test.
                     </p>
                   </div>
                 </div>
@@ -3037,10 +2795,7 @@ export default function ExamsPage() {
 
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
-                  <Sparkles
-                    size={18}
-                    className="text-purple-600"
-                  />
+                  <Sparkles size={18} className="text-purple-600" />
 
                   <h3 className="font-bold text-slate-900">
                     AI schedule suggestion
@@ -3048,9 +2803,8 @@ export default function ExamsPage() {
                 </div>
 
                 <p className="text-sm leading-6 text-slate-600">
-                  Consider spacing high-difficulty mock tests
-                  across different days to reduce assessment
-                  fatigue.
+                  Consider spacing high-difficulty mock tests across different
+                  days to reduce assessment fatigue.
                 </p>
 
                 <button
@@ -3090,9 +2844,7 @@ export default function ExamsPage() {
                 },
                 {
                   label: "Registrations",
-                  value: stats.totalStudents.toLocaleString(
-                    "en-IN"
-                  ),
+                  value: stats.totalStudents.toLocaleString("en-IN"),
                   icon: Users,
                   note: "Across all exams",
                 },
@@ -3116,9 +2868,7 @@ export default function ExamsPage() {
                       {item.value}
                     </p>
 
-                    <p className="mt-1 text-xs text-slate-400">
-                      {item.note}
-                    </p>
+                    <p className="mt-1 text-xs text-slate-400">{item.note}</p>
                   </div>
                 );
               })}
@@ -3176,9 +2926,7 @@ export default function ExamsPage() {
 
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-6">
-                  <h2 className="font-bold text-slate-900">
-                    Exam Performance
-                  </h2>
+                  <h2 className="font-bold text-slate-900">Exam Performance</h2>
 
                   <p className="mt-1 text-sm text-slate-500">
                     Pass-rate comparison across completed exams.
@@ -3188,9 +2936,7 @@ export default function ExamsPage() {
                 <div className="space-y-4">
                   {completedExams
                     .slice()
-                    .sort(
-                      (a, b) => b.passRate - a.passRate
-                    )
+                    .sort((a, b) => b.passRate - a.passRate)
                     .slice(0, 6)
                     .map((exam) => (
                       <div key={exam.id}>
@@ -3232,9 +2978,9 @@ export default function ExamsPage() {
                     </h3>
 
                     <p className="mt-1 text-sm leading-6 text-slate-600">
-                      Current simulated analysis suggests focusing
-                      on low-attendance assessments and difficult
-                      subjects before the next mock-test cycle.
+                      Current simulated analysis suggests focusing on
+                      low-attendance assessments and difficult subjects before
+                      the next mock-test cycle.
                     </p>
                   </div>
                 </div>
@@ -3282,8 +3028,7 @@ export default function ExamsPage() {
                         </p>
 
                         <p className="mt-1 text-xs text-slate-500">
-                          {exam.batch} ·{" "}
-                          {formatDate(exam.examDate)}
+                          {exam.batch} · {formatDate(exam.examDate)}
                         </p>
                       </div>
                     </div>
@@ -3345,10 +3090,10 @@ export default function ExamsPage() {
                   </h3>
 
                   <p className="mt-1 text-sm leading-6 text-blue-800">
-                    Use result trends to identify students who
-                    consistently remain below the passing threshold,
-                    then connect those students to remedial classes,
-                    doubt sessions or targeted practice tests.
+                    Use result trends to identify students who consistently
+                    remain below the passing threshold, then connect those
+                    students to remedial classes, doubt sessions or targeted
+                    practice tests.
                   </p>
                 </div>
               </div>
@@ -3391,14 +3136,9 @@ export default function ExamsPage() {
             <div className="space-y-7 p-5 sm:p-6">
               {formError && (
                 <div className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
-                  <AlertCircle
-                    size={18}
-                    className="mt-0.5 shrink-0"
-                  />
+                  <AlertCircle size={18} className="mt-0.5 shrink-0" />
 
-                  <p className="font-semibold">
-                    {formError}
-                  </p>
+                  <p className="font-semibold">{formError}</p>
                 </div>
               )}
 
@@ -3524,8 +3264,7 @@ export default function ExamsPage() {
                       onChange={(event) =>
                         setForm({
                           ...form,
-                          difficulty:
-                            event.target.value as Difficulty,
+                          difficulty: event.target.value as Difficulty,
                         })
                       }
                       className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -3547,9 +3286,7 @@ export default function ExamsPage() {
                   </div>
 
                   <div>
-                    <h3 className="font-bold text-slate-900">
-                      Schedule
-                    </h3>
+                    <h3 className="font-bold text-slate-900">Schedule</h3>
 
                     <p className="text-xs text-slate-500">
                       Set when the examination will take place.
@@ -3667,8 +3404,7 @@ export default function ExamsPage() {
                       onChange={(event) =>
                         setForm({
                           ...form,
-                          passingMarks:
-                            event.target.value,
+                          passingMarks: event.target.value,
                         })
                       }
                       placeholder="120"
@@ -3714,21 +3450,16 @@ export default function ExamsPage() {
                       onClick={() =>
                         setForm({
                           ...form,
-                          negativeMarking:
-                            !form.negativeMarking,
+                          negativeMarking: !form.negativeMarking,
                         })
                       }
                       className={`relative h-6 w-11 rounded-full transition ${
-                        form.negativeMarking
-                          ? "bg-blue-600"
-                          : "bg-slate-300"
+                        form.negativeMarking ? "bg-blue-600" : "bg-slate-300"
                       }`}
                     >
                       <span
                         className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition ${
-                          form.negativeMarking
-                            ? "left-6"
-                            : "left-1"
+                          form.negativeMarking ? "left-6" : "left-1"
                         }`}
                       />
                     </button>
@@ -3748,8 +3479,7 @@ export default function ExamsPage() {
                         onChange={(event) =>
                           setForm({
                             ...form,
-                            negativeMarks:
-                              event.target.value,
+                            negativeMarks: event.target.value,
                           })
                         }
                         className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:border-blue-500"
@@ -3782,14 +3512,12 @@ export default function ExamsPage() {
                     {
                       key: "randomizeQuestions",
                       title: "Randomize Questions",
-                      description:
-                        "Show questions in a different order.",
+                      description: "Show questions in a different order.",
                     },
                     {
                       key: "randomizeOptions",
                       title: "Randomize Options",
-                      description:
-                        "Shuffle answer choices where supported.",
+                      description: "Shuffle answer choices where supported.",
                     },
                     {
                       key: "publishResultsAutomatically",
@@ -3806,15 +3534,12 @@ export default function ExamsPage() {
                     {
                       key: "allowReattempt",
                       title: "Allow Reattempt",
-                      description:
-                        "Allow students to retake the examination.",
+                      description: "Allow students to retake the examination.",
                     },
                   ].map((setting) => {
-                    const key =
-                      setting.key as keyof ExamForm;
+                    const key = setting.key as keyof ExamForm;
 
-                    const enabled =
-                      form[key] as boolean;
+                    const enabled = form[key] as boolean;
 
                     return (
                       <button
@@ -3908,9 +3633,7 @@ export default function ExamsPage() {
               >
                 <Save size={17} />
 
-                {editingExamId
-                  ? "Save Changes"
-                  : "Create Exam"}
+                {editingExamId ? "Save Changes" : "Create Exam"}
               </button>
             </div>
           </div>
@@ -3931,9 +3654,7 @@ export default function ExamsPage() {
 
                     <span
                       className={`rounded-full border px-2.5 py-1 text-xs font-bold ${
-                        getStatusStyle(
-                          viewingExam.status
-                        ).className
+                        getStatusStyle(viewingExam.status).className
                       }`}
                     >
                       {viewingExam.status}
@@ -3941,7 +3662,7 @@ export default function ExamsPage() {
 
                     <span
                       className={`rounded-full border px-2.5 py-1 text-xs font-bold ${getDifficultyStyle(
-                        viewingExam.difficulty
+                        viewingExam.difficulty,
                       )}`}
                     >
                       {viewingExam.difficulty}
@@ -3953,8 +3674,7 @@ export default function ExamsPage() {
                   </h2>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    {viewingExam.course} ·{" "}
-                    {viewingExam.batch} ·{" "}
+                    {viewingExam.course} · {viewingExam.batch} ·{" "}
                     {viewingExam.subject}
                   </p>
                 </div>
@@ -3974,9 +3694,7 @@ export default function ExamsPage() {
                 {[
                   {
                     label: "Date",
-                    value: formatDate(
-                      viewingExam.examDate
-                    ),
+                    value: formatDate(viewingExam.examDate),
                     icon: CalendarDays,
                     iconClass: "text-blue-600",
                   },
@@ -3994,9 +3712,7 @@ export default function ExamsPage() {
                   },
                   {
                     label: "Students",
-                    value: String(
-                      viewingExam.students
-                    ),
+                    value: String(viewingExam.students),
                     icon: Users,
                     iconClass: "text-emerald-600",
                   },
@@ -4008,10 +3724,7 @@ export default function ExamsPage() {
                       key={item.label}
                       className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
                     >
-                      <Icon
-                        size={18}
-                        className={`mb-2 ${item.iconClass}`}
-                      />
+                      <Icon size={18} className={`mb-2 ${item.iconClass}`} />
 
                       <p className="text-[11px] font-semibold text-slate-500">
                         {item.label}
@@ -4081,21 +3794,14 @@ export default function ExamsPage() {
               {/* Assessment */}
               <div>
                 <div className="mb-3 flex items-center gap-2">
-                  <Award
-                    size={18}
-                    className="text-amber-600"
-                  />
+                  <Award size={18} className="text-amber-600" />
 
-                  <h3 className="font-bold text-slate-900">
-                    Assessment
-                  </h3>
+                  <h3 className="font-bold text-slate-900">Assessment</h3>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                   <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-xs text-slate-500">
-                      Total Marks
-                    </p>
+                    <p className="text-xs text-slate-500">Total Marks</p>
 
                     <p className="mt-1 text-lg font-bold text-slate-900">
                       {viewingExam.totalMarks}
@@ -4103,9 +3809,7 @@ export default function ExamsPage() {
                   </div>
 
                   <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-xs text-slate-500">
-                      Passing
-                    </p>
+                    <p className="text-xs text-slate-500">Passing</p>
 
                     <p className="mt-1 text-lg font-bold text-slate-900">
                       {viewingExam.passingMarks}
@@ -4113,9 +3817,7 @@ export default function ExamsPage() {
                   </div>
 
                   <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-xs text-slate-500">
-                      Questions
-                    </p>
+                    <p className="text-xs text-slate-500">Questions</p>
 
                     <p className="mt-1 text-lg font-bold text-slate-900">
                       {viewingExam.questions}
@@ -4123,9 +3825,7 @@ export default function ExamsPage() {
                   </div>
 
                   <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-xs text-slate-500">
-                      Mode
-                    </p>
+                    <p className="text-xs text-slate-500">Mode</p>
 
                     <p className="mt-1 text-lg font-bold text-slate-900">
                       {viewingExam.mode}
@@ -4137,14 +3837,9 @@ export default function ExamsPage() {
               {/* Settings */}
               <div>
                 <div className="mb-3 flex items-center gap-2">
-                  <Settings2
-                    size={18}
-                    className="text-blue-600"
-                  />
+                  <Settings2 size={18} className="text-blue-600" />
 
-                  <h3 className="font-bold text-slate-900">
-                    Exam Settings
-                  </h3>
+                  <h3 className="font-bold text-slate-900">Exam Settings</h3>
                 </div>
 
                 <div className="grid gap-2 md:grid-cols-2">
@@ -4157,21 +3852,15 @@ export default function ExamsPage() {
                     ],
                     [
                       "Question randomization",
-                      viewingExam.randomizeQuestions
-                        ? "Enabled"
-                        : "Disabled",
+                      viewingExam.randomizeQuestions ? "Enabled" : "Disabled",
                     ],
                     [
                       "Option randomization",
-                      viewingExam.randomizeOptions
-                        ? "Enabled"
-                        : "Disabled",
+                      viewingExam.randomizeOptions ? "Enabled" : "Disabled",
                     ],
                     [
                       "Proctoring",
-                      viewingExam.proctoring
-                        ? "Enabled"
-                        : "Disabled",
+                      viewingExam.proctoring ? "Enabled" : "Disabled",
                     ],
                     [
                       "Auto publish results",
@@ -4181,9 +3870,7 @@ export default function ExamsPage() {
                     ],
                     [
                       "Reattempt",
-                      viewingExam.allowReattempt
-                        ? "Allowed"
-                        : "Not allowed",
+                      viewingExam.allowReattempt ? "Allowed" : "Not allowed",
                     ],
                   ].map(([label, value]) => (
                     <div
@@ -4205,10 +3892,7 @@ export default function ExamsPage() {
               {/* Instructions */}
               <div>
                 <div className="mb-3 flex items-center gap-2">
-                  <BookOpen
-                    size={18}
-                    className="text-emerald-600"
-                  />
+                  <BookOpen size={18} className="text-emerald-600" />
 
                   <h3 className="font-bold text-slate-900">
                     Student Instructions
@@ -4235,10 +3919,9 @@ export default function ExamsPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-purple-800">
-                      This assessment can later be connected to
-                      AI-powered question generation, difficulty
-                      analysis, result interpretation and student
-                      recommendations.
+                      This assessment can later be connected to AI-powered
+                      question generation, difficulty analysis, result
+                      interpretation and student recommendations.
                     </p>
                   </div>
                 </div>
@@ -4259,9 +3942,7 @@ export default function ExamsPage() {
 
               {viewingExam.status === "Upcoming" && (
                 <button
-                  onClick={() =>
-                    handleStartExam(viewingExam.id)
-                  }
+                  onClick={() => handleStartExam(viewingExam.id)}
                   className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-amber-600"
                 >
                   <Play size={16} />
@@ -4271,11 +3952,7 @@ export default function ExamsPage() {
 
               {viewingExam.status === "Ongoing" && (
                 <button
-                  onClick={() =>
-                    handleCompleteExam(
-                      viewingExam.id
-                    )
-                  }
+                  onClick={() => handleCompleteExam(viewingExam.id)}
                   className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700"
                 >
                   <Check size={16} />
@@ -4286,9 +3963,7 @@ export default function ExamsPage() {
               {viewingExam.status === "Completed" && (
                 <button
                   onClick={() => {
-                    handlePublishResults(
-                      viewingExam
-                    );
+                    handlePublishResults(viewingExam);
                   }}
                   className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700"
                 >
@@ -4321,9 +3996,7 @@ export default function ExamsPage() {
 
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-xl font-bold">
-                        AI Exam Assistant
-                      </h2>
+                      <h2 className="text-xl font-bold">AI Exam Assistant</h2>
 
                       <span className="rounded-full bg-white/15 px-2 py-1 text-[10px] font-bold">
                         DEMO AI
@@ -4352,21 +4025,17 @@ export default function ExamsPage() {
                 </p>
 
                 <p className="mt-2 text-sm leading-6 text-purple-900">
-                  Your current exam data suggests that attendance
-                  and pass-rate monitoring should be prioritized for
-                  difficult assessments. Consider automatically
-                  flagging students who repeatedly score below the
-                  passing threshold.
+                  Your current exam data suggests that attendance and pass-rate
+                  monitoring should be prioritized for difficult assessments.
+                  Consider automatically flagging students who repeatedly score
+                  below the passing threshold.
                 </p>
               </div>
 
               {aiInsights.lowAttendance.length > 0 && (
                 <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                   <div className="flex gap-3">
-                    <CircleAlert
-                      size={18}
-                      className="mt-0.5 text-amber-600"
-                    />
+                    <CircleAlert size={18} className="mt-0.5 text-amber-600" />
 
                     <div>
                       <p className="text-sm font-bold text-amber-900">
@@ -4374,14 +4043,10 @@ export default function ExamsPage() {
                       </p>
 
                       <p className="mt-1 text-xs leading-5 text-amber-800">
-                        {aiInsights.lowAttendance.length} completed
-                        exam
-                        {aiInsights.lowAttendance.length === 1
-                          ? ""
-                          : "s"}{" "}
-                        have attendance below the 92% target.
-                        Automated reminders could be triggered
-                        before future assessments.
+                        {aiInsights.lowAttendance.length} completed exam
+                        {aiInsights.lowAttendance.length === 1 ? "" : "s"} have
+                        attendance below the 92% target. Automated reminders
+                        could be triggered before future assessments.
                       </p>
                     </div>
                   </div>
@@ -4391,10 +4056,7 @@ export default function ExamsPage() {
               {aiInsights.hardExams.length > 0 && (
                 <div className="rounded-2xl border border-red-100 bg-red-50 p-4">
                   <div className="flex gap-3">
-                    <TrendingDown
-                      size={18}
-                      className="mt-0.5 text-red-600"
-                    />
+                    <TrendingDown size={18} className="mt-0.5 text-red-600" />
 
                     <div>
                       <p className="text-sm font-bold text-red-900">
@@ -4402,10 +4064,9 @@ export default function ExamsPage() {
                       </p>
 
                       <p className="mt-1 text-xs leading-5 text-red-800">
-                        Some hard assessments are showing lower
-                        pass rates. AI could later analyze question
-                        difficulty and identify which concepts are
-                        causing the most mistakes.
+                        Some hard assessments are showing lower pass rates. AI
+                        could later analyze question difficulty and identify
+                        which concepts are causing the most mistakes.
                       </p>
                     </div>
                   </div>
@@ -4446,17 +4107,11 @@ export default function ExamsPage() {
                       <button
                         key={item.title}
                         onClick={() =>
-                          showToast(
-                            `${item.title} AI workflow queued.`,
-                            "info"
-                          )
+                          showToast(`${item.title} AI workflow queued.`, "info")
                         }
                         className="rounded-2xl border border-slate-200 p-4 text-left transition hover:border-purple-200 hover:bg-purple-50"
                       >
-                        <Icon
-                          size={18}
-                          className="text-purple-600"
-                        />
+                        <Icon size={18} className="text-purple-600" />
 
                         <p className="mt-3 text-sm font-bold text-slate-900">
                           {item.title}
@@ -4473,12 +4128,10 @@ export default function ExamsPage() {
 
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                 <p className="text-[11px] leading-5 text-slate-500">
-                  <strong className="text-slate-700">
-                    AI status:
-                  </strong>{" "}
-                  These recommendations are simulated locally.
-                  Later we can connect this interface to your
-                  backend AI service and real exam/result data.
+                  <strong className="text-slate-700">AI status:</strong> These
+                  recommendations are simulated locally. Later we can connect
+                  this interface to your backend AI service and real exam/result
+                  data.
                 </p>
               </div>
             </div>
@@ -4511,8 +4164,7 @@ export default function ExamsPage() {
                 </h2>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  {showResults.batch} ·{" "}
-                  {formatDate(showResults.examDate)}
+                  {showResults.batch} · {formatDate(showResults.examDate)}
                 </p>
               </div>
 
@@ -4527,9 +4179,7 @@ export default function ExamsPage() {
             <div className="space-y-5 p-5 sm:p-6">
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <div className="rounded-2xl bg-blue-50 p-4">
-                  <p className="text-xs font-semibold text-blue-600">
-                    Average
-                  </p>
+                  <p className="text-xs font-semibold text-blue-600">Average</p>
 
                   <p className="mt-1 text-2xl font-bold text-slate-900">
                     {showResults.averageScore}
@@ -4621,10 +4271,7 @@ export default function ExamsPage() {
 
               <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
                 <div className="flex gap-3">
-                  <BrainCircuit
-                    size={18}
-                    className="mt-0.5 text-purple-600"
-                  />
+                  <BrainCircuit size={18} className="mt-0.5 text-purple-600" />
 
                   <div>
                     <p className="text-sm font-bold text-purple-900">
@@ -4632,11 +4279,10 @@ export default function ExamsPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-purple-800">
-                      The result profile indicates a mixed
-                      performance distribution. A future AI layer
-                      could automatically generate student-level
-                      remediation plans and identify topics that
-                      require revision.
+                      The result profile indicates a mixed performance
+                      distribution. A future AI layer could automatically
+                      generate student-level remediation plans and identify
+                      topics that require revision.
                     </p>
                   </div>
                 </div>
@@ -4645,9 +4291,7 @@ export default function ExamsPage() {
 
             <div className="flex justify-end gap-2 border-t border-slate-200 px-5 py-4 sm:px-6">
               <button
-                onClick={() =>
-                  showToast("Result report exported.")
-                }
+                onClick={() => showToast("Result report exported.")}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
               >
                 <Download size={16} />
@@ -4678,9 +4322,8 @@ export default function ExamsPage() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              This will remove the examination from the current
-              admin view. This demo page does not permanently
-              delete backend records.
+              This will remove the examination from the current admin view. This
+              demo page does not permanently delete backend records.
             </p>
 
             <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -4710,8 +4353,8 @@ export default function ExamsPage() {
               toast.type === "success"
                 ? "border-emerald-100"
                 : toast.type === "error"
-                ? "border-red-100"
-                : "border-blue-100"
+                  ? "border-red-100"
+                  : "border-blue-100"
             }`}
           >
             <div
@@ -4719,8 +4362,8 @@ export default function ExamsPage() {
                 toast.type === "success"
                   ? "bg-emerald-50 text-emerald-600"
                   : toast.type === "error"
-                  ? "bg-red-50 text-red-600"
-                  : "bg-blue-50 text-blue-600"
+                    ? "bg-red-50 text-red-600"
+                    : "bg-blue-50 text-blue-600"
               }`}
             >
               {toast.type === "success" ? (
@@ -4737,8 +4380,8 @@ export default function ExamsPage() {
                 {toast.type === "success"
                   ? "Success"
                   : toast.type === "error"
-                  ? "Action failed"
-                  : "Information"}
+                    ? "Action failed"
+                    : "Information"}
               </p>
 
               <p className="mt-0.5 text-xs leading-5 text-slate-500">

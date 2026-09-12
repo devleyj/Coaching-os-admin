@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import PageHeader from "../components/PageHeader";
 import {
   AlertTriangle,
   ArrowDown,
@@ -1259,71 +1260,50 @@ export default function AttendancePage() {
       <main className="ml-64 min-h-screen p-8">
         <div className="mx-auto max-w-[1700px]">
           {/* HEADER */}
-          <div className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-              <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-                <ClipboardCheck size={13} />
-                Daily Operations
-              </div>
+          <PageHeader
+  title="Attendance Management"
+  description="Manage attendance, devices, notifications, analytics and AI-powered attendance insights."
+  icon={<ClipboardCheck size={20} />}
+  actions={
+    <>
+      <button
+        type="button"
+        onClick={() => setShowAIModal(true)}
+        className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:border-purple-300 hover:bg-purple-100"
+      >
+        <Sparkles size={16} />
+        AI Insights
+      </button>
 
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                Attendance Management
-              </h1>
+      <button
+        type="button"
+        onClick={exportAttendance}
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+      >
+        <Download size={16} />
+        Export
+      </button>
 
-              <p className="mt-1 text-sm font-medium text-slate-500">
-                Manage attendance, devices,
-                notifications, analytics and
-                AI-powered attendance insights.
-              </p>
-            </div>
+      <button
+        type="button"
+        onClick={() => setShowBulkModal(true)}
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+      >
+        <Users size={16} />
+        Bulk Mark
+      </button>
 
-            <div
-              className="flex flex-wrap gap-2"
-              onClick={(event) =>
-                event.stopPropagation()
-              }
-            >
-              <button
-                type="button"
-                onClick={() =>
-                  setShowAIModal(true)
-                }
-                className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-bold text-violet-700 shadow-sm hover:bg-violet-100"
-              >
-                <Sparkles size={17} />
-                AI Insights
-              </button>
-
-              <button
-                type="button"
-                onClick={exportAttendance}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50"
-              >
-                <Download size={17} />
-                Export
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setShowBulkModal(true)
-                }
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50"
-              >
-                <Users size={17} />
-                Bulk Mark
-              </button>
-
-              <button
-                type="button"
-                onClick={openMarkModal}
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-700"
-              >
-                <Plus size={18} />
-                Mark Attendance
-              </button>
-            </div>
-          </div>
+      <button
+        type="button"
+        onClick={openMarkModal}
+        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+      >
+        <Plus size={17} />
+        Mark Attendance
+      </button>
+    </>
+  }
+/>
 
           {/* DATE CONTROL */}
           <div

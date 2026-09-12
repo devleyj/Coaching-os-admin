@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   AlertTriangle,
   BarChart3,
@@ -254,12 +255,7 @@ const initialBatches: Batch[] = [
   },
 ];
 
-const courses = [
-  "JEE Advanced",
-  "JEE Main",
-  "NEET",
-  "Foundation",
-];
+const courses = ["JEE Advanced", "JEE Main", "NEET", "Foundation"];
 
 const teachers = [
   "Rahul Mehta",
@@ -299,9 +295,10 @@ function formatTime(time: string) {
   const suffix = hours >= 12 ? "PM" : "AM";
   const formattedHour = hours % 12 || 12;
 
-  return `${String(formattedHour).padStart(2, "0")}:${String(
-    minutes,
-  ).padStart(2, "0")} ${suffix}`;
+  return `${String(formattedHour).padStart(2, "0")}:${String(minutes).padStart(
+    2,
+    "0",
+  )} ${suffix}`;
 }
 
 function getStatusClasses(status: BatchStatus) {
@@ -394,12 +391,7 @@ export default function BatchesPage() {
       const matchesTeacher =
         teacherFilter === "All" || batch.teacher === teacherFilter;
 
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesCourse &&
-        matchesTeacher
-      );
+      return matchesSearch && matchesStatus && matchesCourse && matchesTeacher;
     });
 
     return filtered.sort((a, b) => {
@@ -477,9 +469,7 @@ export default function BatchesPage() {
     (batch) => batch.status === "Active",
   ).length;
 
-  const fullBatches = batches.filter(
-    (batch) => batch.status === "Full",
-  ).length;
+  const fullBatches = batches.filter((batch) => batch.status === "Full").length;
 
   const completedBatches = batches.filter(
     (batch) => batch.status === "Completed",
@@ -488,20 +478,16 @@ export default function BatchesPage() {
   const averageAttendance =
     batches.length > 0
       ? Math.round(
-          batches.reduce(
-            (total, batch) => total + batch.attendanceRate,
-            0,
-          ) / batches.length,
+          batches.reduce((total, batch) => total + batch.attendanceRate, 0) /
+            batches.length,
         )
       : 0;
 
   const averagePerformance =
     batches.length > 0
       ? Math.round(
-          batches.reduce(
-            (total, batch) => total + batch.performanceScore,
-            0,
-          ) / batches.length,
+          batches.reduce((total, batch) => total + batch.performanceScore, 0) /
+            batches.length,
         )
       : 0;
 
@@ -598,8 +584,7 @@ export default function BatchesPage() {
       })
       .filter(Number.isFinite);
 
-    const nextNumber =
-      numbers.length > 0 ? Math.max(...numbers) + 1 : 1001;
+    const nextNumber = numbers.length > 0 ? Math.max(...numbers) + 1 : 1001;
 
     return `BAT-${nextNumber}`;
   };
@@ -714,9 +699,7 @@ export default function BatchesPage() {
 
     if (!confirmed) return;
 
-    setBatches((current) =>
-      current.filter((item) => item.id !== batch.id),
-    );
+    setBatches((current) => current.filter((item) => item.id !== batch.id));
 
     setOpenActionMenu(null);
 
@@ -996,9 +979,9 @@ export default function BatchesPage() {
             </p>
 
             <p className="mt-1 text-xs leading-5 text-blue-700">
-              Later, this batch can automatically receive AI-generated
-              insights about attendance, capacity, student performance,
-              teacher load and scheduling conflicts.
+              Later, this batch can automatically receive AI-generated insights
+              about attendance, capacity, student performance, teacher load and
+              scheduling conflicts.
             </p>
           </div>
         </div>
@@ -1012,51 +995,35 @@ export default function BatchesPage() {
 
       <main className="ml-64 min-h-screen p-8">
         {/* Header */}
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-                <Layers className="h-5 w-5" />
-              </div>
+        <PageHeader
+          title="Batches"
+          description="Manage batches, schedules, capacity, teachers and student enrollment."
+          icon={<Layers size={20} />}
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => setShowAIModal(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:border-purple-300 hover:bg-purple-100"
+              >
+                <Sparkles size={16} />
+                AI Insights
+              </button>
 
-              <span className="text-sm font-semibold text-blue-600">
-                Academic Operations
-              </span>
-            </div>
-
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-              Batches
-            </h1>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Manage batches, schedules, capacity, teachers and student
-              enrollment.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => setShowAIModal(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-            >
-              <Sparkles className="h-4 w-4" />
-              AI Insights
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                resetForm();
-                setShowAddModal(true);
-              }}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <Plus className="h-4 w-4" />
-              Add Batch
-            </button>
-          </div>
-        </div>
+              <button
+                type="button"
+                onClick={() => {
+                  resetForm();
+                  setShowAddModal(true);
+                }}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <Plus size={17} />
+                Add Batch
+              </button>
+            </>
+          }
+        />
 
         {/* KPI Cards */}
         <div className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
@@ -1087,9 +1054,7 @@ export default function BatchesPage() {
               </div>
             </div>
 
-            <p className="mt-4 text-sm font-medium text-slate-500">
-              Active
-            </p>
+            <p className="mt-4 text-sm font-medium text-slate-500">Active</p>
 
             <p className="mt-1 text-2xl font-bold text-slate-900">
               {activeBatches}
@@ -1285,8 +1250,7 @@ export default function BatchesPage() {
               <select
                 value={`${sortBy}-${sortOrder}`}
                 onChange={(event) => {
-                  const [newSort, newOrder] =
-                    event.target.value.split("-");
+                  const [newSort, newOrder] = event.target.value.split("-");
 
                   setSortBy(newSort);
                   setSortOrder(newOrder as "asc" | "desc");
@@ -1296,20 +1260,14 @@ export default function BatchesPage() {
                 <option value="Name-asc">Name: A → Z</option>
                 <option value="Name-desc">Name: Z → A</option>
                 <option value="Students-asc">Students: Low → High</option>
-                <option value="Students-desc">
-                  Students: High → Low
-                </option>
+                <option value="Students-desc">Students: High → Low</option>
                 <option value="Capacity-asc">Capacity: Low → High</option>
-                <option value="Capacity-desc">
-                  Capacity: High → Low
-                </option>
+                <option value="Capacity-desc">Capacity: High → Low</option>
                 <option value="Course-asc">Course: A → Z</option>
                 <option value="Course-desc">Course: Z → A</option>
                 <option value="Teacher-asc">Teacher: A → Z</option>
                 <option value="Teacher-desc">Teacher: Z → A</option>
-                <option value="Attendance-desc">
-                  Attendance: High → Low
-                </option>
+                <option value="Attendance-desc">Attendance: High → Low</option>
                 <option value="Performance-desc">
                   Performance: High → Low
                 </option>
@@ -1334,8 +1292,8 @@ export default function BatchesPage() {
               </div>
 
               <div className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600">
-                {activeBatches} Active · {fullBatches} Full ·{" "}
-                {completedBatches} Completed
+                {activeBatches} Active · {fullBatches} Full · {completedBatches}{" "}
+                Completed
               </div>
             </div>
           </div>
@@ -1411,8 +1369,7 @@ export default function BatchesPage() {
                   </tr>
                 ) : (
                   paginatedBatches.map((batch) => {
-                    const capacityPercentage =
-                      getCapacityPercentage(batch);
+                    const capacityPercentage = getCapacityPercentage(batch);
 
                     return (
                       <tr
@@ -1552,9 +1509,7 @@ export default function BatchesPage() {
                               type="button"
                               onClick={() =>
                                 setOpenActionMenu(
-                                  openActionMenu === batch.id
-                                    ? null
-                                    : batch.id,
+                                  openActionMenu === batch.id ? null : batch.id,
                                 )
                               }
                               className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
@@ -1626,9 +1581,7 @@ export default function BatchesPage() {
                   {safeCurrentPage}
                 </span>{" "}
                 of{" "}
-                <span className="font-bold text-slate-800">
-                  {totalPages}
-                </span>
+                <span className="font-bold text-slate-800">{totalPages}</span>
               </p>
 
               <div className="flex items-center gap-2">
@@ -1666,9 +1619,7 @@ export default function BatchesPage() {
                   type="button"
                   disabled={safeCurrentPage === totalPages}
                   onClick={() =>
-                    setCurrentPage((page) =>
-                      Math.min(totalPages, page + 1),
-                    )
+                    setCurrentPage((page) => Math.min(totalPages, page + 1))
                   }
                   className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
@@ -1715,11 +1666,9 @@ export default function BatchesPage() {
 
                 <p className="mt-1 text-xs leading-5 text-slate-600">
                   Current average batch performance is{" "}
-                  <span className="font-bold">
-                    {averagePerformance}%
-                  </span>
-                  . AI can later identify why individual batches are
-                  outperforming others.
+                  <span className="font-bold">{averagePerformance}%</span>. AI
+                  can later identify why individual batches are outperforming
+                  others.
                 </p>
               </div>
             </div>
@@ -1732,9 +1681,7 @@ export default function BatchesPage() {
               </div>
 
               <div>
-                <p className="text-sm font-bold text-slate-900">
-                  Scheduling
-                </p>
+                <p className="text-sm font-bold text-slate-900">Scheduling</p>
 
                 <p className="mt-1 text-xs leading-5 text-slate-600">
                   {batches.length} batches are currently configured with
@@ -1799,9 +1746,7 @@ export default function BatchesPage() {
           <div className="w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">
-                  Edit Batch
-                </h2>
+                <h2 className="text-xl font-bold text-slate-900">Edit Batch</h2>
 
                 <p className="mt-1 text-sm text-slate-500">
                   Update {selectedBatch.id} information.
@@ -2069,9 +2014,7 @@ export default function BatchesPage() {
                   </div>
 
                   <div>
-                    <h2 className="text-xl font-bold">
-                      AI Batch Insights
-                    </h2>
+                    <h2 className="text-xl font-bold">AI Batch Insights</h2>
 
                     <p className="mt-1 text-sm text-blue-100">
                       Intelligent operational signals for your batches.
@@ -2156,8 +2099,8 @@ export default function BatchesPage() {
                           <span className="font-bold">
                             {selectedBatch.attendanceRate}%
                           </span>
-                          . Future AI analysis can identify students at
-                          risk of dropping below the institute's target.
+                          . Future AI analysis can identify students at risk of
+                          dropping below the institute's target.
                         </p>
                       </div>
                     </div>
@@ -2175,9 +2118,9 @@ export default function BatchesPage() {
                         </p>
 
                         <p className="mt-1 text-xs leading-5 text-slate-600">
-                          {fullBatches} batches are currently full. The
-                          system could later recommend new sections based
-                          on inquiry demand and waitlists.
+                          {fullBatches} batches are currently full. The system
+                          could later recommend new sections based on inquiry
+                          demand and waitlists.
                         </p>
                       </div>
                     </div>
@@ -2197,8 +2140,8 @@ export default function BatchesPage() {
                           <span className="font-bold">
                             {averagePerformance}%
                           </span>
-                          . Future AI can compare teacher, course,
-                          attendance and exam outcomes.
+                          . Future AI can compare teacher, course, attendance
+                          and exam outcomes.
                         </p>
                       </div>
                     </div>
@@ -2214,10 +2157,9 @@ export default function BatchesPage() {
                         </p>
 
                         <p className="mt-1 text-xs leading-5 text-slate-600">
-                          Automatically detect overloaded teachers,
-                          classroom conflicts, low attendance batches,
-                          under-filled batches and students needing
-                          intervention.
+                          Automatically detect overloaded teachers, classroom
+                          conflicts, low attendance batches, under-filled
+                          batches and students needing intervention.
                         </p>
                       </div>
                     </div>
@@ -2227,9 +2169,9 @@ export default function BatchesPage() {
 
               <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-xs font-semibold leading-5 text-slate-500">
-                  AI status: simulated frontend intelligence. Real AI
-                  analysis will be connected after the backend, database
-                  and AI service are implemented.
+                  AI status: simulated frontend intelligence. Real AI analysis
+                  will be connected after the backend, database and AI service
+                  are implemented.
                 </p>
               </div>
             </div>

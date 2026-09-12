@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Sidebar from "./components/Slidebar";
+
 import StudentGrowthChart from "./components/StudentGrowthCharts";
 import RevenueChart from "./components/RevenueChart";
 import AttendanceOverview from "./components/AttendanceOverview";
@@ -36,11 +37,9 @@ import {
   X,
   Brain,
   TrendingUp,
-  TrendingDown,
   Target,
   ShieldCheck,
   Zap,
-  Eye,
   ArrowRight,
   CircleDollarSign,
   UserRoundSearch,
@@ -87,7 +86,7 @@ const stats = [
     change: "+8.3%",
     description: "from last month",
     icon: Layers,
-    iconStyle: "bg-green-50 text-green-600",
+    iconStyle: "bg-emerald-50 text-emerald-600",
     trend: "up",
     href: "/batches",
   },
@@ -117,7 +116,7 @@ const stats = [
     change: "+2.4%",
     description: "this month",
     icon: ClipboardCheck,
-    iconStyle: "bg-emerald-50 text-emerald-600",
+    iconStyle: "bg-cyan-50 text-cyan-600",
     trend: "up",
     href: "/attendance",
   },
@@ -187,7 +186,7 @@ const quickActions = [
     description: "Add a fee payment",
     icon: CreditCard,
     href: "/fees",
-    iconStyle: "bg-green-50 text-green-600",
+    iconStyle: "bg-emerald-50 text-emerald-600",
   },
   {
     title: "Mark Attendance",
@@ -301,10 +300,13 @@ export default function Home() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+
   const [selectedDateRange, setSelectedDateRange] = useState("This Month");
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
+
   const [unreadNotifications, setUnreadNotifications] = useState(3);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [aiQuery, setAiQuery] = useState("");
   const [toast, setToast] = useState("");
@@ -434,11 +436,11 @@ export default function Home() {
 
   const getInsightStyle = (type: InsightType) => {
     if (type === "success") {
-      return "bg-green-50 text-green-700 border-green-100";
+      return "bg-emerald-50 text-emerald-700 border-emerald-100";
     }
 
     if (type === "warning") {
-      return "bg-yellow-50 text-yellow-700 border-yellow-100";
+      return "bg-amber-50 text-amber-700 border-amber-100";
     }
 
     if (type === "danger") {
@@ -452,266 +454,289 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50">
       <Sidebar />
 
-      <main className="ml-64 min-h-screen">
-        {/* Header */}
-        <header className="sticky top-0 z-30 flex min-h-[76px] items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur lg:px-8">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="hidden w-full max-w-xl md:block">
+      <main className="min-h-screen lg:ml-64">
+        {/* =========================================================
+            TOP HEADER
+        ========================================================= */}
+        <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
+          <div className="flex min-h-[72px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+            {/* Search */}
+            <div className="hidden min-w-0 flex-1 md:block">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
-                className="flex w-full items-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-left transition hover:border-blue-200 hover:bg-white"
+                className="flex h-11 w-full max-w-2xl items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-left transition hover:border-blue-200 hover:bg-white hover:shadow-sm"
               >
-                <Search size={19} className="shrink-0 text-slate-400" />
-                <span className="ml-3 text-sm text-slate-500">
+                <Search
+                  size={18}
+                  className="shrink-0 text-slate-400"
+                />
+
+                <span className="ml-3 truncate text-sm text-slate-500">
                   Search students, teachers, classes, payments...
                 </span>
-                <span className="ml-auto hidden rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-400 lg:block">
+
+                <span className="ml-auto hidden shrink-0 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold text-slate-400 lg:block">
                   Ctrl K
                 </span>
               </button>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setAiOpen(true)}
-              className="hidden items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3.5 py-2.5 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 lg:flex"
-            >
-              <Sparkles size={17} />
-              AI Insights
-            </button>
-          </div>
-
-          <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            {/* Mobile Search */}
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              className="rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 md:hidden"
-              aria-label="Open search"
-            >
-              <Search size={20} />
-            </button>
-
-            {/* Refresh */}
-            <button
-              type="button"
-              onClick={handleRefresh}
-              className="rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-              aria-label="Refresh dashboard"
-              title="Refresh dashboard"
-            >
-              <RefreshCw
-                size={19}
-                className={isRefreshing ? "animate-spin" : ""}
-              />
-            </button>
-
-            {/* Notifications */}
-            <div ref={notificationRef} className="relative">
+            {/* Right controls */}
+            <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+              {/* Mobile search */}
               <button
-                onClick={() => {
-                  setNotificationOpen(!notificationsOpen);
-                  setProfileOpen(false);
-                  setDateMenuOpen(false);
-                }}
-                className="relative rounded-xl p-2.5 text-slate-500 hover:bg-slate-100"
-                aria-label="Open notifications"
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 md:hidden"
+                aria-label="Open search"
               >
-                <Bell size={20} />
-
-                {unreadNotifications > 0 && (
-                  <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
-                    {unreadNotifications}
-                  </span>
-                )}
+                <Search size={19} />
               </button>
 
-              {notificationsOpen && (
-                <div className="absolute right-0 top-14 z-50 w-[340px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-                  <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-slate-900">
-                        Notifications
-                      </h3>
-
-                      <p className="mt-1 text-xs text-slate-500">
-                        {unreadNotifications === 0
-                          ? "You're all caught up"
-                          : `You have ${unreadNotifications} unread notifications`}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={handleMarkAllRead}
-                      className="text-xs font-semibold text-blue-600 hover:text-blue-700"
-                    >
-                      Mark all read
-                    </button>
-                  </div>
-
-                  <div className="max-h-[360px] overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className="cursor-pointer border-b border-slate-100 px-4 py-3.5 transition hover:bg-slate-50"
-                      >
-                        <div className="flex gap-3">
-                          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                            {notification.type === "student" && (
-                              <UserPlus size={15} />
-                            )}
-
-                            {notification.type === "payment" && (
-                              <CreditCard size={15} />
-                            )}
-
-                            {notification.type === "attendance" && (
-                              <ClipboardCheck size={15} />
-                            )}
-
-                            {notification.type === "inquiry" && (
-                              <MessageCircle size={15} />
-                            )}
-                          </div>
-
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-slate-900">
-                              {notification.title}
-                            </p>
-
-                            <p className="mt-1 text-xs leading-5 text-slate-500">
-                              {notification.description}
-                            </p>
-
-                            <p className="mt-1 text-[11px] text-slate-400">
-                              {notification.time}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="border-t border-slate-100 p-3 text-center">
-                    <Link
-                      href="/notifications"
-                      onClick={() => setNotificationOpen(false)}
-                      className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-                    >
-                      View all notifications →
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="hidden h-8 w-px bg-slate-200 sm:block" />
-
-            {/* Admin Menu */}
-            <div ref={profileRef} className="relative">
+              {/* AI */}
               <button
-                onClick={() => {
-                  setProfileOpen(!profileOpen);
-                  setNotificationOpen(false);
-                  setDateMenuOpen(false);
-                }}
-                className="flex items-center gap-3 rounded-xl p-1.5 text-left hover:bg-slate-50"
-                aria-label="Open admin profile menu"
+                type="button"
+                onClick={() => setAiOpen(true)}
+                className="hidden items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3.5 py-2.5 text-sm font-semibold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100 lg:flex"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                  A
-                </div>
+                <Sparkles size={16} />
+                AI Insights
+              </button>
 
-                <div className="hidden sm:block">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Admin
-                  </p>
-                  <p className="text-xs text-slate-500">Super Admin</p>
-                </div>
-
-                <ChevronDown
-                  size={15}
-                  className="hidden text-slate-400 sm:block"
+              {/* Refresh */}
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Refresh dashboard"
+                title="Refresh dashboard"
+              >
+                <RefreshCw
+                  size={18}
+                  className={isRefreshing ? "animate-spin" : ""}
                 />
               </button>
 
-              {profileOpen && (
-                <div className="absolute right-0 top-14 z-50 w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-                  <div className="border-b border-slate-100 px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
-                        A
+              {/* Notifications */}
+              <div ref={notificationRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNotificationOpen(!notificationsOpen);
+                    setProfileOpen(false);
+                    setDateMenuOpen(false);
+                  }}
+                  className="relative rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  aria-label="Open notifications"
+                >
+                  <Bell size={19} />
+
+                  {unreadNotifications > 0 && (
+                    <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white ring-2 ring-white">
+                      {unreadNotifications}
+                    </span>
+                  )}
+                </button>
+
+                {notificationsOpen && (
+                  <div className="absolute right-0 top-14 z-50 w-[calc(100vw-32px)] max-w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                    <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">
+                          Notifications
+                        </h3>
+
+                        <p className="mt-1 text-xs text-slate-500">
+                          {unreadNotifications === 0
+                            ? "You're all caught up"
+                            : `You have ${unreadNotifications} unread notifications`}
+                        </p>
                       </div>
 
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">
-                          Admin
-                        </p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          Super Admin
-                        </p>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={handleMarkAllRead}
+                        className="text-xs font-bold text-blue-600 hover:text-blue-700"
+                      >
+                        Mark all read
+                      </button>
+                    </div>
+
+                    <div className="max-h-[360px] overflow-y-auto">
+                      {notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className="cursor-pointer border-b border-slate-100 px-4 py-3.5 transition hover:bg-slate-50"
+                        >
+                          <div className="flex gap-3">
+                            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                              {notification.type === "student" && (
+                                <UserPlus size={15} />
+                              )}
+
+                              {notification.type === "payment" && (
+                                <CreditCard size={15} />
+                              )}
+
+                              {notification.type === "attendance" && (
+                                <ClipboardCheck size={15} />
+                              )}
+
+                              {notification.type === "inquiry" && (
+                                <MessageCircle size={15} />
+                              )}
+                            </div>
+
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-slate-900">
+                                {notification.title}
+                              </p>
+
+                              <p className="mt-1 text-xs leading-5 text-slate-500">
+                                {notification.description}
+                              </p>
+
+                              <p className="mt-1 text-[11px] text-slate-400">
+                                {notification.time}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="border-t border-slate-100 p-3 text-center">
+                      <Link
+                        href="/notifications"
+                        onClick={() => setNotificationOpen(false)}
+                        className="text-sm font-bold text-blue-600 hover:text-blue-700"
+                      >
+                        View all notifications →
+                      </Link>
                     </div>
                   </div>
+                )}
+              </div>
 
-                  <div className="p-2">
-                    <button
-                      type="button"
-                      onClick={() => handleProfileAction("profile")}
-                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50"
-                    >
-                      <User size={17} />
-                      <span>Profile</span>
-                    </button>
+              <div className="hidden h-8 w-px bg-slate-200 sm:block" />
 
-                    <button
-                      type="button"
-                      onClick={() => handleProfileAction("settings")}
-                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50"
-                    >
-                      <Settings size={17} />
-                      <span>Account Settings</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleProfileAction("logout")}
-                      className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-500 hover:bg-red-50"
-                    >
-                      <LogOut size={17} />
-                      <span>Sign Out</span>
-                    </button>
+              {/* Admin */}
+              <div ref={profileRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen(!profileOpen);
+                    setNotificationOpen(false);
+                    setDateMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 rounded-xl p-1.5 text-left transition hover:bg-slate-50 sm:gap-3"
+                  aria-label="Open admin profile menu"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700 ring-2 ring-white">
+                    A
                   </div>
-                </div>
-              )}
+
+                  <div className="hidden sm:block">
+                    <p className="text-sm font-bold text-slate-900">
+                      Admin
+                    </p>
+
+                    <p className="text-[11px] text-slate-500">
+                      Super Admin
+                    </p>
+                  </div>
+
+                  <ChevronDown
+                    size={15}
+                    className="hidden text-slate-400 sm:block"
+                  />
+                </button>
+
+                {profileOpen && (
+                  <div className="absolute right-0 top-14 z-50 w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                    <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
+                          A
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">
+                            Admin
+                          </p>
+
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            Super Admin
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2">
+                      <button
+                        type="button"
+                        onClick={() => handleProfileAction("profile")}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+                      >
+                        <User size={17} />
+                        <span>Profile</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleProfileAction("settings")}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+                      >
+                        <Settings size={17} />
+                        <span>Account Settings</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleProfileAction("logout")}
+                        className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-500 transition hover:bg-red-50"
+                      >
+                        <LogOut size={17} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Dashboard */}
-        <section className="p-5 sm:p-6 lg:p-8">
-          {/* Heading */}
-          <div className="mb-7 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+        {/* =========================================================
+            DASHBOARD CONTENT
+        ========================================================= */}
+        <section className="p-4 sm:p-6 lg:p-8">
+          {/* Page heading */}
+          <div className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                   Dashboard
                 </h1>
 
-                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-600">
+                <span className="rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-600">
                   AI Ready
+                </span>
+
+                <span className="hidden rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold text-slate-500 sm:inline-flex">
+                  v0.1.21
                 </span>
               </div>
 
-              <p className="mt-1.5 text-sm text-slate-500">
+              <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-500">
                 Your institute command center — monitor students, academics,
-                revenue and operations.
+                revenue and daily operations.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {/* Date Range */}
+              {/* Date */}
               <div ref={dateRef} className="relative">
                 <button
                   type="button"
@@ -720,50 +745,65 @@ export default function Home() {
                     setNotificationOpen(false);
                     setProfileOpen(false);
                   }}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300"
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-slate-50"
                 >
-                  <CalendarDays size={17} className="text-slate-500" />
+                  <CalendarDays
+                    size={16}
+                    className="text-slate-500"
+                  />
+
                   {selectedDateRange}
-                  <ChevronDown size={15} className="text-slate-400" />
+
+                  <ChevronDown
+                    size={15}
+                    className="text-slate-400"
+                  />
                 </button>
 
                 {dateMenuOpen && (
                   <div className="absolute right-0 top-12 z-40 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">
-                    {["Today", "This Week", "This Month", "This Quarter"].map(
-                      (range) => (
-                        <button
-                          key={range}
-                          type="button"
-                          onClick={() => {
-                            setSelectedDateRange(range);
-                            setDateMenuOpen(false);
-                            setToast(`Dashboard range changed to ${range}`);
-                          }}
-                          className={`flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm ${
-                            selectedDateRange === range
-                              ? "bg-blue-50 font-semibold text-blue-700"
-                              : "text-slate-600 hover:bg-slate-50"
-                          }`}
-                        >
-                          {range}
-                        </button>
-                      ),
-                    )}
+                    {[
+                      "Today",
+                      "This Week",
+                      "This Month",
+                      "This Quarter",
+                    ].map((range) => (
+                      <button
+                        key={range}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDateRange(range);
+                          setDateMenuOpen(false);
+                          setToast(
+                            `Dashboard range changed to ${range}`,
+                          );
+                        }}
+                        className={`flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm ${
+                          selectedDateRange === range
+                            ? "bg-blue-50 font-semibold text-blue-700"
+                            : "text-slate-600 hover:bg-slate-50"
+                        }`}
+                      >
+                        {range}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
 
               <Link
                 href="/reports"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-400 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800"
               >
-                <TrendingUp size={17} />
+                <TrendingUp size={16} />
                 View Reports
               </Link>
             </div>
           </div>
 
-          {/* KPI Cards */}
+          {/* =====================================================
+              KPI CARDS
+          ===================================================== */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {stats.map((stat) => {
               const Icon = stat.icon;
@@ -772,10 +812,10 @@ export default function Home() {
                 <Link
                   href={stat.href}
                   key={stat.title}
-                  className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
                 >
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-slate-500">
                         {stat.title}
                       </p>
@@ -786,7 +826,7 @@ export default function Home() {
                     </div>
 
                     <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.iconStyle}`}
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${stat.iconStyle}`}
                     >
                       <Icon size={21} />
                     </div>
@@ -794,12 +834,18 @@ export default function Home() {
 
                   <div className="mt-4 flex items-center gap-1 text-xs">
                     {stat.trend === "up" ? (
-                      <ArrowUpRight size={14} className="text-green-600" />
+                      <ArrowUpRight
+                        size={14}
+                        className="text-emerald-600"
+                      />
                     ) : (
-                      <ArrowDownRight size={14} className="text-green-600" />
+                      <ArrowDownRight
+                        size={14}
+                        className="text-emerald-600"
+                      />
                     )}
 
-                    <span className="font-semibold text-green-600">
+                    <span className="font-bold text-emerald-600">
                       {stat.change}
                     </span>
 
@@ -808,7 +854,7 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-blue-600 opacity-0 transition group-hover:opacity-100">
+                  <div className="mt-3 flex items-center gap-1 text-xs font-bold text-blue-600 opacity-0 transition group-hover:opacity-100">
                     View details
                     <ArrowRight size={13} />
                   </div>
@@ -817,12 +863,14 @@ export default function Home() {
             })}
           </div>
 
-          {/* AI Command Center */}
+          {/* =====================================================
+              AI COMMAND CENTER
+          ===================================================== */}
           <div className="mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 shadow-sm">
             <div className="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
-                  <Sparkles size={23} />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
+                  <Sparkles size={22} />
                 </div>
 
                 <div>
@@ -831,7 +879,7 @@ export default function Home() {
                       AI Command Center
                     </h2>
 
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-green-700">
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
                       Ready
                     </span>
                   </div>
@@ -860,17 +908,19 @@ export default function Home() {
                   <Target size={14} className="text-blue-600" />
                   Risk Detection
                 </div>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
+
+                <p className="mt-1 text-sm font-bold text-slate-900">
                   8 students need review
                 </p>
               </div>
 
               <div className="border-b border-blue-100 p-4 sm:border-b-0 sm:border-r">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-                  <TrendingUp size={14} className="text-green-600" />
+                  <TrendingUp size={14} className="text-emerald-600" />
                   Growth Signal
                 </div>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
+
+                <p className="mt-1 text-sm font-bold text-slate-900">
                   Revenue trend is positive
                 </p>
               </div>
@@ -880,14 +930,17 @@ export default function Home() {
                   <Zap size={14} className="text-yellow-600" />
                   Recommended Action
                 </div>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
+
+                <p className="mt-1 text-sm font-bold text-slate-900">
                   Follow up with 14 inquiries
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Quick Actions + Needs Attention */}
+          {/* =====================================================
+              QUICK ACTIONS + ATTENTION
+          ===================================================== */}
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-5">
             {/* Quick Actions */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-3">
@@ -896,12 +949,15 @@ export default function Home() {
                   <h2 className="text-base font-bold text-slate-900">
                     Quick Actions
                   </h2>
+
                   <p className="mt-1 text-xs text-slate-500">
                     Common tasks for your daily operations.
                   </p>
                 </div>
 
-                <Zap size={18} className="text-yellow-500" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-yellow-50 text-yellow-600">
+                  <Zap size={17} />
+                </div>
               </div>
 
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -928,7 +984,7 @@ export default function Home() {
                         {action.description}
                       </p>
 
-                      <div className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-blue-600 opacity-0 transition group-hover:opacity-100">
+                      <div className="mt-2 flex items-center gap-1 text-[11px] font-bold text-blue-600 opacity-0 transition group-hover:opacity-100">
                         Open
                         <ArrowRight size={11} />
                       </div>
@@ -945,12 +1001,15 @@ export default function Home() {
                   <h2 className="text-base font-bold text-slate-900">
                     Needs Attention
                   </h2>
+
                   <p className="mt-1 text-xs text-slate-500">
                     Items that may require action.
                   </p>
                 </div>
 
-                <AlertTriangle size={18} className="text-orange-500" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                  <AlertTriangle size={17} />
+                </div>
               </div>
 
               <div className="mt-4 space-y-2">
@@ -969,7 +1028,9 @@ export default function Home() {
                         <CircleDollarSign size={16} />
                       )}
 
-                      {item.type === "risk" && <AlertTriangle size={16} />}
+                      {item.type === "risk" && (
+                        <AlertTriangle size={16} />
+                      )}
 
                       {item.type === "inquiry" && (
                         <UserRoundSearch size={16} />
@@ -980,6 +1041,7 @@ export default function Home() {
                       <p className="truncate text-xs font-semibold text-slate-900">
                         {item.title}
                       </p>
+
                       <p className="mt-0.5 truncate text-[11px] text-slate-500">
                         {item.description}
                       </p>
@@ -994,19 +1056,25 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Analytics */}
+          {/* =====================================================
+              ANALYTICS
+          ===================================================== */}
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
             <StudentGrowthChart />
             <RevenueChart />
           </div>
 
-          {/* Operations */}
+          {/* =====================================================
+              OPERATIONS
+          ===================================================== */}
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
             <AttendanceOverview />
             <TodaysClasses />
           </div>
 
-          {/* AI Insights */}
+          {/* =====================================================
+              AI INSIGHTS
+          ===================================================== */}
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -1021,15 +1089,15 @@ export default function Home() {
                 </div>
 
                 <p className="mt-2 text-xs leading-5 text-slate-500">
-                  These are currently simulated dashboard insights. The real AI
-                  engine will be connected through the backend later.
+                  These are currently simulated dashboard insights. The real
+                  AI engine will be connected through the backend later.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setAiOpen(true)}
-                className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               >
                 <Sparkles size={14} />
                 Open AI Assistant
@@ -1063,7 +1131,7 @@ export default function Home() {
                       {insight.href && (
                         <Link
                           href={insight.href}
-                          className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700"
+                          className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700"
                         >
                           {insight.action}
                           <ArrowRight size={12} />
@@ -1076,21 +1144,29 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Recent Activity + Payments */}
+          {/* =====================================================
+              RECENT ACTIVITY + PAYMENTS
+          ===================================================== */}
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
             <RecentActivity />
             <RecentPayments />
           </div>
 
-          {/* Bottom Summary */}
+          {/* =====================================================
+              SYSTEM SUMMARY
+          ===================================================== */}
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-green-600">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
                   <CheckCircle2 size={18} />
                 </div>
+
                 <div>
-                  <p className="text-xs text-slate-500">System Status</p>
+                  <p className="text-xs text-slate-500">
+                    System Status
+                  </p>
+
                   <p className="text-sm font-semibold text-slate-900">
                     All systems operational
                   </p>
@@ -1103,8 +1179,12 @@ export default function Home() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                   <ShieldCheck size={18} />
                 </div>
+
                 <div>
-                  <p className="text-xs text-slate-500">Security</p>
+                  <p className="text-xs text-slate-500">
+                    Security
+                  </p>
+
                   <p className="text-sm font-semibold text-slate-900">
                     Protected
                   </p>
@@ -1117,8 +1197,12 @@ export default function Home() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
                   <BookOpen size={18} />
                 </div>
+
                 <div>
-                  <p className="text-xs text-slate-500">Learning</p>
+                  <p className="text-xs text-slate-500">
+                    Learning
+                  </p>
+
                   <p className="text-sm font-semibold text-slate-900">
                     28 active batches
                   </p>
@@ -1131,8 +1215,12 @@ export default function Home() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
                   <Clock3 size={18} />
                 </div>
+
                 <div>
-                  <p className="text-xs text-slate-500">Today</p>
+                  <p className="text-xs text-slate-500">
+                    Today
+                  </p>
+
                   <p className="text-sm font-semibold text-slate-900">
                     9 classes scheduled
                   </p>
@@ -1143,10 +1231,12 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Global Search Modal */}
+      {/* =========================================================
+          GLOBAL SEARCH MODAL
+      ========================================================= */}
       {searchOpen && (
         <div
-          className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/40 p-4 pt-[12vh] backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/40 p-4 pt-[10vh] backdrop-blur-sm"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               setSearchOpen(false);
@@ -1168,7 +1258,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setSearchOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
               >
                 <X size={18} />
               </button>
@@ -1201,6 +1291,7 @@ export default function Home() {
                           <p className="text-sm font-semibold text-slate-900">
                             {action.title}
                           </p>
+
                           <p className="text-xs text-slate-500">
                             {action.description}
                           </p>
@@ -1215,9 +1306,11 @@ export default function Home() {
                     size={28}
                     className="mx-auto text-slate-300"
                   />
+
                   <p className="mt-2 text-sm font-semibold text-slate-700">
                     No actions found
                   </p>
+
                   <p className="mt-1 text-xs text-slate-500">
                     Try another search term.
                   </p>
@@ -1228,7 +1321,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* AI Assistant Modal */}
+      {/* =========================================================
+          AI ASSISTANT MODAL
+      ========================================================= */}
       {aiOpen && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm"
@@ -1249,6 +1344,7 @@ export default function Home() {
                   <h2 className="text-base font-bold text-slate-900">
                     Institute AI Assistant
                   </h2>
+
                   <p className="text-xs text-slate-500">
                     AI-ready dashboard assistant
                   </p>
@@ -1258,7 +1354,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setAiOpen(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-white hover:text-slate-600"
+                className="rounded-lg p-2 text-slate-400 transition hover:bg-white hover:text-slate-600"
               >
                 <X size={18} />
               </button>
@@ -1267,14 +1363,19 @@ export default function Home() {
             <div className="p-5">
               <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4">
                 <div className="flex gap-3">
-                  <Brain size={19} className="mt-0.5 shrink-0 text-blue-600" />
+                  <Brain
+                    size={19}
+                    className="mt-0.5 shrink-0 text-blue-600"
+                  />
+
                   <div>
                     <p className="text-sm font-semibold text-slate-900">
                       What should I analyze?
                     </p>
+
                     <p className="mt-1 text-xs leading-5 text-slate-600">
-                      The real AI model will later receive secure backend data
-                      and generate evidence-based recommendations.
+                      The real AI model will later receive secure backend
+                      data and generate evidence-based recommendations.
                     </p>
                   </div>
                 </div>
@@ -1293,9 +1394,12 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                 <div className="flex flex-1 items-center rounded-xl border border-slate-200 bg-white px-3">
-                  <Search size={16} className="text-slate-400" />
+                  <Search
+                    size={16}
+                    className="shrink-0 text-slate-400"
+                  />
 
                   <input
                     value={aiQuery}
@@ -1314,7 +1418,7 @@ export default function Home() {
                         : "Please enter an AI question first",
                     )
                   }
-                  className="rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"
+                  className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
                 >
                   Ask
                 </button>
@@ -1322,7 +1426,11 @@ export default function Home() {
 
               <div className="mt-5 rounded-xl border border-dashed border-slate-200 p-4">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-green-600" />
+                  <ShieldCheck
+                    size={16}
+                    className="text-emerald-600"
+                  />
+
                   <p className="text-xs font-semibold text-slate-700">
                     AI privacy architecture
                   </p>
@@ -1339,14 +1447,18 @@ export default function Home() {
         </div>
       )}
 
-      {/* Toast */}
+      {/* =========================================================
+          TOAST
+      ========================================================= */}
       {toast && (
         <div className="fixed bottom-5 right-5 z-[120] flex max-w-sm items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-2xl">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
             <CheckCircle2 size={17} />
           </div>
 
-          <p className="text-sm font-medium text-slate-700">{toast}</p>
+          <p className="text-sm font-medium text-slate-700">
+            {toast}
+          </p>
 
           <button
             type="button"

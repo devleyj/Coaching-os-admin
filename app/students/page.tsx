@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
+
 import {
   Activity,
   AlertCircle,
@@ -178,24 +180,11 @@ const initialStudents: Student[] = [
   },
 ];
 
-const courses = [
-  "JEE Preparation",
-  "NEET Preparation",
-  "Foundation",
-];
+const courses = ["JEE Preparation", "NEET Preparation", "Foundation"];
 
-const batches = [
-  "JEE Advanced",
-  "JEE Main",
-  "NEET 2027",
-  "Foundation 2027",
-];
+const batches = ["JEE Advanced", "JEE Main", "NEET 2027", "Foundation 2027"];
 
-const statuses: StudentStatus[] = [
-  "Active",
-  "Inactive",
-  "Pending",
-];
+const statuses: StudentStatus[] = ["Active", "Inactive", "Pending"];
 
 const studentsPerPage = 8;
 
@@ -262,13 +251,9 @@ export default function StudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [showAddStudent, setShowAddStudent] = useState(false);
-  const [editingStudentId, setEditingStudentId] = useState<string | null>(
-    null,
-  );
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
 
-  const [viewingStudentId, setViewingStudentId] = useState<string | null>(
-    null,
-  );
+  const [viewingStudentId, setViewingStudentId] = useState<string | null>(null);
 
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
 
@@ -318,14 +303,11 @@ export default function StudentsPage() {
         student.email.toLowerCase().includes(search) ||
         student.parentName.toLowerCase().includes(search);
 
-      const matchesBatch =
-        !batchFilter || student.batch === batchFilter;
+      const matchesBatch = !batchFilter || student.batch === batchFilter;
 
-      const matchesCourse =
-        !courseFilter || student.course === courseFilter;
+      const matchesCourse = !courseFilter || student.course === courseFilter;
 
-      const matchesStatus =
-        !statusFilter || student.status === statusFilter;
+      const matchesStatus = !statusFilter || student.status === statusFilter;
 
       const matchesFee =
         !feeFilter ||
@@ -377,8 +359,7 @@ export default function StudentsPage() {
           break;
 
         case "feeProgress":
-          comparison =
-            getFeeProgress(a) - getFeeProgress(b);
+          comparison = getFeeProgress(a) - getFeeProgress(b);
           break;
 
         case "status":
@@ -400,8 +381,7 @@ export default function StudentsPage() {
 
   const safeCurrentPage = Math.min(currentPage, totalPages);
 
-  const startIndex =
-    (safeCurrentPage - 1) * studentsPerPage;
+  const startIndex = (safeCurrentPage - 1) * studentsPerPage;
 
   const paginatedStudents = sortedStudents.slice(
     startIndex,
@@ -426,10 +406,8 @@ export default function StudentsPage() {
   const averageAttendance =
     studentList.length > 0
       ? Math.round(
-          studentList.reduce(
-            (sum, student) => sum + student.attendance,
-            0,
-          ) / studentList.length,
+          studentList.reduce((sum, student) => sum + student.attendance, 0) /
+            studentList.length,
         )
       : 0;
 
@@ -467,9 +445,7 @@ export default function StudentsPage() {
   };
 
   const editStudent = (studentId: string) => {
-    const student = studentList.find(
-      (item) => item.id === studentId,
-    );
+    const student = studentList.find((item) => item.id === studentId);
 
     if (!student) {
       return;
@@ -526,10 +502,7 @@ export default function StudentsPage() {
             return student;
           }
 
-          const pendingFees = Math.max(
-            fees - student.paidFees,
-            0,
-          );
+          const pendingFees = Math.max(fees - student.paidFees, 0);
 
           return {
             ...student,
@@ -542,9 +515,7 @@ export default function StudentsPage() {
             pendingFees,
             parentName: studentParentName.trim(),
             parentPhone: studentParentPhone.trim(),
-            enrollmentDate:
-              studentEnrollmentDate ||
-              student.enrollmentDate,
+            enrollmentDate: studentEnrollmentDate || student.enrollmentDate,
             notes: studentNotes.trim(),
           };
         }),
@@ -552,18 +523,11 @@ export default function StudentsPage() {
 
       showToast("Student updated successfully.");
     } else {
-      const highestId = studentList.reduce(
-        (highest, student) => {
-          const numericId = Number(
-            student.id.replace("STU-", ""),
-          );
+      const highestId = studentList.reduce((highest, student) => {
+        const numericId = Number(student.id.replace("STU-", ""));
 
-          return Number.isNaN(numericId)
-            ? highest
-            : Math.max(highest, numericId);
-        },
-        1000,
-      );
+        return Number.isNaN(numericId) ? highest : Math.max(highest, numericId);
+      }, 1000);
 
       const newStudent: Student = {
         name: studentName.trim(),
@@ -577,8 +541,7 @@ export default function StudentsPage() {
         pendingFees: fees,
         status: "Active",
         enrollmentDate:
-          studentEnrollmentDate ||
-          new Date().toISOString().slice(0, 10),
+          studentEnrollmentDate || new Date().toISOString().slice(0, 10),
         parentName: studentParentName.trim(),
         parentPhone: studentParentPhone.trim(),
         attendance: 0,
@@ -587,10 +550,7 @@ export default function StudentsPage() {
         notes: studentNotes.trim(),
       };
 
-      setStudentList((currentStudents) => [
-        ...currentStudents,
-        newStudent,
-      ]);
+      setStudentList((currentStudents) => [...currentStudents, newStudent]);
 
       showToast("Student added successfully.");
     }
@@ -601,14 +561,10 @@ export default function StudentsPage() {
 
   const deleteStudent = (studentId: string) => {
     setStudentList((currentStudents) =>
-      currentStudents.filter(
-        (student) => student.id !== studentId,
-      ),
+      currentStudents.filter((student) => student.id !== studentId),
     );
 
-    setSelectedStudents((current) =>
-      current.filter((id) => id !== studentId),
-    );
+    setSelectedStudents((current) => current.filter((id) => id !== studentId));
 
     setOpenActionMenu(null);
     setShowDeleteConfirm(null);
@@ -624,22 +580,16 @@ export default function StudentsPage() {
   };
 
   const toggleSelectAll = () => {
-    const pageIds = paginatedStudents.map(
-      (student) => student.id,
-    );
+    const pageIds = paginatedStudents.map((student) => student.id);
 
-    const allSelected = pageIds.every((id) =>
-      selectedStudents.includes(id),
-    );
+    const allSelected = pageIds.every((id) => selectedStudents.includes(id));
 
     if (allSelected) {
       setSelectedStudents((current) =>
         current.filter((id) => !pageIds.includes(id)),
       );
     } else {
-      setSelectedStudents((current) => [
-        ...new Set([...current, ...pageIds]),
-      ]);
+      setSelectedStudents((current) => [...new Set([...current, ...pageIds])]);
     }
   };
 
@@ -656,9 +606,7 @@ export default function StudentsPage() {
       ),
     );
 
-    showToast(
-      `${selectedStudents.length} student(s) updated.`,
-    );
+    showToast(`${selectedStudents.length} student(s) updated.`);
 
     setSelectedStudents([]);
     setShowBulkMenu(false);
@@ -698,9 +646,7 @@ export default function StudentsPage() {
     const csv = [
       headers.join(","),
       ...rows.map((row) =>
-        row
-          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-          .join(","),
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","),
       ),
     ].join("\n");
 
@@ -726,22 +672,16 @@ export default function StudentsPage() {
   };
 
   const selectedStudent = aiStudentId
-    ? studentList.find(
-        (student) => student.id === aiStudentId,
-      )
+    ? studentList.find((student) => student.id === aiStudentId)
     : null;
 
   const viewedStudent = viewingStudentId
-    ? studentList.find(
-        (student) => student.id === viewingStudentId,
-      )
+    ? studentList.find((student) => student.id === viewingStudentId)
     : null;
 
   const allCurrentPageSelected =
     paginatedStudents.length > 0 &&
-    paginatedStudents.every((student) =>
-      selectedStudents.includes(student.id),
-    );
+    paginatedStudents.every((student) => selectedStudents.includes(student.id));
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -749,64 +689,50 @@ export default function StudentsPage() {
 
       <main className="ml-0 min-h-screen p-4 sm:p-6 lg:ml-64 lg:p-8">
         {/* Header */}
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-                <Users size={20} />
-              </div>
+        <PageHeader
+          title="Students"
+          description="Manage enrollment, fees, attendance and student performance."
+          icon={<Users size={20} />}
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={refreshStudents}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                <RefreshCw size={16} />
+                Refresh
+              </button>
 
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                  Students
-                </h1>
+              <button
+                type="button"
+                onClick={exportStudents}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                <Download size={16} />
+                Export
+              </button>
 
-                <p className="mt-0.5 text-sm text-slate-500">
-                  Manage enrollment, fees, attendance and student
-                  performance.
-                </p>
-              </div>
-            </div>
-          </div>
+              <button
+                type="button"
+                onClick={() => setShowAiPanel(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:bg-purple-100"
+              >
+                <Sparkles size={16} />
+                AI Insights
+              </button>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={refreshStudents}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-            >
-              <RefreshCw size={16} />
-              Refresh
-            </button>
-
-            <button
-              type="button"
-              onClick={exportStudents}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-            >
-              <Download size={16} />
-              Export
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowAiPanel(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:bg-purple-100"
-            >
-              <Sparkles size={16} />
-              AI Insights
-            </button>
-
-            <button
-              type="button"
-              onClick={openAddStudent}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <Plus size={17} />
-              Add Student
-            </button>
-          </div>
-        </div>
+              <button
+                type="button"
+                onClick={openAddStudent}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <Plus size={17} />
+                Add Student
+              </button>
+            </>
+          }
+        />
 
         {/* KPI Cards */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -848,9 +774,7 @@ export default function StudentsPage() {
 
             <p className="mt-2 text-xs font-semibold text-green-600">
               {totalStudents
-                ? Math.round(
-                    (activeStudents / totalStudents) * 100,
-                  )
+                ? Math.round((activeStudents / totalStudents) * 100)
                 : 0}
               % of current records
             </p>
@@ -858,9 +782,7 @@ export default function StudentsPage() {
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-slate-500">
-                Pending Fees
-              </p>
+              <p className="text-sm font-medium text-slate-500">Pending Fees</p>
 
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
                 <IndianRupee size={18} />
@@ -942,9 +864,9 @@ export default function StudentsPage() {
                 </div>
 
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-                  Identify attendance risk, academic risk and fee-risk
-                  patterns now. Real AI recommendations can be connected
-                  to the backend later.
+                  Identify attendance risk, academic risk and fee-risk patterns
+                  now. Real AI recommendations can be connected to the backend
+                  later.
                 </p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -1078,18 +1000,10 @@ export default function StudentsPage() {
               >
                 <option value="name">Sort: Name</option>
                 <option value="totalFees">Sort: Total Fees</option>
-                <option value="pendingFees">
-                  Sort: Pending Fees
-                </option>
-                <option value="feeProgress">
-                  Sort: Fee Progress
-                </option>
-                <option value="attendance">
-                  Sort: Attendance
-                </option>
-                <option value="performance">
-                  Sort: Performance
-                </option>
+                <option value="pendingFees">Sort: Pending Fees</option>
+                <option value="feeProgress">Sort: Fee Progress</option>
+                <option value="attendance">Sort: Attendance</option>
+                <option value="performance">Sort: Performance</option>
                 <option value="status">Sort: Status</option>
               </select>
 
@@ -1107,9 +1021,7 @@ export default function StudentsPage() {
                 ) : (
                   <ArrowDown size={14} />
                 )}
-                {sortOrder === "asc"
-                  ? "Ascending"
-                  : "Descending"}
+                {sortOrder === "asc" ? "Ascending" : "Descending"}
               </button>
 
               {(searchTerm ||
@@ -1157,9 +1069,7 @@ export default function StudentsPage() {
             <div className="relative">
               <button
                 type="button"
-                onClick={() =>
-                  setShowBulkMenu((current) => !current)
-                }
+                onClick={() => setShowBulkMenu((current) => !current)}
                 className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
               >
                 Bulk Actions
@@ -1170,9 +1080,7 @@ export default function StudentsPage() {
                 <div className="absolute right-0 top-12 z-30 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">
                   <button
                     type="button"
-                    onClick={() =>
-                      bulkUpdateStatus("Active")
-                    }
+                    onClick={() => bulkUpdateStatus("Active")}
                     className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark Active
@@ -1180,9 +1088,7 @@ export default function StudentsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      bulkUpdateStatus("Inactive")
-                    }
+                    onClick={() => bulkUpdateStatus("Inactive")}
                     className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark Inactive
@@ -1190,9 +1096,7 @@ export default function StudentsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      bulkUpdateStatus("Pending")
-                    }
+                    onClick={() => bulkUpdateStatus("Pending")}
                     className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
                     Mark Pending
@@ -1244,8 +1148,7 @@ export default function StudentsPage() {
               </h3>
 
               <p className="mt-1 max-w-md text-sm text-slate-500">
-                Try changing your search or filters, or add a new
-                student.
+                Try changing your search or filters, or add a new student.
               </p>
 
               <div className="mt-5 flex gap-2">
@@ -1318,8 +1221,7 @@ export default function StudentsPage() {
 
                   <tbody>
                     {paginatedStudents.map((student) => {
-                      const feeProgress =
-                        getFeeProgress(student);
+                      const feeProgress = getFeeProgress(student);
 
                       const risk = getRiskLevel(student);
 
@@ -1331,13 +1233,9 @@ export default function StudentsPage() {
                           <td className="px-4 py-4">
                             <input
                               type="checkbox"
-                              checked={selectedStudents.includes(
-                                student.id,
-                              )}
+                              checked={selectedStudents.includes(student.id)}
                               onChange={() =>
-                                toggleStudentSelection(
-                                  student.id,
-                                )
+                                toggleStudentSelection(student.id)
                               }
                               className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                               aria-label={`Select ${student.name}`}
@@ -1363,10 +1261,7 @@ export default function StudentsPage() {
                                   <span className="h-1 w-1 rounded-full bg-slate-300" />
 
                                   <span className="text-xs text-slate-400">
-                                    Joined{" "}
-                                    {formatDate(
-                                      student.enrollmentDate,
-                                    )}
+                                    Joined {formatDate(student.enrollmentDate)}
                                   </span>
                                 </div>
                               </div>
@@ -1387,9 +1282,7 @@ export default function StudentsPage() {
                             <div className="w-44">
                               <div className="flex items-center justify-between gap-2">
                                 <span className="text-sm font-bold text-slate-900">
-                                  {formatCurrency(
-                                    student.totalFees,
-                                  )}
+                                  {formatCurrency(student.totalFees)}
                                 </span>
 
                                 <span className="text-xs font-bold text-slate-500">
@@ -1408,17 +1301,11 @@ export default function StudentsPage() {
 
                               <div className="mt-1.5 flex justify-between text-[11px]">
                                 <span className="font-medium text-green-600">
-                                  Paid{" "}
-                                  {formatCurrency(
-                                    student.paidFees,
-                                  )}
+                                  Paid {formatCurrency(student.paidFees)}
                                 </span>
 
                                 <span className="font-medium text-orange-600">
-                                  Due{" "}
-                                  {formatCurrency(
-                                    student.pendingFees,
-                                  )}
+                                  Due {formatCurrency(student.pendingFees)}
                                 </span>
                               </div>
                             </div>
@@ -1449,8 +1336,7 @@ export default function StudentsPage() {
                                   className={`h-full rounded-full ${
                                     student.attendance >= 85
                                       ? "bg-green-500"
-                                      : student.attendance >=
-                                          75
+                                      : student.attendance >= 75
                                         ? "bg-yellow-500"
                                         : "bg-red-500"
                                   }`}
@@ -1478,11 +1364,9 @@ export default function StudentsPage() {
                               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
                                 <div
                                   className={`h-full rounded-full ${
-                                    student.performance >=
-                                    85
+                                    student.performance >= 85
                                       ? "bg-blue-500"
-                                      : student.performance >=
-                                          70
+                                      : student.performance >= 70
                                         ? "bg-yellow-500"
                                         : "bg-red-500"
                                   }`}
@@ -1518,8 +1402,7 @@ export default function StudentsPage() {
                               className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${
                                 student.status === "Active"
                                   ? "bg-green-50 text-green-600"
-                                  : student.status ===
-                                      "Pending"
+                                  : student.status === "Pending"
                                     ? "bg-orange-50 text-orange-600"
                                     : "bg-slate-100 text-slate-600"
                               }`}
@@ -1532,11 +1415,7 @@ export default function StudentsPage() {
                             <div className="relative flex items-center gap-1.5">
                               <button
                                 type="button"
-                                onClick={() =>
-                                  setViewingStudentId(
-                                    student.id,
-                                  )
-                                }
+                                onClick={() => setViewingStudentId(student.id)}
                                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-blue-600 transition hover:border-blue-200 hover:bg-blue-50"
                               >
                                 <Eye size={13} />
@@ -1545,11 +1424,7 @@ export default function StudentsPage() {
 
                               <button
                                 type="button"
-                                onClick={() =>
-                                  setAiStudentId(
-                                    student.id,
-                                  )
-                                }
+                                onClick={() => setAiStudentId(student.id)}
                                 className="rounded-lg border border-purple-200 bg-purple-50 p-2 text-purple-600 transition hover:bg-purple-100"
                                 aria-label={`AI insights for ${student.name}`}
                               >
@@ -1560,8 +1435,7 @@ export default function StudentsPage() {
                                 type="button"
                                 onClick={() =>
                                   setOpenActionMenu(
-                                    openActionMenu ===
-                                      student.id
+                                    openActionMenu === student.id
                                       ? null
                                       : student.id,
                                   )
@@ -1569,20 +1443,15 @@ export default function StudentsPage() {
                                 className="rounded-lg border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
                                 aria-label={`More actions for ${student.name}`}
                               >
-                                <MoreHorizontal
-                                  size={16}
-                                />
+                                <MoreHorizontal size={16} />
                               </button>
 
-                              {openActionMenu ===
-                                student.id && (
+                              {openActionMenu === student.id && (
                                 <div className="absolute right-0 top-10 z-30 w-40 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      setViewingStudentId(
-                                        student.id,
-                                      )
+                                      setViewingStudentId(student.id)
                                     }
                                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                                   >
@@ -1592,11 +1461,7 @@ export default function StudentsPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      editStudent(
-                                        student.id,
-                                      )
-                                    }
+                                    onClick={() => editStudent(student.id)}
                                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                                   >
                                     <Edit3 size={14} />
@@ -1605,11 +1470,7 @@ export default function StudentsPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      setAiStudentId(
-                                        student.id,
-                                      )
-                                    }
+                                    onClick={() => setAiStudentId(student.id)}
                                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-purple-700 hover:bg-purple-50"
                                   >
                                     <Sparkles size={14} />
@@ -1621,9 +1482,7 @@ export default function StudentsPage() {
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      setShowDeleteConfirm(
-                                        student.id,
-                                      )
+                                      setShowDeleteConfirm(student.id)
                                     }
                                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
                                   >
@@ -1646,9 +1505,7 @@ export default function StudentsPage() {
                 <p className="text-sm text-slate-500">
                   Showing{" "}
                   <span className="font-bold text-slate-900">
-                    {sortedStudents.length === 0
-                      ? 0
-                      : startIndex + 1}
+                    {sortedStudents.length === 0 ? 0 : startIndex + 1}
                   </span>{" "}
                   to{" "}
                   <span className="font-bold text-slate-900">
@@ -1669,9 +1526,7 @@ export default function StudentsPage() {
                     type="button"
                     disabled={safeCurrentPage === 1}
                     onClick={() =>
-                      setCurrentPage((page) =>
-                        Math.max(page - 1, 1),
-                      )
+                      setCurrentPage((page) => Math.max(page - 1, 1))
                     }
                     className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                   >
@@ -1686,9 +1541,7 @@ export default function StudentsPage() {
                     <button
                       key={page}
                       type="button"
-                      onClick={() =>
-                        setCurrentPage(page)
-                      }
+                      onClick={() => setCurrentPage(page)}
                       className={`h-9 min-w-9 rounded-lg px-3 text-xs font-bold transition ${
                         safeCurrentPage === page
                           ? "bg-blue-600 text-white shadow-sm"
@@ -1701,16 +1554,9 @@ export default function StudentsPage() {
 
                   <button
                     type="button"
-                    disabled={
-                      safeCurrentPage === totalPages
-                    }
+                    disabled={safeCurrentPage === totalPages}
                     onClick={() =>
-                      setCurrentPage((page) =>
-                        Math.min(
-                          page + 1,
-                          totalPages,
-                        ),
-                      )
+                      setCurrentPage((page) => Math.min(page + 1, totalPages))
                     }
                     className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                   >
@@ -1731,14 +1577,11 @@ export default function StudentsPage() {
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-6 py-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">
-                  {editingStudentId
-                    ? "Edit Student"
-                    : "Add New Student"}
+                  {editingStudentId ? "Edit Student" : "Add New Student"}
                 </h2>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  Add the student's profile, academic and parent
-                  information.
+                  Add the student's profile, academic and parent information.
                 </p>
               </div>
 
@@ -1758,10 +1601,7 @@ export default function StudentsPage() {
             <div className="p-6">
               {formError && (
                 <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                  <AlertCircle
-                    size={17}
-                    className="mt-0.5 shrink-0"
-                  />
+                  <AlertCircle size={17} className="mt-0.5 shrink-0" />
                   <span>{formError}</span>
                 </div>
               )}
@@ -1794,9 +1634,7 @@ export default function StudentsPage() {
                     type="text"
                     placeholder="Enter full name"
                     value={studentName}
-                    onChange={(event) =>
-                      setStudentName(event.target.value)
-                    }
+                    onChange={(event) => setStudentName(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -1810,9 +1648,7 @@ export default function StudentsPage() {
                     type="tel"
                     placeholder="Enter phone number"
                     value={studentPhone}
-                    onChange={(event) =>
-                      setStudentPhone(event.target.value)
-                    }
+                    onChange={(event) => setStudentPhone(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -1826,9 +1662,7 @@ export default function StudentsPage() {
                     type="email"
                     placeholder="Enter email address"
                     value={studentEmail}
-                    onChange={(event) =>
-                      setStudentEmail(event.target.value)
-                    }
+                    onChange={(event) => setStudentEmail(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -1842,9 +1676,7 @@ export default function StudentsPage() {
                     type="date"
                     value={studentEnrollmentDate}
                     onChange={(event) =>
-                      setStudentEnrollmentDate(
-                        event.target.value,
-                      )
+                      setStudentEnrollmentDate(event.target.value)
                     }
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
@@ -1857,18 +1689,13 @@ export default function StudentsPage() {
 
                   <select
                     value={studentCourse}
-                    onChange={(event) =>
-                      setStudentCourse(event.target.value)
-                    }
+                    onChange={(event) => setStudentCourse(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
                     <option value="">Select Course</option>
 
                     {courses.map((course) => (
-                      <option
-                        key={course}
-                        value={course}
-                      >
+                      <option key={course} value={course}>
                         {course}
                       </option>
                     ))}
@@ -1882,18 +1709,13 @@ export default function StudentsPage() {
 
                   <select
                     value={studentBatch}
-                    onChange={(event) =>
-                      setStudentBatch(event.target.value)
-                    }
+                    onChange={(event) => setStudentBatch(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
                     <option value="">Select Batch</option>
 
                     {batches.map((batch) => (
-                      <option
-                        key={batch}
-                        value={batch}
-                      >
+                      <option key={batch} value={batch}>
                         {batch}
                       </option>
                     ))}
@@ -1910,9 +1732,7 @@ export default function StudentsPage() {
                     min="0"
                     placeholder="Enter total fees"
                     value={studentFees}
-                    onChange={(event) =>
-                      setStudentFees(event.target.value)
-                    }
+                    onChange={(event) => setStudentFees(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -1929,8 +1749,7 @@ export default function StudentsPage() {
                       </h3>
 
                       <p className="text-xs text-slate-500">
-                        Used for communication and future
-                        notifications.
+                        Used for communication and future notifications.
                       </p>
                     </div>
                   </div>
@@ -1946,9 +1765,7 @@ export default function StudentsPage() {
                     placeholder="Enter parent name"
                     value={studentParentName}
                     onChange={(event) =>
-                      setStudentParentName(
-                        event.target.value,
-                      )
+                      setStudentParentName(event.target.value)
                     }
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
@@ -1964,9 +1781,7 @@ export default function StudentsPage() {
                     placeholder="Enter parent phone"
                     value={studentParentPhone}
                     onChange={(event) =>
-                      setStudentParentPhone(
-                        event.target.value,
-                      )
+                      setStudentParentPhone(event.target.value)
                     }
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
@@ -1981,9 +1796,7 @@ export default function StudentsPage() {
                     rows={4}
                     placeholder="Add mentor notes, academic observations or other useful information..."
                     value={studentNotes}
-                    onChange={(event) =>
-                      setStudentNotes(event.target.value)
-                    }
+                    onChange={(event) => setStudentNotes(event.target.value)}
                     className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -2007,9 +1820,7 @@ export default function StudentsPage() {
                 onClick={saveStudent}
                 className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
               >
-                {editingStudentId
-                  ? "Update Student"
-                  : "Add Student"}
+                {editingStudentId ? "Update Student" : "Add Student"}
               </button>
             </div>
           </div>
@@ -2032,17 +1843,14 @@ export default function StudentsPage() {
                   </h2>
 
                   <p className="text-xs font-medium text-slate-500">
-                    {viewedStudent.id} ·{" "}
-                    {viewedStudent.course}
+                    {viewedStudent.id} · {viewedStudent.course}
                   </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setViewingStudentId(null)
-                }
+                onClick={() => setViewingStudentId(null)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               >
                 <X size={19} />
@@ -2077,9 +1885,7 @@ export default function StudentsPage() {
                   </p>
 
                   <p className="mt-2 text-2xl font-bold text-slate-900">
-                    {formatCurrency(
-                      viewedStudent.paidFees,
-                    )}
+                    {formatCurrency(viewedStudent.paidFees)}
                   </p>
                 </div>
 
@@ -2089,9 +1895,7 @@ export default function StudentsPage() {
                   </p>
 
                   <p className="mt-2 text-2xl font-bold text-slate-900">
-                    {formatCurrency(
-                      viewedStudent.pendingFees,
-                    )}
+                    {formatCurrency(viewedStudent.pendingFees)}
                   </p>
                 </div>
               </div>
@@ -2104,15 +1908,10 @@ export default function StudentsPage() {
 
                   <div className="mt-4 space-y-4">
                     <div className="flex items-center gap-3">
-                      <Phone
-                        size={16}
-                        className="text-slate-400"
-                      />
+                      <Phone size={16} className="text-slate-400" />
 
                       <div>
-                        <p className="text-xs text-slate-500">
-                          Phone
-                        </p>
+                        <p className="text-xs text-slate-500">Phone</p>
 
                         <p className="text-sm font-semibold text-slate-900">
                           {viewedStudent.phone}
@@ -2121,52 +1920,34 @@ export default function StudentsPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <Mail
-                        size={16}
-                        className="text-slate-400"
-                      />
+                      <Mail size={16} className="text-slate-400" />
 
                       <div>
-                        <p className="text-xs text-slate-500">
-                          Email
-                        </p>
+                        <p className="text-xs text-slate-500">Email</p>
 
                         <p className="break-all text-sm font-semibold text-slate-900">
-                          {viewedStudent.email ||
-                            "Not provided"}
+                          {viewedStudent.email || "Not provided"}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <CalendarDays
-                        size={16}
-                        className="text-slate-400"
-                      />
+                      <CalendarDays size={16} className="text-slate-400" />
 
                       <div>
-                        <p className="text-xs text-slate-500">
-                          Enrollment
-                        </p>
+                        <p className="text-xs text-slate-500">Enrollment</p>
 
                         <p className="text-sm font-semibold text-slate-900">
-                          {formatDate(
-                            viewedStudent.enrollmentDate,
-                          )}
+                          {formatDate(viewedStudent.enrollmentDate)}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <FileText
-                        size={16}
-                        className="text-slate-400"
-                      />
+                      <FileText size={16} className="text-slate-400" />
 
                       <div>
-                        <p className="text-xs text-slate-500">
-                          Batch
-                        </p>
+                        <p className="text-xs text-slate-500">Batch</p>
 
                         <p className="text-sm font-semibold text-slate-900">
                           {viewedStudent.batch}
@@ -2183,47 +1964,32 @@ export default function StudentsPage() {
 
                   <div className="mt-4 space-y-4">
                     <div className="flex items-center gap-3">
-                      <User
-                        size={16}
-                        className="text-slate-400"
-                      />
+                      <User size={16} className="text-slate-400" />
 
                       <div>
-                        <p className="text-xs text-slate-500">
-                          Name
-                        </p>
+                        <p className="text-xs text-slate-500">Name</p>
 
                         <p className="text-sm font-semibold text-slate-900">
-                          {viewedStudent.parentName ||
-                            "Not provided"}
+                          {viewedStudent.parentName || "Not provided"}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <Phone
-                        size={16}
-                        className="text-slate-400"
-                      />
+                      <Phone size={16} className="text-slate-400" />
 
                       <div>
-                        <p className="text-xs text-slate-500">
-                          Phone
-                        </p>
+                        <p className="text-xs text-slate-500">Phone</p>
 
                         <p className="text-sm font-semibold text-slate-900">
-                          {viewedStudent.parentPhone ||
-                            "Not provided"}
+                          {viewedStudent.parentPhone || "Not provided"}
                         </p>
                       </div>
                     </div>
 
                     <div className="rounded-xl bg-purple-50 p-4">
                       <div className="flex items-center gap-2">
-                        <Sparkles
-                          size={15}
-                          className="text-purple-600"
-                        />
+                        <Sparkles size={15} className="text-purple-600" />
 
                         <p className="text-xs font-bold text-purple-700">
                           AI Risk Level
@@ -2239,9 +2005,7 @@ export default function StudentsPage() {
               </div>
 
               <div className="mt-5 rounded-2xl border border-slate-200 p-5">
-                <h3 className="text-sm font-bold text-slate-900">
-                  Fees
-                </h3>
+                <h3 className="text-sm font-bold text-slate-900">Fees</h3>
 
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-sm">
@@ -2258,47 +2022,33 @@ export default function StudentsPage() {
                     <div
                       className="h-full rounded-full bg-blue-500"
                       style={{
-                        width: `${getFeeProgress(
-                          viewedStudent,
-                        )}%`,
+                        width: `${getFeeProgress(viewedStudent)}%`,
                       }}
                     />
                   </div>
 
                   <div className="mt-3 grid grid-cols-3 gap-3">
                     <div className="rounded-xl bg-slate-50 p-3">
-                      <p className="text-xs text-slate-500">
-                        Total
-                      </p>
+                      <p className="text-xs text-slate-500">Total</p>
 
                       <p className="mt-1 text-sm font-bold text-slate-900">
-                        {formatCurrency(
-                          viewedStudent.totalFees,
-                        )}
+                        {formatCurrency(viewedStudent.totalFees)}
                       </p>
                     </div>
 
                     <div className="rounded-xl bg-green-50 p-3">
-                      <p className="text-xs text-green-600">
-                        Paid
-                      </p>
+                      <p className="text-xs text-green-600">Paid</p>
 
                       <p className="mt-1 text-sm font-bold text-slate-900">
-                        {formatCurrency(
-                          viewedStudent.paidFees,
-                        )}
+                        {formatCurrency(viewedStudent.paidFees)}
                       </p>
                     </div>
 
                     <div className="rounded-xl bg-orange-50 p-3">
-                      <p className="text-xs text-orange-600">
-                        Pending
-                      </p>
+                      <p className="text-xs text-orange-600">Pending</p>
 
                       <p className="mt-1 text-sm font-bold text-slate-900">
-                        {formatCurrency(
-                          viewedStudent.pendingFees,
-                        )}
+                        {formatCurrency(viewedStudent.pendingFees)}
                       </p>
                     </div>
                   </div>
@@ -2311,8 +2061,7 @@ export default function StudentsPage() {
                 </h3>
 
                 <p className="mt-3 text-sm leading-6 text-slate-600">
-                  {viewedStudent.notes ||
-                    "No notes have been added yet."}
+                  {viewedStudent.notes || "No notes have been added yet."}
                 </p>
               </div>
             </div>
@@ -2370,8 +2119,7 @@ export default function StudentsPage() {
                   </h2>
 
                   <p className="text-xs text-slate-500">
-                    {selectedStudent.name} ·{" "}
-                    {selectedStudent.id}
+                    {selectedStudent.name} · {selectedStudent.id}
                   </p>
                 </div>
               </div>
@@ -2390,8 +2138,7 @@ export default function StudentsPage() {
                 className={`rounded-2xl border p-5 ${
                   getRiskLevel(selectedStudent) === "High"
                     ? "border-red-200 bg-red-50"
-                    : getRiskLevel(selectedStudent) ===
-                        "Medium"
+                    : getRiskLevel(selectedStudent) === "Medium"
                       ? "border-orange-200 bg-orange-50"
                       : "border-green-200 bg-green-50"
                 }`}
@@ -2407,25 +2154,19 @@ export default function StudentsPage() {
                     </p>
                   </div>
 
-                  <Sparkles
-                    size={22}
-                    className="text-purple-600"
-                  />
+                  <Sparkles size={22} className="text-purple-600" />
                 </div>
 
                 <p className="mt-3 text-sm leading-6 text-slate-600">
-                  This is a rule-based demonstration of the future
-                  AI layer. In production, these insights can be
-                  generated from attendance, exams, payments,
-                  engagement and learning data.
+                  This is a rule-based demonstration of the future AI layer. In
+                  production, these insights can be generated from attendance,
+                  exams, payments, engagement and learning data.
                 </p>
               </div>
 
               <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="rounded-xl border border-slate-200 p-4">
-                  <p className="text-xs text-slate-500">
-                    Attendance
-                  </p>
+                  <p className="text-xs text-slate-500">Attendance</p>
 
                   <p className="mt-1 text-xl font-bold text-slate-900">
                     {selectedStudent.attendance}%
@@ -2433,9 +2174,7 @@ export default function StudentsPage() {
                 </div>
 
                 <div className="rounded-xl border border-slate-200 p-4">
-                  <p className="text-xs text-slate-500">
-                    Performance
-                  </p>
+                  <p className="text-xs text-slate-500">Performance</p>
 
                   <p className="mt-1 text-xl font-bold text-slate-900">
                     {selectedStudent.performance}%
@@ -2443,14 +2182,10 @@ export default function StudentsPage() {
                 </div>
 
                 <div className="rounded-xl border border-slate-200 p-4">
-                  <p className="text-xs text-slate-500">
-                    Pending Fees
-                  </p>
+                  <p className="text-xs text-slate-500">Pending Fees</p>
 
                   <p className="mt-1 text-xl font-bold text-slate-900">
-                    {formatCurrency(
-                      selectedStudent.pendingFees,
-                    )}
+                    {formatCurrency(selectedStudent.pendingFees)}
                   </p>
                 </div>
               </div>
@@ -2473,8 +2208,8 @@ export default function StudentsPage() {
                       </p>
 
                       <p className="mt-1 text-xs leading-5 text-slate-600">
-                        Consider mentor follow-up and parent
-                        communication regarding recent attendance.
+                        Consider mentor follow-up and parent communication
+                        regarding recent attendance.
                       </p>
                     </div>
                   </div>
@@ -2493,8 +2228,8 @@ export default function StudentsPage() {
                       </p>
 
                       <p className="mt-1 text-xs leading-5 text-slate-600">
-                        Schedule a mentor review and identify weak
-                        subjects from exam-level analytics.
+                        Schedule a mentor review and identify weak subjects from
+                        exam-level analytics.
                       </p>
                     </div>
                   </div>
@@ -2514,9 +2249,8 @@ export default function StudentsPage() {
                       </p>
 
                       <p className="mt-1 text-xs leading-5 text-slate-600">
-                        More than half of the configured fee amount
-                        remains pending. A payment reminder may be
-                        appropriate.
+                        More than half of the configured fee amount remains
+                        pending. A payment reminder may be appropriate.
                       </p>
                     </div>
                   </div>
@@ -2536,8 +2270,8 @@ export default function StudentsPage() {
                         </p>
 
                         <p className="mt-1 text-xs leading-5 text-slate-600">
-                          Attendance and performance are both strong.
-                          Consider enrichment or advanced practice.
+                          Attendance and performance are both strong. Consider
+                          enrichment or advanced practice.
                         </p>
                       </div>
                     </div>
@@ -2546,10 +2280,7 @@ export default function StudentsPage() {
 
               <div className="mt-5 rounded-xl border border-purple-200 bg-purple-50 p-4">
                 <div className="flex items-center gap-2">
-                  <Sparkles
-                    size={15}
-                    className="text-purple-600"
-                  />
+                  <Sparkles size={15} className="text-purple-600" />
 
                   <p className="text-xs font-bold text-purple-700">
                     Future AI capabilities
@@ -2630,10 +2361,7 @@ export default function StudentsPage() {
             <div className="space-y-5 p-6">
               <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
                 <div className="flex items-center gap-2">
-                  <ShieldAlert
-                    size={17}
-                    className="text-red-600"
-                  />
+                  <ShieldAlert size={17} className="text-red-600" />
 
                   <h3 className="text-sm font-bold text-slate-900">
                     High-priority attention
@@ -2641,26 +2369,22 @@ export default function StudentsPage() {
                 </div>
 
                 <p className="mt-2 text-sm text-slate-600">
-                  {studentList.filter(
-                    (student) =>
-                      getRiskLevel(student) === "High",
-                  ).length}{" "}
+                  {
+                    studentList.filter(
+                      (student) => getRiskLevel(student) === "High",
+                    ).length
+                  }{" "}
                   student(s) currently show high-risk signals.
                 </p>
 
                 <div className="mt-3 space-y-2">
                   {studentList
-                    .filter(
-                      (student) =>
-                        getRiskLevel(student) === "High",
-                    )
+                    .filter((student) => getRiskLevel(student) === "High")
                     .map((student) => (
                       <button
                         key={student.id}
                         type="button"
-                        onClick={() =>
-                          setAiStudentId(student.id)
-                        }
+                        onClick={() => setAiStudentId(student.id)}
                         className="flex w-full items-center justify-between rounded-xl bg-white p-3 text-left transition hover:shadow-sm"
                       >
                         <div>
@@ -2669,16 +2393,12 @@ export default function StudentsPage() {
                           </p>
 
                           <p className="mt-1 text-xs text-slate-500">
-                            Attendance{" "}
-                            {student.attendance}% · Performance{" "}
+                            Attendance {student.attendance}% · Performance{" "}
                             {student.performance}%
                           </p>
                         </div>
 
-                        <ChevronRight
-                          size={16}
-                          className="text-slate-400"
-                        />
+                        <ChevronRight size={16} className="text-slate-400" />
                       </button>
                     ))}
                 </div>
@@ -2686,19 +2406,14 @@ export default function StudentsPage() {
 
               <div className="rounded-2xl border border-orange-200 bg-orange-50 p-5">
                 <div className="flex items-center gap-2">
-                  <IndianRupee
-                    size={17}
-                    className="text-orange-600"
-                  />
+                  <IndianRupee size={17} className="text-orange-600" />
 
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Fee risk
-                  </h3>
+                  <h3 className="text-sm font-bold text-slate-900">Fee risk</h3>
                 </div>
 
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Total pending student fees currently represented
-                  in this demo dataset are{" "}
+                  Total pending student fees currently represented in this demo
+                  dataset are{" "}
                   <span className="font-bold text-slate-900">
                     {formatCurrency(totalPendingFees)}
                   </span>
@@ -2720,10 +2435,7 @@ export default function StudentsPage() {
 
               <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2
-                    size={17}
-                    className="text-green-600"
-                  />
+                  <CheckCircle2 size={17} className="text-green-600" />
 
                   <h3 className="text-sm font-bold text-slate-900">
                     Positive signals
@@ -2731,18 +2443,15 @@ export default function StudentsPage() {
                 </div>
 
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Students with strong attendance and performance
-                  can be candidates for advanced practice,
-                  recognition or mentoring opportunities.
+                  Students with strong attendance and performance can be
+                  candidates for advanced practice, recognition or mentoring
+                  opportunities.
                 </p>
               </div>
 
               <div className="rounded-2xl border border-purple-200 bg-purple-50 p-5">
                 <div className="flex items-center gap-2">
-                  <Brain
-                    size={17}
-                    className="text-purple-600"
-                  />
+                  <Brain size={17} className="text-purple-600" />
 
                   <h3 className="text-sm font-bold text-slate-900">
                     AI roadmap for Students
@@ -2764,10 +2473,7 @@ export default function StudentsPage() {
                       key={feature}
                       className="flex items-center gap-2 rounded-lg bg-white px-3 py-2.5"
                     >
-                      <Check
-                        size={14}
-                        className="text-purple-600"
-                      />
+                      <Check size={14} className="text-purple-600" />
 
                       <span className="text-xs font-semibold text-slate-600">
                         {feature}
@@ -2794,18 +2500,15 @@ export default function StudentsPage() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              This will remove the student from the current demo
-              dataset. In the production backend, deletion should
-              use proper permissions, audit logs and soft-delete
-              rules.
+              This will remove the student from the current demo dataset. In the
+              production backend, deletion should use proper permissions, audit
+              logs and soft-delete rules.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowDeleteConfirm(null)
-                }
+                onClick={() => setShowDeleteConfirm(null)}
                 className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 Cancel
@@ -2813,9 +2516,7 @@ export default function StudentsPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  deleteStudent(showDeleteConfirm)
-                }
+                onClick={() => deleteStudent(showDeleteConfirm)}
                 className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
               >
                 Delete Student
@@ -2832,9 +2533,7 @@ export default function StudentsPage() {
             <Check size={16} />
           </div>
 
-          <p className="text-sm font-semibold text-slate-800">
-            {toast}
-          </p>
+          <p className="text-sm font-semibold text-slate-800">{toast}</p>
         </div>
       )}
     </div>

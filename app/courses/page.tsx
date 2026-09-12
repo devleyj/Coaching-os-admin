@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import PageHeader from "../components/PageHeader";
 import {
   AlertTriangle,
   ArrowDown,
@@ -505,8 +506,7 @@ export default function CoursesPage() {
 
     const duplicate = courses.some(
       (course) =>
-        course.name.trim().toLowerCase() ===
-        newCourseName.trim().toLowerCase(),
+        course.name.trim().toLowerCase() === newCourseName.trim().toLowerCase(),
     );
 
     if (duplicate) {
@@ -591,10 +591,8 @@ export default function CoursesPage() {
               fees: Number(editCourseFees),
               subjects,
               capacity: Number(editCourseCapacity),
-              startDate:
-                editCourseStartDate || course.startDate,
-              description:
-                editCourseDescription.trim() || course.description,
+              startDate: editCourseStartDate || course.startDate,
+              description: editCourseDescription.trim() || course.description,
               status: editCourseStatus,
             }
           : course,
@@ -623,10 +621,7 @@ export default function CoursesPage() {
 
     setSelectedCourse(null);
 
-    if (
-      paginatedCourses.length === 1 &&
-      currentPage > 1
-    ) {
+    if (paginatedCourses.length === 1 && currentPage > 1) {
       setCurrentPage((page) => Math.max(1, page - 1));
     }
 
@@ -656,8 +651,7 @@ export default function CoursesPage() {
         item.id === course.id
           ? {
               ...item,
-              status:
-                item.status === "Active" ? "Inactive" : "Active",
+              status: item.status === "Active" ? "Inactive" : "Active",
             }
           : item,
       ),
@@ -683,10 +677,7 @@ export default function CoursesPage() {
 
   const occupancyRate = (course: Course) => {
     if (!course.capacity) return 0;
-    return Math.min(
-      100,
-      Math.round((course.students / course.capacity) * 100),
-    );
+    return Math.min(100, Math.round((course.students / course.capacity) * 100));
   };
 
   return (
@@ -698,45 +689,32 @@ export default function CoursesPage() {
 
       <main className="ml-64 min-h-screen p-8">
         {/* HEADER */}
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
-                <BookOpen size={24} />
-              </div>
+        <PageHeader
+          title="Courses"
+          description="Manage programs, curriculum, fees and course performance."
+          icon={<BookOpen size={20} />}
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => setShowAiInsights(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:border-purple-300 hover:bg-purple-100"
+              >
+                <Sparkles size={16} />
+                AI Insights
+              </button>
 
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  Courses
-                </h1>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Manage programs, curriculum, fees and course performance.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => setShowAiInsights(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm font-semibold text-violet-700 transition hover:bg-violet-100"
-            >
-              <Sparkles size={17} />
-              AI Insights
-            </button>
-
-            <button
-              type="button"
-              onClick={openAddModal}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <Plus size={18} />
-              Add Course
-            </button>
-          </div>
-        </div>
+              <button
+                type="button"
+                onClick={openAddModal}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <Plus size={17} />
+                Add Course
+              </button>
+            </>
+          }
+        />
 
         {/* KPI CARDS */}
         <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -1157,10 +1135,7 @@ export default function CoursesPage() {
 
                           <td className="px-6 py-5">
                             <div className="flex items-center gap-2">
-                              <Users
-                                size={16}
-                                className="text-slate-400"
-                              />
+                              <Users size={16} className="text-slate-400" />
 
                               <div>
                                 <p className="text-sm font-bold text-slate-900">
@@ -1176,10 +1151,7 @@ export default function CoursesPage() {
 
                           <td className="px-6 py-5">
                             <div className="flex items-center gap-2">
-                              <Layers3
-                                size={16}
-                                className="text-slate-400"
-                              />
+                              <Layers3 size={16} className="text-slate-400" />
 
                               <span className="text-sm font-semibold text-slate-700">
                                 {course.batches}
@@ -1269,15 +1241,11 @@ export default function CoursesPage() {
                               {openActionMenu === course.id && (
                                 <div
                                   className="absolute right-0 top-11 z-30 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl"
-                                  onClick={(event) =>
-                                    event.stopPropagation()
-                                  }
+                                  onClick={(event) => event.stopPropagation()}
                                 >
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      openViewModal(course)
-                                    }
+                                    onClick={() => openViewModal(course)}
                                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                   >
                                     <Eye size={16} />
@@ -1286,9 +1254,7 @@ export default function CoursesPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      openEditModal(course)
-                                    }
+                                    onClick={() => openEditModal(course)}
                                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                   >
                                     <Edit3 size={16} />
@@ -1297,9 +1263,7 @@ export default function CoursesPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      duplicateCourse(course)
-                                    }
+                                    onClick={() => duplicateCourse(course)}
                                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                   >
                                     <Copy size={16} />
@@ -1308,9 +1272,7 @@ export default function CoursesPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      toggleCourseStatus(course)
-                                    }
+                                    onClick={() => toggleCourseStatus(course)}
                                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                   >
                                     {course.status === "Active" ? (
@@ -1318,7 +1280,6 @@ export default function CoursesPage() {
                                     ) : (
                                       <ArrowUp size={16} />
                                     )}
-
                                     Mark{" "}
                                     {course.status === "Active"
                                       ? "Inactive"
@@ -1329,9 +1290,7 @@ export default function CoursesPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      handleDeleteCourse(course)
-                                    }
+                                    onClick={() => handleDeleteCourse(course)}
                                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50"
                                   >
                                     <Trash2 size={16} />
@@ -1378,9 +1337,7 @@ export default function CoursesPage() {
                     type="button"
                     disabled={currentPage === totalPages}
                     onClick={() =>
-                      setCurrentPage((page) =>
-                        Math.min(totalPages, page + 1),
-                      )
+                      setCurrentPage((page) => Math.min(totalPages, page + 1))
                     }
                     className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                   >
@@ -1467,8 +1424,7 @@ export default function CoursesPage() {
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-violet-800">
-                  Consider targeted promotions for courses with unused
-                  capacity.
+                  Consider targeted promotions for courses with unused capacity.
                 </p>
               </div>
             </div>
@@ -1522,9 +1478,7 @@ export default function CoursesPage() {
                   <input
                     type="text"
                     value={newCourseName}
-                    onChange={(event) =>
-                      setNewCourseName(event.target.value)
-                    }
+                    onChange={(event) => setNewCourseName(event.target.value)}
                     placeholder="e.g. JEE Advanced"
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                   />
@@ -1571,9 +1525,7 @@ export default function CoursesPage() {
                     type="number"
                     min="1"
                     value={newCourseFees}
-                    onChange={(event) =>
-                      setNewCourseFees(event.target.value)
-                    }
+                    onChange={(event) => setNewCourseFees(event.target.value)}
                     placeholder="e.g. 45000"
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500"
                   />
@@ -1639,9 +1591,7 @@ export default function CoursesPage() {
                   <select
                     value={newCourseStatus}
                     onChange={(event) =>
-                      setNewCourseStatus(
-                        event.target.value as CourseStatus,
-                      )
+                      setNewCourseStatus(event.target.value as CourseStatus)
                     }
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                   >
@@ -1735,9 +1685,7 @@ export default function CoursesPage() {
                   <input
                     type="text"
                     value={editCourseName}
-                    onChange={(event) =>
-                      setEditCourseName(event.target.value)
-                    }
+                    onChange={(event) => setEditCourseName(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                   />
                 </div>
@@ -1781,9 +1729,7 @@ export default function CoursesPage() {
                     type="number"
                     min="1"
                     value={editCourseFees}
-                    onChange={(event) =>
-                      setEditCourseFees(event.target.value)
-                    }
+                    onChange={(event) => setEditCourseFees(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                   />
                 </div>
@@ -1842,9 +1788,7 @@ export default function CoursesPage() {
                   <select
                     value={editCourseStatus}
                     onChange={(event) =>
-                      setEditCourseStatus(
-                        event.target.value as CourseStatus,
-                      )
+                      setEditCourseStatus(event.target.value as CourseStatus)
                     }
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                   >
@@ -1937,10 +1881,7 @@ export default function CoursesPage() {
             <div className="space-y-6 p-6">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <div className="rounded-xl bg-slate-50 p-4">
-                  <Users
-                    size={17}
-                    className="text-blue-600"
-                  />
+                  <Users size={17} className="text-blue-600" />
                   <p className="mt-3 text-xs font-medium text-slate-500">
                     Students
                   </p>
@@ -1950,10 +1891,7 @@ export default function CoursesPage() {
                 </div>
 
                 <div className="rounded-xl bg-slate-50 p-4">
-                  <Layers3
-                    size={17}
-                    className="text-violet-600"
-                  />
+                  <Layers3 size={17} className="text-violet-600" />
                   <p className="mt-3 text-xs font-medium text-slate-500">
                     Batches
                   </p>
@@ -1963,10 +1901,7 @@ export default function CoursesPage() {
                 </div>
 
                 <div className="rounded-xl bg-slate-50 p-4">
-                  <GraduationCap
-                    size={17}
-                    className="text-emerald-600"
-                  />
+                  <GraduationCap size={17} className="text-emerald-600" />
                   <p className="mt-3 text-xs font-medium text-slate-500">
                     Teachers
                   </p>
@@ -1976,10 +1911,7 @@ export default function CoursesPage() {
                 </div>
 
                 <div className="rounded-xl bg-slate-50 p-4">
-                  <IndianRupee
-                    size={17}
-                    className="text-amber-600"
-                  />
+                  <IndianRupee size={17} className="text-amber-600" />
                   <p className="mt-3 text-xs font-medium text-slate-500">
                     Course Fee
                   </p>
@@ -1996,8 +1928,8 @@ export default function CoursesPage() {
 
                 <div className="mt-3 flex items-center justify-between">
                   <span className="text-sm font-semibold text-slate-700">
-                    {selectedCourse.students} /{" "}
-                    {selectedCourse.capacity} students
+                    {selectedCourse.students} / {selectedCourse.capacity}{" "}
+                    students
                   </span>
 
                   <span className="text-sm font-bold text-slate-900">
@@ -2044,15 +1976,10 @@ export default function CoursesPage() {
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="flex items-center gap-3 rounded-xl border border-slate-200 p-4">
-                  <Clock3
-                    size={18}
-                    className="text-blue-600"
-                  />
+                  <Clock3 size={18} className="text-blue-600" />
 
                   <div>
-                    <p className="text-xs text-slate-500">
-                      Duration
-                    </p>
+                    <p className="text-xs text-slate-500">Duration</p>
 
                     <p className="mt-1 text-sm font-bold text-slate-900">
                       {selectedCourse.duration}
@@ -2061,15 +1988,10 @@ export default function CoursesPage() {
                 </div>
 
                 <div className="flex items-center gap-3 rounded-xl border border-slate-200 p-4">
-                  <CalendarDays
-                    size={18}
-                    className="text-violet-600"
-                  />
+                  <CalendarDays size={18} className="text-violet-600" />
 
                   <div>
-                    <p className="text-xs text-slate-500">
-                      Start Date
-                    </p>
+                    <p className="text-xs text-slate-500">Start Date</p>
 
                     <p className="mt-1 text-sm font-bold text-slate-900">
                       {new Date(
@@ -2086,10 +2008,7 @@ export default function CoursesPage() {
 
               <div className="rounded-xl border border-violet-200 bg-violet-50 p-4">
                 <div className="flex items-start gap-3">
-                  <Sparkles
-                    size={18}
-                    className="mt-0.5 text-violet-600"
-                  />
+                  <Sparkles size={18} className="mt-0.5 text-violet-600" />
 
                   <div>
                     <p className="text-sm font-bold text-violet-900">
@@ -2097,8 +2016,7 @@ export default function CoursesPage() {
                     </p>
 
                     <p className="mt-1 text-sm leading-6 text-violet-800">
-                      This course has{" "}
-                      {occupancyRate(selectedCourse)}% capacity
+                      This course has {occupancyRate(selectedCourse)}% capacity
                       utilization. Future AI analytics will combine enrollment,
                       attendance, fees, exam performance and inquiry trends to
                       predict demand.
@@ -2162,10 +2080,7 @@ export default function CoursesPage() {
             <div className="space-y-4 p-6">
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                 <div className="flex gap-3">
-                  <CheckCircle2
-                    size={19}
-                    className="mt-0.5 text-emerald-600"
-                  />
+                  <CheckCircle2 size={19} className="mt-0.5 text-emerald-600" />
 
                   <div>
                     <p className="text-sm font-bold text-emerald-900">
@@ -2182,10 +2097,7 @@ export default function CoursesPage() {
 
               <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
                 <div className="flex gap-3">
-                  <AlertTriangle
-                    size={19}
-                    className="mt-0.5 text-amber-600"
-                  />
+                  <AlertTriangle size={19} className="mt-0.5 text-amber-600" />
 
                   <div>
                     <p className="text-sm font-bold text-amber-900">
@@ -2202,10 +2114,7 @@ export default function CoursesPage() {
 
               <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
                 <div className="flex gap-3">
-                  <BarChart3
-                    size={19}
-                    className="mt-0.5 text-blue-600"
-                  />
+                  <BarChart3 size={19} className="mt-0.5 text-blue-600" />
 
                   <div>
                     <p className="text-sm font-bold text-blue-900">
@@ -2223,10 +2132,7 @@ export default function CoursesPage() {
 
               <div className="rounded-xl border border-violet-200 bg-violet-50 p-4">
                 <div className="flex gap-3">
-                  <Sparkles
-                    size={19}
-                    className="mt-0.5 text-violet-600"
-                  />
+                  <Sparkles size={19} className="mt-0.5 text-violet-600" />
 
                   <div>
                     <p className="text-sm font-bold text-violet-900">
@@ -2259,10 +2165,7 @@ export default function CoursesPage() {
       {/* TOAST */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-[100] flex items-center gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-xl">
-          <CheckCircle2
-            size={18}
-            className="text-emerald-400"
-          />
+          <CheckCircle2 size={18} className="text-emerald-400" />
           {toast}
         </div>
       )}

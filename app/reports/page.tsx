@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   AlertTriangle,
   ArrowDown,
@@ -146,7 +147,8 @@ const initialReports: Report[] = [
     id: "RPT-1005",
     name: "Teacher Performance Report",
     category: "Teachers",
-    description: "Teacher workload, classes, attendance and performance metrics.",
+    description:
+      "Teacher workload, classes, attendance and performance metrics.",
     generatedDate: "2026-09-02",
     generatedTime: "01:45 PM",
     status: "Ready",
@@ -182,7 +184,8 @@ const initialReports: Report[] = [
     id: "RPT-1008",
     name: "Student Risk Prediction",
     category: "Students",
-    description: "AI-style early warning analysis for students needing attention.",
+    description:
+      "AI-style early warning analysis for students needing attention.",
     generatedDate: "2026-08-30",
     generatedTime: "12:25 PM",
     status: "Ready",
@@ -534,8 +537,7 @@ function getStatusClasses(status: ReportStatus) {
 export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>(initialReports);
 
-  const [activeCategory, setActiveCategory] =
-    useState<ReportCategory>("All");
+  const [activeCategory, setActiveCategory] = useState<ReportCategory>("All");
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -559,8 +561,7 @@ export default function ReportsPage() {
 
   const [sortBy, setSortBy] = useState("Date");
 
-  const [sortDirection, setSortDirection] =
-    useState<"asc" | "desc">("desc");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   const [page, setPage] = useState(1);
 
@@ -579,20 +580,15 @@ export default function ReportsPage() {
 
   const [builderDateTo, setBuilderDateTo] = useState("2026-09-30");
 
-  const [builderIncludeCharts, setBuilderIncludeCharts] =
-    useState(true);
+  const [builderIncludeCharts, setBuilderIncludeCharts] = useState(true);
 
-  const [builderIncludeAI, setBuilderIncludeAI] =
-    useState(true);
+  const [builderIncludeAI, setBuilderIncludeAI] = useState(true);
 
-  const [scheduleFrequency, setScheduleFrequency] =
-    useState("Weekly");
+  const [scheduleFrequency, setScheduleFrequency] = useState("Weekly");
 
-  const [scheduleEmail, setScheduleEmail] =
-    useState("admin@coaching.local");
+  const [scheduleEmail, setScheduleEmail] = useState("admin@coaching.local");
 
-  const [scheduleReport, setScheduleReport] =
-    useState("Student Performance");
+  const [scheduleReport, setScheduleReport] = useState("Student Performance");
 
   const [copied, setCopied] = useState(false);
 
@@ -610,8 +606,7 @@ export default function ReportsPage() {
   const filteredReports = useMemo(() => {
     const result = reports.filter((report) => {
       const matchesCategory =
-        activeCategory === "All" ||
-        report.category === activeCategory;
+        activeCategory === "All" || report.category === activeCategory;
 
       const query = searchQuery.toLowerCase();
 
@@ -622,8 +617,7 @@ export default function ReportsPage() {
         report.id.toLowerCase().includes(query);
 
       const matchesStatus =
-        selectedStatus === "All Status" ||
-        report.status === selectedStatus;
+        selectedStatus === "All Status" || report.status === selectedStatus;
 
       return matchesCategory && matchesSearch && matchesStatus;
     });
@@ -658,12 +652,12 @@ export default function ReportsPage() {
 
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredReports.length / rowsPerPage)
+    Math.ceil(filteredReports.length / rowsPerPage),
   );
 
   const paginatedReports = filteredReports.slice(
     (page - 1) * rowsPerPage,
-    page * rowsPerPage
+    page * rowsPerPage,
   );
 
   const totalStudents = 1248;
@@ -671,37 +665,24 @@ export default function ReportsPage() {
   const totalReports = reports.length;
 
   const attendanceAverage = Math.round(
-    attendanceData.reduce(
-      (sum, item) => sum + item.percentage,
-      0
-    ) / attendanceData.length
+    attendanceData.reduce((sum, item) => sum + item.percentage, 0) /
+      attendanceData.length,
   );
 
-  const totalCollected = feeData.reduce(
-    (sum, item) => sum + item.collected,
-    0
-  );
+  const totalCollected = feeData.reduce((sum, item) => sum + item.collected, 0);
 
-  const totalPending = feeData.reduce(
-    (sum, item) => sum + item.pending,
-    0
-  );
+  const totalPending = feeData.reduce((sum, item) => sum + item.pending, 0);
 
-  const totalTarget = feeData.reduce(
-    (sum, item) => sum + item.target,
-    0
-  );
+  const totalTarget = feeData.reduce((sum, item) => sum + item.target, 0);
 
-  const collectionRate = Math.round(
-    (totalCollected / totalTarget) * 100
-  );
+  const collectionRate = Math.round((totalCollected / totalTarget) * 100);
 
   const highRiskStudents = studentPerformance.filter(
-    (student) => student.risk === "High"
+    (student) => student.risk === "High",
   ).length;
 
   const mediumRiskStudents = studentPerformance.filter(
-    (student) => student.risk === "Medium"
+    (student) => student.risk === "Medium",
   ).length;
 
   const showToast = (message: string) => {
@@ -724,14 +705,9 @@ export default function ReportsPage() {
       const newReport: Report = {
         id: `RPT-${1000 + reports.length + 1}`,
         name: builderName,
-        category:
-          builderCategory === "All"
-            ? "Students"
-            : builderCategory,
+        category: builderCategory === "All" ? "Students" : builderCategory,
         description: `Custom ${builderCategory} report generated using the report builder.`,
-        generatedDate: new Date()
-          .toISOString()
-          .split("T")[0],
+        generatedDate: new Date().toISOString().split("T")[0],
         generatedTime: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -741,13 +717,11 @@ export default function ReportsPage() {
           builderCategory === "Students"
             ? 1248
             : builderCategory === "Teachers"
-            ? 42
-            : builderCategory === "Batches"
-            ? 28
-            : 500,
-        owner: builderIncludeAI
-          ? "AI Analytics"
-          : "Admin",
+              ? 42
+              : builderCategory === "Batches"
+                ? 28
+                : 500,
+        owner: builderIncludeAI ? "AI Analytics" : "Admin",
         frequency: "On Demand",
       };
 
@@ -766,9 +740,7 @@ export default function ReportsPage() {
   };
 
   const handleDeleteReport = (id: string) => {
-    setReports((current) =>
-      current.filter((report) => report.id !== id)
-    );
+    setReports((current) => current.filter((report) => report.id !== id));
 
     setShowActionMenu(null);
 
@@ -781,9 +753,7 @@ export default function ReportsPage() {
       id: `RPT-${1000 + reports.length + 1}`,
       name: `${report.name} Copy`,
       status: "Ready",
-      generatedDate: new Date()
-        .toISOString()
-        .split("T")[0],
+      generatedDate: new Date().toISOString().split("T")[0],
       generatedTime: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -824,16 +794,9 @@ export default function ReportsPage() {
       report.frequency,
     ]);
 
-    const csv = [
-      headers,
-      ...rows,
-    ]
+    const csv = [headers, ...rows]
       .map((row) =>
-        row
-          .map((value) =>
-            `"${String(value).replace(/"/g, '""')}"`
-          )
-          .join(",")
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","),
       )
       .join("\n");
 
@@ -889,7 +852,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
     setShowScheduleModal(false);
 
     showToast(
-      `${scheduleReport} scheduled ${scheduleFrequency.toLowerCase()}.`
+      `${scheduleReport} scheduled ${scheduleFrequency.toLowerCase()}.`,
     );
   };
 
@@ -907,53 +870,41 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
       <main className="ml-64 min-h-screen p-8">
         {/* HEADER */}
-        <div className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
-                <FileBarChart className="h-5 w-5" />
-              </div>
+        <PageHeader
+          title="Reports & Intelligence"
+          description="Turn your coaching data into actionable insights."
+          icon={<FileBarChart size={20} />}
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => setShowTemplatePanel(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                <FileText size={16} />
+                Templates
+              </button>
 
-              <span className="text-sm font-semibold text-blue-600">
-                Analytics Center
-              </span>
-            </div>
+              <button
+                type="button"
+                onClick={() => setShowAiPanel(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:border-purple-300 hover:bg-purple-100"
+              >
+                <Sparkles size={16} />
+                AI Insights
+              </button>
 
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-              Reports & Intelligence
-            </h1>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Turn your coaching data into actionable insights.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => setShowTemplatePanel(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50"
-            >
-              <FileText className="h-4 w-4" />
-              Templates
-            </button>
-
-            <button
-              onClick={() => setShowAiPanel(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:bg-purple-100"
-            >
-              <Sparkles className="h-4 w-4" />
-              AI Insights
-            </button>
-
-            <button
-              onClick={() => setShowReportBuilder(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <BarChart3 className="h-4 w-4" />
-              Create Report
-            </button>
-          </div>
-        </div>
+              <button
+                type="button"
+                onClick={() => setShowReportBuilder(true)}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <BarChart3 size={16} />
+                Create Report
+              </button>
+            </>
+          }
+        />
 
         {/* KPI CARDS */}
         <div className="mb-7 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
@@ -998,9 +949,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               {attendanceAverage}%
             </h2>
 
-            <p className="mt-1 text-xs text-slate-400">
-              Overall average
-            </p>
+            <p className="mt-1 text-xs text-slate-400">Overall average</p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -1054,9 +1003,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                 <FileBarChart className="h-5 w-5" />
               </div>
 
-              <span className="text-xs font-semibold text-blue-600">
-                Live
-              </span>
+              <span className="text-xs font-semibold text-blue-600">Live</span>
             </div>
 
             <p className="text-sm text-slate-500">Reports Available</p>
@@ -1091,9 +1038,9 @@ Medium Risk Students: ${mediumRiskStudents}`;
                 </div>
 
                 <p className="max-w-3xl text-sm leading-6 text-slate-600">
-                  Identify students at risk, detect unusual attendance
-                  patterns, understand revenue trends and surface important
-                  operational signals automatically.
+                  Identify students at risk, detect unusual attendance patterns,
+                  understand revenue trends and surface important operational
+                  signals automatically.
                 </p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -1142,9 +1089,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
               <select
                 value={dateRange}
-                onChange={(event) =>
-                  setDateRange(event.target.value)
-                }
+                onChange={(event) => setDateRange(event.target.value)}
                 className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none focus:border-blue-500"
               >
                 <option>This Month</option>
@@ -1158,9 +1103,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
               <div className="rounded-xl bg-slate-50 p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm text-slate-500">
-                    Average Score
-                  </span>
+                  <span className="text-sm text-slate-500">Average Score</span>
 
                   <Target className="h-4 w-4 text-blue-500" />
                 </div>
@@ -1216,9 +1159,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
               <div className="rounded-xl bg-slate-50 p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm text-slate-500">
-                    At-Risk Rate
-                  </span>
+                  <span className="text-sm text-slate-500">At-Risk Rate</span>
 
                   <AlertTriangle className="h-4 w-4 text-red-500" />
                 </div>
@@ -1250,29 +1191,25 @@ Medium Risk Students: ${mediumRiskStudents}`;
                   Academic performance trend
                 </span>
 
-                <span className="text-xs text-slate-400">
-                  Last 6 periods
-                </span>
+                <span className="text-xs text-slate-400">Last 6 periods</span>
               </div>
 
               <div className="flex h-36 items-end gap-3 rounded-xl bg-slate-50 p-4">
-                {[58, 63, 61, 72, 76, 82].map(
-                  (height, index) => (
+                {[58, 63, 61, 72, 76, 82].map((height, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-1 flex-col items-center justify-end gap-2"
+                  >
                     <div
-                      key={index}
-                      className="flex flex-1 flex-col items-center justify-end gap-2"
-                    >
-                      <div
-                        className="w-full max-w-12 rounded-t-lg bg-blue-500 transition hover:bg-blue-600"
-                        style={{ height: `${height}%` }}
-                      />
+                      className="w-full max-w-12 rounded-t-lg bg-blue-500 transition hover:bg-blue-600"
+                      style={{ height: `${height}%` }}
+                    />
 
-                      <span className="text-[10px] font-medium text-slate-400">
-                        {feeData[index]?.month}
-                      </span>
-                    </div>
-                  )
-                )}
+                    <span className="text-[10px] font-medium text-slate-400">
+                      {feeData[index]?.month}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1280,9 +1217,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
           {/* QUICK REPORT ACTIONS */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-5">
-              <h2 className="font-bold text-slate-900">
-                Quick Reports
-              </h2>
+              <h2 className="font-bold text-slate-900">Quick Reports</h2>
 
               <p className="mt-1 text-sm text-slate-500">
                 Generate common reports instantly.
@@ -1356,7 +1291,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
             <div className="space-y-4">
               {feeData.map((item) => {
                 const percentage = Math.round(
-                  (item.collected / item.target) * 100
+                  (item.collected / item.target) * 100,
                 );
 
                 return (
@@ -1381,10 +1316,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                       <div
                         className="h-full rounded-full bg-amber-500"
                         style={{
-                          width: `${Math.min(
-                            percentage,
-                            100
-                          )}%`,
+                          width: `${Math.min(percentage, 100)}%`,
                         }}
                       />
                     </div>
@@ -1395,9 +1327,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
             <div className="mt-6 grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-emerald-50 p-4">
-                <p className="text-xs text-emerald-700">
-                  Collected
-                </p>
+                <p className="text-xs text-emerald-700">Collected</p>
 
                 <p className="mt-1 text-xl font-bold text-emerald-800">
                   {formatCurrency(totalCollected)}
@@ -1405,9 +1335,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </div>
 
               <div className="rounded-xl bg-red-50 p-4">
-                <p className="text-xs text-red-700">
-                  Pending
-                </p>
+                <p className="text-xs text-red-700">Pending</p>
 
                 <p className="mt-1 text-xl font-bold text-red-800">
                   {formatCurrency(totalPending)}
@@ -1458,34 +1386,24 @@ Medium Risk Students: ${mediumRiskStudents}`;
                     <div
                       className="bg-red-400"
                       style={{
-                        width: `${
-                          (item.absent / 320) * 100
-                        }%`,
+                        width: `${(item.absent / 320) * 100}%`,
                       }}
                     />
 
                     <div
                       className="bg-amber-400"
                       style={{
-                        width: `${
-                          (item.late / 320) * 100
-                        }%`,
+                        width: `${(item.late / 320) * 100}%`,
                       }}
                     />
                   </div>
 
                   <div className="mt-2 flex gap-4 text-[11px] text-slate-400">
-                    <span>
-                      Present {item.present}
-                    </span>
+                    <span>Present {item.present}</span>
 
-                    <span>
-                      Absent {item.absent}
-                    </span>
+                    <span>Absent {item.absent}</span>
 
-                    <span>
-                      Late {item.late}
-                    </span>
+                    <span>Late {item.late}</span>
                   </div>
                 </div>
               ))}
@@ -1493,9 +1411,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
             <div className="mt-6 flex items-center justify-between rounded-xl bg-slate-50 p-4">
               <div>
-                <p className="text-xs text-slate-500">
-                  Overall attendance
-                </p>
+                <p className="text-xs text-slate-500">Overall attendance</p>
 
                 <p className="mt-1 text-xl font-bold text-slate-900">
                   {attendanceAverage}%
@@ -1554,8 +1470,8 @@ Medium Risk Students: ${mediumRiskStudents}`;
                       insight.impact === "High"
                         ? "text-red-600"
                         : insight.impact === "Positive"
-                        ? "text-emerald-600"
-                        : "text-amber-600"
+                          ? "text-emerald-600"
+                          : "text-amber-600"
                     }`}
                   >
                     {insight.impact}
@@ -1659,9 +1575,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                             {student.name}
                           </p>
 
-                          <p className="text-xs text-slate-400">
-                            {student.id}
-                          </p>
+                          <p className="text-xs text-slate-400">{student.id}</p>
                         </div>
                       </div>
                     </td>
@@ -1671,9 +1585,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                         {student.course}
                       </p>
 
-                      <p className="text-xs text-slate-400">
-                        {student.batch}
-                      </p>
+                      <p className="text-xs text-slate-400">{student.batch}</p>
                     </td>
 
                     <td className="px-6 py-4">
@@ -1708,7 +1620,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${getRiskClasses(
-                          student.risk
+                          student.risk,
                         )}`}
                       >
                         {student.risk}
@@ -1726,9 +1638,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
           <div className="border-b border-slate-200 p-6">
             <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <h2 className="font-bold text-slate-900">
-                  Report Library
-                </h2>
+                <h2 className="font-bold text-slate-900">Report Library</h2>
 
                 <p className="mt-1 text-sm text-slate-500">
                   Generated, saved and scheduled reports.
@@ -1794,9 +1704,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
               <select
                 value={sortBy}
-                onChange={(event) =>
-                  setSortBy(event.target.value)
-                }
+                onChange={(event) => setSortBy(event.target.value)}
                 className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none focus:border-blue-500"
               >
                 <option>Date</option>
@@ -1807,7 +1715,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               <button
                 onClick={() =>
                   setSortDirection((current) =>
-                    current === "asc" ? "desc" : "asc"
+                    current === "asc" ? "desc" : "asc",
                   )
                 }
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
@@ -1817,9 +1725,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                 ) : (
                   <ArrowDown className="h-4 w-4" />
                 )}
-                {sortDirection === "asc"
-                  ? "Ascending"
-                  : "Descending"}
+                {sortDirection === "asc" ? "Ascending" : "Descending"}
               </button>
 
               <button
@@ -1865,9 +1771,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                   <select
                     value={dateRange}
-                    onChange={(event) =>
-                      setDateRange(event.target.value)
-                    }
+                    onChange={(event) => setDateRange(event.target.value)}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
                   >
                     <option>This Month</option>
@@ -1886,17 +1790,13 @@ Medium Risk Students: ${mediumRiskStudents}`;
                   <select
                     value={activeCategory}
                     onChange={(event) => {
-                      setActiveCategory(
-                        event.target.value as ReportCategory
-                      );
+                      setActiveCategory(event.target.value as ReportCategory);
                       setPage(1);
                     }}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
                   >
                     {categories.map((category) => (
-                      <option key={category}>
-                        {category}
-                      </option>
+                      <option key={category}>{category}</option>
                     ))}
                   </select>
                 </div>
@@ -1997,7 +1897,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClasses(
-                          report.status
+                          report.status,
                         )}`}
                       >
                         {report.status === "Processing" && (
@@ -2030,9 +1930,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                           <button
                             onClick={() =>
                               setShowActionMenu(
-                                showActionMenu === report.id
-                                  ? null
-                                  : report.id
+                                showActionMenu === report.id ? null : report.id,
                               )
                             }
                             className="rounded-lg border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50"
@@ -2054,9 +1952,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                               </button>
 
                               <button
-                                onClick={() =>
-                                  handleDuplicateReport(report)
-                                }
+                                onClick={() => handleDuplicateReport(report)}
                                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50"
                               >
                                 <Copy className="h-3.5 w-3.5" />
@@ -2065,9 +1961,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                               <button
                                 onClick={() => {
-                                  setBuilderCategory(
-                                    report.category
-                                  );
+                                  setBuilderCategory(report.category);
                                   setBuilderName(report.name);
                                   setShowReportBuilder(true);
                                   setShowActionMenu(null);
@@ -2079,9 +1973,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                               </button>
 
                               <button
-                                onClick={() =>
-                                  handleDeleteReport(report.id)
-                                }
+                                onClick={() => handleDeleteReport(report.id)}
                                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 hover:bg-red-50"
                               >
                                 <X className="h-3.5 w-3.5" />
@@ -2097,10 +1989,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                 {paginatedReports.length === 0 && (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-14 text-center"
-                    >
+                    <td colSpan={6} className="px-6 py-14 text-center">
                       <div className="mx-auto flex max-w-sm flex-col items-center">
                         <div className="rounded-2xl bg-slate-100 p-4 text-slate-400">
                           <Search className="h-6 w-6" />
@@ -2139,10 +2028,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </span>{" "}
               to{" "}
               <span className="font-semibold text-slate-700">
-                {Math.min(
-                  page * rowsPerPage,
-                  filteredReports.length
-                )}
+                {Math.min(page * rowsPerPage, filteredReports.length)}
               </span>{" "}
               of{" "}
               <span className="font-semibold text-slate-700">
@@ -2154,39 +2040,32 @@ Medium Risk Students: ${mediumRiskStudents}`;
             <div className="flex items-center gap-1">
               <button
                 disabled={page === 1}
-                onClick={() =>
-                  setPage((current) =>
-                    Math.max(current - 1, 1)
-                  )
-                }
+                onClick={() => setPage((current) => Math.max(current - 1, 1))}
                 className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
 
-              {Array.from(
-                { length: totalPages },
-                (_, index) => index + 1
-              ).map((pageNumber) => (
-                <button
-                  key={pageNumber}
-                  onClick={() => setPage(pageNumber)}
-                  className={`h-8 min-w-8 rounded-lg px-2 text-xs font-semibold ${
-                    page === pageNumber
-                      ? "bg-blue-600 text-white"
-                      : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  {pageNumber}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => setPage(pageNumber)}
+                    className={`h-8 min-w-8 rounded-lg px-2 text-xs font-semibold ${
+                      page === pageNumber
+                        ? "bg-blue-600 text-white"
+                        : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                ),
+              )}
 
               <button
                 disabled={page === totalPages}
                 onClick={() =>
-                  setPage((current) =>
-                    Math.min(current + 1, totalPages)
-                  )
+                  setPage((current) => Math.min(current + 1, totalPages))
                 }
                 className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
@@ -2235,9 +2114,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
             <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-3">
               <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Report ID
-                </p>
+                <p className="text-xs text-slate-500">Report ID</p>
 
                 <p className="mt-1 font-bold text-slate-800">
                   {selectedReport.id}
@@ -2245,9 +2122,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Category
-                </p>
+                <p className="text-xs text-slate-500">Category</p>
 
                 <p className="mt-1 font-bold text-slate-800">
                   {selectedReport.category}
@@ -2255,9 +2130,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Records
-                </p>
+                <p className="text-xs text-slate-500">Records</p>
 
                 <p className="mt-1 font-bold text-slate-800">
                   {selectedReport.records.toLocaleString()}
@@ -2265,9 +2138,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Generated
-                </p>
+                <p className="text-xs text-slate-500">Generated</p>
 
                 <p className="mt-1 font-bold text-slate-800">
                   {selectedReport.generatedDate}
@@ -2279,9 +2150,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Owner
-                </p>
+                <p className="text-xs text-slate-500">Owner</p>
 
                 <p className="mt-1 font-bold text-slate-800">
                   {selectedReport.owner}
@@ -2289,9 +2158,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Frequency
-                </p>
+                <p className="text-xs text-slate-500">Frequency</p>
 
                 <p className="mt-1 font-bold text-slate-800">
                   {selectedReport.frequency}
@@ -2310,10 +2177,10 @@ Medium Risk Students: ${mediumRiskStudents}`;
                     </h3>
 
                     <p className="mt-2 text-sm leading-6 text-purple-800">
-                      This report can be enhanced with AI-generated
-                      summaries, anomaly detection, recommendations,
-                      trend explanations and risk predictions once the
-                      reporting backend and AI service are connected.
+                      This report can be enhanced with AI-generated summaries,
+                      anomaly detection, recommendations, trend explanations and
+                      risk predictions once the reporting backend and AI service
+                      are connected.
                     </p>
                   </div>
                 </div>
@@ -2391,9 +2258,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                 <input
                   value={builderName}
-                  onChange={(event) =>
-                    setBuilderName(event.target.value)
-                  }
+                  onChange={(event) => setBuilderName(event.target.value)}
                   placeholder="e.g. September Student Performance"
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500"
                 />
@@ -2407,9 +2272,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                 <select
                   value={builderCategory}
                   onChange={(event) =>
-                    setBuilderCategory(
-                      event.target.value as ReportCategory
-                    )
+                    setBuilderCategory(event.target.value as ReportCategory)
                   }
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500"
                 >
@@ -2432,9 +2295,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                   <input
                     type="date"
                     value={builderDateFrom}
-                    onChange={(event) =>
-                      setBuilderDateFrom(event.target.value)
-                    }
+                    onChange={(event) => setBuilderDateFrom(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
                   />
                 </div>
@@ -2447,9 +2308,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                   <input
                     type="date"
                     value={builderDateTo}
-                    onChange={(event) =>
-                      setBuilderDateTo(event.target.value)
-                    }
+                    onChange={(event) => setBuilderDateTo(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
                   />
                 </div>
@@ -2480,9 +2339,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                       type="checkbox"
                       checked={builderIncludeCharts}
                       onChange={(event) =>
-                        setBuilderIncludeCharts(
-                          event.target.checked
-                        )
+                        setBuilderIncludeCharts(event.target.checked)
                       }
                       className="h-4 w-4 accent-blue-600"
                     />
@@ -2507,9 +2364,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                       type="checkbox"
                       checked={builderIncludeAI}
                       onChange={(event) =>
-                        setBuilderIncludeAI(
-                          event.target.checked
-                        )
+                        setBuilderIncludeAI(event.target.checked)
                       }
                       className="h-4 w-4 accent-purple-600"
                     />
@@ -2527,9 +2382,9 @@ Medium Risk Students: ${mediumRiskStudents}`;
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-blue-800">
-                      For student reports, combining attendance,
-                      exam performance and fee status can provide a
-                      stronger picture of student health.
+                      For student reports, combining attendance, exam
+                      performance and fee status can provide a stronger picture
+                      of student health.
                     </p>
                   </div>
                 </div>
@@ -2622,10 +2477,10 @@ Medium Risk Students: ${mediumRiskStudents}`;
                         index === 0
                           ? "bg-red-50 text-red-600"
                           : index === 1
-                          ? "bg-emerald-50 text-emerald-600"
-                          : index === 2
-                          ? "bg-amber-50 text-amber-600"
-                          : "bg-blue-50 text-blue-600"
+                            ? "bg-emerald-50 text-emerald-600"
+                            : index === 2
+                              ? "bg-amber-50 text-amber-600"
+                              : "bg-blue-50 text-blue-600"
                       }`}
                     >
                       {index === 0 ? (
@@ -2656,17 +2511,17 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                       {index === 0 && (
                         <div className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-800">
-                          Recommended action: review attendance and
-                          recent exam results, then trigger an early
-                          intervention workflow for affected students.
+                          Recommended action: review attendance and recent exam
+                          results, then trigger an early intervention workflow
+                          for affected students.
                         </div>
                       )}
 
                       {index === 1 && (
                         <div className="mt-4 rounded-lg bg-emerald-50 p-3 text-xs leading-5 text-emerald-800">
-                          Recommended action: compare the strongest
-                          collection periods against payment reminders
-                          and enrollment activity.
+                          Recommended action: compare the strongest collection
+                          periods against payment reminders and enrollment
+                          activity.
                         </div>
                       )}
                     </div>
@@ -2684,11 +2539,11 @@ Medium Risk Students: ${mediumRiskStudents}`;
                     </h3>
 
                     <p className="mt-2 text-sm leading-6 text-purple-800">
-                      Once the backend is connected, this layer can
-                      support natural-language questions such as
-                      “Which students are likely to drop attendance next
-                      month?”, “Which batches are underperforming?” or
-                      “Why did fee collection fall this month?”
+                      Once the backend is connected, this layer can support
+                      natural-language questions such as “Which students are
+                      likely to drop attendance next month?”, “Which batches are
+                      underperforming?” or “Why did fee collection fall this
+                      month?”
                     </p>
                   </div>
                 </div>
@@ -2821,9 +2676,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                 <select
                   value={scheduleReport}
-                  onChange={(event) =>
-                    setScheduleReport(event.target.value)
-                  }
+                  onChange={(event) => setScheduleReport(event.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500"
                 >
                   <option>Student Performance</option>
@@ -2842,9 +2695,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                 <select
                   value={scheduleFrequency}
-                  onChange={(event) =>
-                    setScheduleFrequency(event.target.value)
-                  }
+                  onChange={(event) => setScheduleFrequency(event.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500"
                 >
                   <option>Daily</option>
@@ -2862,9 +2713,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                 <input
                   type="email"
                   value={scheduleEmail}
-                  onChange={(event) =>
-                    setScheduleEmail(event.target.value)
-                  }
+                  onChange={(event) => setScheduleEmail(event.target.value)}
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
                 />
               </div>
@@ -2874,10 +2723,9 @@ Medium Risk Students: ${mediumRiskStudents}`;
                   <Clock3 className="mt-0.5 h-5 w-5 text-blue-600" />
 
                   <p className="text-xs leading-5 text-blue-800">
-                    Scheduling is currently stored locally in this
-                    frontend prototype. Later it will connect to the
-                    backend scheduler, email service and notification
-                    engine.
+                    Scheduling is currently stored locally in this frontend
+                    prototype. Later it will connect to the backend scheduler,
+                    email service and notification engine.
                   </p>
                 </div>
               </div>

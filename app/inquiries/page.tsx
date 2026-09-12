@@ -1,6 +1,7 @@
 "use client";
 
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   Search,
   Plus,
@@ -47,12 +48,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-type InquiryStatus =
-  | "New"
-  | "Contacted"
-  | "Follow-up"
-  | "Converted"
-  | "Lost";
+type InquiryStatus = "New" | "Contacted" | "Follow-up" | "Converted" | "Lost";
 
 type InquiryPriority = "Hot" | "Warm" | "Cold";
 
@@ -456,11 +452,9 @@ const getPriorityIcon = (priority: InquiryPriority) => {
 };
 
 export default function InquiriesPage() {
-  const [inquiries, setInquiries] =
-    useState<Inquiry[]>(initialInquiries);
+  const [inquiries, setInquiries] = useState<Inquiry[]>(initialInquiries);
 
-  const [followUps, setFollowUps] =
-    useState<FollowUp[]>(initialFollowUps);
+  const [followUps, setFollowUps] = useState<FollowUp[]>(initialFollowUps);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -472,66 +466,57 @@ export default function InquiriesPage() {
   const [inquiryPage, setInquiryPage] = useState(1);
 
   const [showAddInquiry, setShowAddInquiry] = useState(false);
-  const [editingInquiryId, setEditingInquiryId] =
-    useState<string | null>(null);
+  const [editingInquiryId, setEditingInquiryId] = useState<string | null>(null);
 
-  const [viewingInquiryId, setViewingInquiryId] =
-    useState<string | null>(null);
+  const [viewingInquiryId, setViewingInquiryId] = useState<string | null>(null);
 
-  const [followUpInquiryId, setFollowUpInquiryId] =
-    useState<string | null>(null);
+  const [followUpInquiryId, setFollowUpInquiryId] = useState<string | null>(
+    null,
+  );
 
-  const [showFollowUpForm, setShowFollowUpForm] =
-    useState(false);
+  const [showFollowUpForm, setShowFollowUpForm] = useState(false);
 
-  const [showDeleteConfirm, setShowDeleteConfirm] =
-    useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
+    null,
+  );
 
   const [showAiCenter, setShowAiCenter] = useState(false);
   const [showPipeline, setShowPipeline] = useState(false);
 
-  const [openActionMenu, setOpenActionMenu] =
-    useState<string | null>(null);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
 
   const [toast, setToast] = useState("");
 
   const [formError, setFormError] = useState("");
 
-  const [followUpFormError, setFollowUpFormError] =
-    useState("");
+  const [followUpFormError, setFollowUpFormError] = useState("");
 
-  const [changingStatusInquiryId, setChangingStatusInquiryId] =
-    useState<string | null>(null);
+  const [changingStatusInquiryId, setChangingStatusInquiryId] = useState<
+    string | null
+  >(null);
 
-  const [changingPriorityInquiryId, setChangingPriorityInquiryId] =
-    useState<string | null>(null);
+  const [changingPriorityInquiryId, setChangingPriorityInquiryId] = useState<
+    string | null
+  >(null);
 
   const [inquiryName, setInquiryName] = useState("");
   const [inquiryPhone, setInquiryPhone] = useState("");
   const [inquiryEmail, setInquiryEmail] = useState("");
   const [inquiryCourse, setInquiryCourse] = useState("");
   const [inquiryBatch, setInquiryBatch] = useState("");
-  const [inquirySource, setInquirySource] =
-    useState("Website");
-  const [inquiryFollowUpDate, setInquiryFollowUpDate] =
-    useState("");
+  const [inquirySource, setInquirySource] = useState("Website");
+  const [inquiryFollowUpDate, setInquiryFollowUpDate] = useState("");
   const [inquiryPriority, setInquiryPriority] =
     useState<InquiryPriority>("Warm");
-  const [inquiryAssignedTo, setInquiryAssignedTo] =
-    useState("Admin");
-  const [inquiryExpectedFee, setInquiryExpectedFee] =
-    useState("");
-  const [inquiryLostReason, setInquiryLostReason] =
-    useState("");
+  const [inquiryAssignedTo, setInquiryAssignedTo] = useState("Admin");
+  const [inquiryExpectedFee, setInquiryExpectedFee] = useState("");
+  const [inquiryLostReason, setInquiryLostReason] = useState("");
   const [inquiryNotes, setInquiryNotes] = useState("");
 
   const [followUpNotes, setFollowUpNotes] = useState("");
-  const [followUpOutcome, setFollowUpOutcome] =
-    useState("Interested");
-  const [followUpNextDate, setFollowUpNextDate] =
-    useState("");
-  const [followUpAssignedTo, setFollowUpAssignedTo] =
-    useState("Admin");
+  const [followUpOutcome, setFollowUpOutcome] = useState("Interested");
+  const [followUpNextDate, setFollowUpNextDate] = useState("");
+  const [followUpAssignedTo, setFollowUpAssignedTo] = useState("Admin");
 
   const rowsPerPage = 10;
 
@@ -573,25 +558,20 @@ export default function InquiriesPage() {
         inquiry.id.toLowerCase().includes(query);
 
       const matchesStatus =
-        statusFilter === "All" ||
-        inquiry.status === statusFilter;
+        statusFilter === "All" || inquiry.status === statusFilter;
 
       const matchesPriority =
-        priorityFilter === "All" ||
-        inquiry.priority === priorityFilter;
+        priorityFilter === "All" || inquiry.priority === priorityFilter;
 
       const matchesSource =
-        sourceFilter === "All" ||
-        inquiry.source === sourceFilter;
+        sourceFilter === "All" || inquiry.source === sourceFilter;
 
       const matchesCourse =
-        courseFilter === "All" ||
-        inquiry.course === courseFilter;
+        courseFilter === "All" || inquiry.course === courseFilter;
 
       const matchesFollowUp =
         followUpFilter === "All" ||
-        getFollowUpStatus(inquiry.followUpDate) ===
-          followUpFilter;
+        getFollowUpStatus(inquiry.followUpDate) === followUpFilter;
 
       return (
         matchesSearch &&
@@ -647,53 +627,38 @@ export default function InquiriesPage() {
   ).length;
 
   const overdueFollowUps = inquiries.filter(
-    (inquiry) =>
-      getFollowUpStatus(inquiry.followUpDate) === "Overdue",
+    (inquiry) => getFollowUpStatus(inquiry.followUpDate) === "Overdue",
   ).length;
 
   const dueTodayFollowUps = inquiries.filter(
-    (inquiry) =>
-      getFollowUpStatus(inquiry.followUpDate) === "Due Today",
+    (inquiry) => getFollowUpStatus(inquiry.followUpDate) === "Due Today",
   ).length;
 
   const upcomingFollowUps = inquiries.filter(
-    (inquiry) =>
-      getFollowUpStatus(inquiry.followUpDate) === "Upcoming",
+    (inquiry) => getFollowUpStatus(inquiry.followUpDate) === "Upcoming",
   ).length;
 
   const conversionRate =
     totalInquiries === 0
       ? 0
-      : Math.round(
-          (convertedInquiries / totalInquiries) * 100,
-        );
+      : Math.round((convertedInquiries / totalInquiries) * 100);
 
   const totalPipelineValue = inquiries
     .filter((inquiry) => inquiry.status !== "Lost")
-    .reduce(
-      (total, inquiry) => total + inquiry.expectedFee,
-      0,
-    );
+    .reduce((total, inquiry) => total + inquiry.expectedFee, 0);
 
   const convertedRevenue = inquiries
     .filter((inquiry) => inquiry.status === "Converted")
-    .reduce(
-      (total, inquiry) => total + inquiry.expectedFee,
-      0,
-    );
+    .reduce((total, inquiry) => total + inquiry.expectedFee, 0);
 
   const inquiryTotalPages = Math.max(
     1,
     Math.ceil(filteredInquiries.length / rowsPerPage),
   );
 
-  const safeInquiryPage = Math.min(
-    inquiryPage,
-    inquiryTotalPages,
-  );
+  const safeInquiryPage = Math.min(inquiryPage, inquiryTotalPages);
 
-  const inquiryStartIndex =
-    (safeInquiryPage - 1) * rowsPerPage;
+  const inquiryStartIndex = (safeInquiryPage - 1) * rowsPerPage;
 
   const paginatedInquiries = filteredInquiries.slice(
     inquiryStartIndex,
@@ -721,8 +686,7 @@ export default function InquiriesPage() {
   const aiRiskLeads = inquiries
     .filter(
       (inquiry) =>
-        getFollowUpStatus(inquiry.followUpDate) ===
-          "Overdue" &&
+        getFollowUpStatus(inquiry.followUpDate) === "Overdue" &&
         inquiry.status !== "Converted" &&
         inquiry.status !== "Lost",
     )
@@ -763,9 +727,7 @@ export default function InquiriesPage() {
         rate:
           data.total === 0
             ? 0
-            : Math.round(
-                (data.converted / data.total) * 100,
-              ),
+            : Math.round((data.converted / data.total) * 100),
       }))
       .sort((a, b) => b.total - a.total);
   }, [inquiries]);
@@ -774,10 +736,7 @@ export default function InquiriesPage() {
     const map = new Map<string, number>();
 
     inquiries.forEach((inquiry) => {
-      map.set(
-        inquiry.course,
-        (map.get(inquiry.course) || 0) + 1,
-      );
+      map.set(inquiry.course, (map.get(inquiry.course) || 0) + 1);
     });
 
     return Array.from(map.entries())
@@ -822,9 +781,7 @@ export default function InquiriesPage() {
     setInquiryFollowUpDate(inquiry.followUpDate);
     setInquiryPriority(inquiry.priority);
     setInquiryAssignedTo(inquiry.assignedTo);
-    setInquiryExpectedFee(
-      String(inquiry.expectedFee),
-    );
+    setInquiryExpectedFee(String(inquiry.expectedFee));
     setInquiryLostReason(inquiry.lostReason);
     setInquiryNotes(inquiry.notes);
 
@@ -847,9 +804,7 @@ export default function InquiriesPage() {
     const cleanedPhone = inquiryPhone.replace(/\D/g, "");
 
     if (cleanedPhone.length < 10) {
-      setFormError(
-        "Please enter a valid phone number.",
-      );
+      setFormError("Please enter a valid phone number.");
       return;
     }
 
@@ -891,9 +846,7 @@ export default function InquiriesPage() {
                 followUpDate: inquiryFollowUpDate,
                 priority: inquiryPriority,
                 assignedTo: inquiryAssignedTo,
-                expectedFee: Number(
-                  inquiryExpectedFee,
-                ),
+                expectedFee: Number(inquiryExpectedFee),
                 lostReason: inquiryLostReason.trim(),
                 notes: inquiryNotes.trim(),
               }
@@ -907,9 +860,7 @@ export default function InquiriesPage() {
         inquiries.length > 0
           ? Math.max(
               ...inquiries.map((inquiry) =>
-                Number(
-                  inquiry.id.replace("INQ-", ""),
-                ),
+                Number(inquiry.id.replace("INQ-", "")),
               ),
             ) + 1
           : 1001;
@@ -933,10 +884,7 @@ export default function InquiriesPage() {
         notes: inquiryNotes.trim(),
       };
 
-      setInquiries((current) => [
-        newInquiry,
-        ...current,
-      ]);
+      setInquiries((current) => [newInquiry, ...current]);
 
       showToast("New inquiry added successfully.");
     }
@@ -948,16 +896,11 @@ export default function InquiriesPage() {
 
   const handleDeleteInquiry = (inquiryId: string) => {
     setInquiries((current) =>
-      current.filter(
-        (inquiry) => inquiry.id !== inquiryId,
-      ),
+      current.filter((inquiry) => inquiry.id !== inquiryId),
     );
 
     setFollowUps((current) =>
-      current.filter(
-        (followUp) =>
-          followUp.inquiryId !== inquiryId,
-      ),
+      current.filter((followUp) => followUp.inquiryId !== inquiryId),
     );
 
     setShowDeleteConfirm(null);
@@ -967,10 +910,7 @@ export default function InquiriesPage() {
     showToast("Inquiry deleted successfully.");
   };
 
-  const handleStatusChange = (
-    inquiryId: string,
-    nextStatus: InquiryStatus,
-  ) => {
+  const handleStatusChange = (inquiryId: string, nextStatus: InquiryStatus) => {
     setChangingStatusInquiryId(inquiryId);
 
     setInquiries((current) =>
@@ -980,8 +920,7 @@ export default function InquiriesPage() {
               ...inquiry,
               status: nextStatus,
               followUpDate:
-                nextStatus === "Converted" ||
-                nextStatus === "Lost"
+                nextStatus === "Converted" || nextStatus === "Lost"
                   ? ""
                   : inquiry.followUpDate,
             }
@@ -993,9 +932,7 @@ export default function InquiriesPage() {
       setChangingStatusInquiryId(null);
     }, 500);
 
-    showToast(
-      `Inquiry status changed to ${nextStatus}.`,
-    );
+    showToast(`Inquiry status changed to ${nextStatus}.`);
   };
 
   const handlePriorityChange = (
@@ -1023,21 +960,15 @@ export default function InquiriesPage() {
   };
 
   const openFollowUp = (inquiryId: string) => {
-    const inquiry = inquiries.find(
-      (item) => item.id === inquiryId,
-    );
+    const inquiry = inquiries.find((item) => item.id === inquiryId);
 
     setFollowUpInquiryId(inquiryId);
     setShowFollowUpForm(false);
     setFollowUpFormError("");
     setFollowUpNotes("");
     setFollowUpOutcome("Interested");
-    setFollowUpNextDate(
-      inquiry?.followUpDate || "",
-    );
-    setFollowUpAssignedTo(
-      inquiry?.assignedTo || "Admin",
-    );
+    setFollowUpNextDate(inquiry?.followUpDate || "");
+    setFollowUpAssignedTo(inquiry?.assignedTo || "Admin");
     setOpenActionMenu(null);
   };
 
@@ -1051,16 +982,12 @@ export default function InquiriesPage() {
     if (!followUpInquiryId) return;
 
     if (!followUpNotes.trim()) {
-      setFollowUpFormError(
-        "Conversation notes are required.",
-      );
+      setFollowUpFormError("Conversation notes are required.");
       return;
     }
 
     if (!followUpNextDate) {
-      setFollowUpFormError(
-        "Next follow-up date is required.",
-      );
+      setFollowUpFormError("Next follow-up date is required.");
       return;
     }
 
@@ -1068,9 +995,7 @@ export default function InquiriesPage() {
       followUps.length > 0
         ? Math.max(
             ...followUps.map((followUp) =>
-              Number(
-                followUp.id.replace("FU-", ""),
-              ),
+              Number(followUp.id.replace("FU-", "")),
             ),
           ) + 1
         : 1001;
@@ -1087,10 +1012,7 @@ export default function InquiriesPage() {
       assignedTo: followUpAssignedTo,
     };
 
-    setFollowUps((current) => [
-      newFollowUp,
-      ...current,
-    ]);
+    setFollowUps((current) => [newFollowUp, ...current]);
 
     setInquiries((current) =>
       current.map((inquiry) =>
@@ -1107,8 +1029,7 @@ export default function InquiriesPage() {
               status:
                 followUpOutcome === "Converted"
                   ? "Converted"
-                  : followUpOutcome ===
-                      "Not Interested"
+                  : followUpOutcome === "Not Interested"
                     ? "Lost"
                     : inquiry.status === "New"
                       ? "Follow-up"
@@ -1129,13 +1050,8 @@ export default function InquiriesPage() {
 
   const getInquiryFollowUps = (inquiryId: string) =>
     followUps
-      .filter(
-        (followUp) =>
-          followUp.inquiryId === inquiryId,
-      )
-      .sort((a, b) =>
-        b.date.localeCompare(a.date),
-      );
+      .filter((followUp) => followUp.inquiryId === inquiryId)
+      .sort((a, b) => b.date.localeCompare(a.date));
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -1194,19 +1110,9 @@ export default function InquiriesPage() {
       inquiry.notes,
     ]);
 
-    const csv = [
-      headers,
-      ...rows,
-    ]
+    const csv = [headers, ...rows]
       .map((row) =>
-        row
-          .map((value) =>
-            `"${String(value).replace(
-              /"/g,
-              '""',
-            )}"`,
-          )
-          .join(","),
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","),
       )
       .join("\n");
 
@@ -1227,9 +1133,7 @@ export default function InquiriesPage() {
   };
 
   const handleRefresh = () => {
-    showToast(
-      "Inquiry data refreshed. Backend sync will be connected later.",
-    );
+    showToast("Inquiry data refreshed. Backend sync will be connected later.");
   };
 
   const callInquiry = (phone: string) => {
@@ -1239,10 +1143,7 @@ export default function InquiriesPage() {
   const whatsappInquiry = (phone: string) => {
     const phoneNumber = phone.replace(/\D/g, "");
 
-    window.open(
-      `https://wa.me/91${phoneNumber}`,
-      "_blank",
-    );
+    window.open(`https://wa.me/91${phoneNumber}`, "_blank");
   };
 
   return (
@@ -1255,83 +1156,62 @@ export default function InquiriesPage() {
       <main className="ml-64 min-h-screen p-8">
         <div className="mx-auto max-w-[1700px]">
           {/* HEADER */}
+          <PageHeader
+            title="Inquiries & CRM"
+            description="Manage leads, admissions, conversations and follow-ups from one place."
+            icon={<UserRoundSearch size={20} />}
+            actions={
+              <>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRefresh();
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                >
+                  <RefreshCw size={16} />
+                  Refresh
+                </button>
 
-          <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
-            <div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
-                  <UserRoundSearch size={23} />
-                </div>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleExportCsv();
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                >
+                  <Download size={16} />
+                  Export
+                </button>
 
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold text-slate-900">
-                      Inquiries & CRM
-                    </h1>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setShowAiCenter(true);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:border-purple-300 hover:bg-purple-100"
+                >
+                  <Sparkles size={16} />
+                  AI Insights
+                </button>
 
-                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-                      AI-Ready
-                    </span>
-                  </div>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Manage leads, admissions, conversations
-                    and follow-ups from one place.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleRefresh();
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-              >
-                <RefreshCw size={17} />
-                Refresh
-              </button>
-
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleExportCsv();
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-              >
-                <Download size={17} />
-                Export
-              </button>
-
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setShowAiCenter(true);
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
-              >
-                <Sparkles size={17} />
-                AI Insights
-              </button>
-
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  openAddInquiry();
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-              >
-                <Plus size={18} />
-                Add Inquiry
-              </button>
-            </div>
-          </div>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openAddInquiry();
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                >
+                  <Plus size={17} />
+                  Add Inquiry
+                </button>
+              </>
+            }
+          />
 
           {/* KPI CARDS */}
 
@@ -1342,10 +1222,7 @@ export default function InquiriesPage() {
                   Total Leads
                 </p>
 
-                <Users
-                  size={19}
-                  className="text-slate-400"
-                />
+                <Users size={19} className="text-slate-400" />
               </div>
 
               <p className="mt-2 text-2xl font-bold text-slate-900">
@@ -1359,35 +1236,23 @@ export default function InquiriesPage() {
 
             <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500">
-                  New
-                </p>
+                <p className="text-sm font-medium text-slate-500">New</p>
 
-                <UserPlus
-                  size={19}
-                  className="text-blue-500"
-                />
+                <UserPlus size={19} className="text-blue-500" />
               </div>
 
               <p className="mt-2 text-2xl font-bold text-blue-600">
                 {newInquiries}
               </p>
 
-              <p className="mt-1 text-xs text-slate-500">
-                Need first contact
-              </p>
+              <p className="mt-1 text-xs text-slate-500">Need first contact</p>
             </div>
 
             <div className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500">
-                  Follow-ups
-                </p>
+                <p className="text-sm font-medium text-slate-500">Follow-ups</p>
 
-                <Clock3
-                  size={19}
-                  className="text-amber-500"
-                />
+                <Clock3 size={19} className="text-amber-500" />
               </div>
 
               <p className="mt-2 text-2xl font-bold text-amber-600">
@@ -1401,35 +1266,23 @@ export default function InquiriesPage() {
 
             <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500">
-                  Converted
-                </p>
+                <p className="text-sm font-medium text-slate-500">Converted</p>
 
-                <UserCheck
-                  size={19}
-                  className="text-emerald-500"
-                />
+                <UserCheck size={19} className="text-emerald-500" />
               </div>
 
               <p className="mt-2 text-2xl font-bold text-emerald-600">
                 {convertedInquiries}
               </p>
 
-              <p className="mt-1 text-xs text-slate-500">
-                Registered students
-              </p>
+              <p className="mt-1 text-xs text-slate-500">Registered students</p>
             </div>
 
             <div className="rounded-2xl border border-violet-100 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500">
-                  Conversion
-                </p>
+                <p className="text-sm font-medium text-slate-500">Conversion</p>
 
-                <Target
-                  size={19}
-                  className="text-violet-500"
-                />
+                <Target size={19} className="text-violet-500" />
               </div>
 
               <p className="mt-2 text-2xl font-bold text-violet-600">
@@ -1443,25 +1296,16 @@ export default function InquiriesPage() {
 
             <div className="rounded-2xl border border-indigo-100 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500">
-                  Pipeline
-                </p>
+                <p className="text-sm font-medium text-slate-500">Pipeline</p>
 
-                <IndianRupee
-                  size={19}
-                  className="text-indigo-500"
-                />
+                <IndianRupee size={19} className="text-indigo-500" />
               </div>
 
               <p className="mt-2 text-xl font-bold text-indigo-600">
-                {formatCurrency(
-                  totalPipelineValue,
-                )}
+                {formatCurrency(totalPipelineValue)}
               </p>
 
-              <p className="mt-1 text-xs text-slate-500">
-                Potential fee value
-              </p>
+              <p className="mt-1 text-xs text-slate-500">Potential fee value</p>
             </div>
           </div>
 
@@ -1480,16 +1324,13 @@ export default function InquiriesPage() {
                       AI CRM Command Center
                     </h2>
 
-                    <Sparkles
-                      size={16}
-                      className="text-blue-300"
-                    />
+                    <Sparkles size={16} className="text-blue-300" />
                   </div>
 
                   <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-300">
-                    Your CRM is structured for AI lead scoring,
-                    conversion prediction, follow-up prioritization,
-                    risk detection and automated sales recommendations.
+                    Your CRM is structured for AI lead scoring, conversion
+                    prediction, follow-up prioritization, risk detection and
+                    automated sales recommendations.
                   </p>
                 </div>
               </div>
@@ -1513,13 +1354,9 @@ export default function InquiriesPage() {
                   Hot opportunities
                 </p>
 
-                <p className="mt-2 text-2xl font-bold text-white">
-                  {hotLeads}
-                </p>
+                <p className="mt-2 text-2xl font-bold text-white">{hotLeads}</p>
 
-                <p className="mt-1 text-xs text-slate-400">
-                  High intent leads
-                </p>
+                <p className="mt-1 text-xs text-slate-400">High intent leads</p>
               </div>
 
               <div className="border-b border-white/10 p-5 md:border-b-0 md:border-r">
@@ -1542,9 +1379,7 @@ export default function InquiriesPage() {
                 </p>
 
                 <p className="mt-2 text-xl font-bold text-white">
-                  {formatCurrency(
-                    totalPipelineValue,
-                  )}
+                  {formatCurrency(totalPipelineValue)}
                 </p>
 
                 <p className="mt-1 text-xs text-slate-400">
@@ -1558,9 +1393,7 @@ export default function InquiriesPage() {
                 </p>
 
                 <p className="mt-2 text-2xl font-bold text-emerald-300">
-                  {hotLeads > 0
-                    ? "High"
-                    : "Medium"}
+                  {hotLeads > 0 ? "High" : "Medium"}
                 </p>
 
                 <p className="mt-1 text-xs text-slate-400">
@@ -1576,10 +1409,7 @@ export default function InquiriesPage() {
             <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
               <div>
                 <div className="flex items-center gap-2">
-                  <BarChart3
-                    size={19}
-                    className="text-slate-500"
-                  />
+                  <BarChart3 size={19} className="text-slate-500" />
 
                   <h2 className="text-lg font-bold text-slate-900">
                     Lead Pipeline
@@ -1599,9 +1429,7 @@ export default function InquiriesPage() {
                 }}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
-                {showPipeline
-                  ? "Hide Details"
-                  : "View Details"}
+                {showPipeline ? "Hide Details" : "View Details"}
 
                 <ArrowRight size={16} />
               </button>
@@ -1653,9 +1481,7 @@ export default function InquiriesPage() {
                     setFollowUpFilter("All");
                   }}
                   className={`rounded-xl border border-slate-100 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-sm ${
-                    statusFilter === item.label
-                      ? "ring-2 ring-blue-100"
-                      : ""
+                    statusFilter === item.label ? "ring-2 ring-blue-100" : ""
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -1677,11 +1503,7 @@ export default function InquiriesPage() {
                   <p className="mt-1 text-xs text-slate-500">
                     {totalInquiries === 0
                       ? 0
-                      : Math.round(
-                          (item.count /
-                            totalInquiries) *
-                            100,
-                        )}
+                      : Math.round((item.count / totalInquiries) * 100)}
                     % of leads
                   </p>
                 </button>
@@ -1696,9 +1518,7 @@ export default function InquiriesPage() {
                   </p>
 
                   <p className="mt-2 text-xl font-bold text-slate-900">
-                    {formatCurrency(
-                      totalPipelineValue,
-                    )}
+                    {formatCurrency(totalPipelineValue)}
                   </p>
 
                   <p className="mt-1 text-xs text-slate-500">
@@ -1712,9 +1532,7 @@ export default function InquiriesPage() {
                   </p>
 
                   <p className="mt-2 text-xl font-bold text-emerald-700">
-                    {formatCurrency(
-                      convertedRevenue,
-                    )}
+                    {formatCurrency(convertedRevenue)}
                   </p>
 
                   <p className="mt-1 text-xs text-emerald-600">
@@ -1731,10 +1549,7 @@ export default function InquiriesPage() {
                     {formatCurrency(
                       totalInquiries === 0
                         ? 0
-                        : Math.round(
-                            totalPipelineValue /
-                              totalInquiries,
-                          ),
+                        : Math.round(totalPipelineValue / totalInquiries),
                     )}
                   </p>
 
@@ -1750,10 +1565,7 @@ export default function InquiriesPage() {
 
           <div className="mt-6">
             <div className="mb-3 flex items-center gap-2">
-              <CalendarDays
-                size={18}
-                className="text-slate-500"
-              />
+              <CalendarDays size={18} className="text-slate-500" />
 
               <h2 className="text-base font-bold text-slate-900">
                 Follow-up Action Center
@@ -1763,9 +1575,7 @@ export default function InquiriesPage() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <button
                 type="button"
-                onClick={() =>
-                  handleFollowUpFilter("Overdue")
-                }
+                onClick={() => handleFollowUpFilter("Overdue")}
                 className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
                   followUpFilter === "Overdue"
                     ? "border-red-300 ring-2 ring-red-100"
@@ -1783,10 +1593,7 @@ export default function InquiriesPage() {
                     </p>
                   </div>
 
-                  <AlertCircle
-                    className="text-red-500"
-                    size={22}
-                  />
+                  <AlertCircle className="text-red-500" size={22} />
                 </div>
 
                 <p className="mt-1 text-xs text-slate-500">
@@ -1796,9 +1603,7 @@ export default function InquiriesPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  handleFollowUpFilter("Due Today")
-                }
+                onClick={() => handleFollowUpFilter("Due Today")}
                 className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
                   followUpFilter === "Due Today"
                     ? "border-amber-300 ring-2 ring-amber-100"
@@ -1816,10 +1621,7 @@ export default function InquiriesPage() {
                     </p>
                   </div>
 
-                  <Clock3
-                    className="text-amber-500"
-                    size={22}
-                  />
+                  <Clock3 className="text-amber-500" size={22} />
                 </div>
 
                 <p className="mt-1 text-xs text-slate-500">
@@ -1829,9 +1631,7 @@ export default function InquiriesPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  handleFollowUpFilter("Upcoming")
-                }
+                onClick={() => handleFollowUpFilter("Upcoming")}
                 className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
                   followUpFilter === "Upcoming"
                     ? "border-blue-300 ring-2 ring-blue-100"
@@ -1849,10 +1649,7 @@ export default function InquiriesPage() {
                     </p>
                   </div>
 
-                  <ArrowRight
-                    className="text-blue-500"
-                    size={22}
-                  />
+                  <ArrowRight className="text-blue-500" size={22} />
                 </div>
 
                 <p className="mt-1 text-xs text-slate-500">
@@ -1867,13 +1664,9 @@ export default function InquiriesPage() {
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
             <button
               type="button"
-              onClick={() =>
-                setPriorityFilter("Hot")
-              }
+              onClick={() => setPriorityFilter("Hot")}
               className={`rounded-2xl border border-red-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-                priorityFilter === "Hot"
-                  ? "ring-2 ring-red-100"
-                  : ""
+                priorityFilter === "Hot" ? "ring-2 ring-red-100" : ""
               }`}
             >
               <div className="flex items-center justify-between">
@@ -1899,13 +1692,9 @@ export default function InquiriesPage() {
 
             <button
               type="button"
-              onClick={() =>
-                setPriorityFilter("Warm")
-              }
+              onClick={() => setPriorityFilter("Warm")}
               className={`rounded-2xl border border-amber-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-                priorityFilter === "Warm"
-                  ? "ring-2 ring-amber-100"
-                  : ""
+                priorityFilter === "Warm" ? "ring-2 ring-amber-100" : ""
               }`}
             >
               <div className="flex items-center justify-between">
@@ -1931,13 +1720,9 @@ export default function InquiriesPage() {
 
             <button
               type="button"
-              onClick={() =>
-                setPriorityFilter("Cold")
-              }
+              onClick={() => setPriorityFilter("Cold")}
               className={`rounded-2xl border border-sky-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-                priorityFilter === "Cold"
-                  ? "ring-2 ring-sky-100"
-                  : ""
+                priorityFilter === "Cold" ? "ring-2 ring-sky-100" : ""
               }`}
             >
               <div className="flex items-center justify-between">
@@ -1986,11 +1771,7 @@ export default function InquiriesPage() {
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(event) =>
-                      setSearchQuery(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Name, ID, phone, email..."
                     className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:w-64"
                   />
@@ -1998,41 +1779,23 @@ export default function InquiriesPage() {
 
                 <select
                   value={statusFilter}
-                  onChange={(event) =>
-                    setStatusFilter(
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => setStatusFilter(event.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
-                  <option value="All">
-                    All Statuses
-                  </option>
+                  <option value="All">All Statuses</option>
                   <option value="New">New</option>
-                  <option value="Contacted">
-                    Contacted
-                  </option>
-                  <option value="Follow-up">
-                    Follow-up
-                  </option>
-                  <option value="Converted">
-                    Converted
-                  </option>
+                  <option value="Contacted">Contacted</option>
+                  <option value="Follow-up">Follow-up</option>
+                  <option value="Converted">Converted</option>
                   <option value="Lost">Lost</option>
                 </select>
 
                 <select
                   value={priorityFilter}
-                  onChange={(event) =>
-                    setPriorityFilter(
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => setPriorityFilter(event.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
-                  <option value="All">
-                    All Priorities
-                  </option>
+                  <option value="All">All Priorities</option>
                   <option value="Hot">Hot</option>
                   <option value="Warm">Warm</option>
                   <option value="Cold">Cold</option>
@@ -2040,22 +1803,13 @@ export default function InquiriesPage() {
 
                 <select
                   value={courseFilter}
-                  onChange={(event) =>
-                    setCourseFilter(
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => setCourseFilter(event.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
-                  <option value="All">
-                    All Courses
-                  </option>
+                  <option value="All">All Courses</option>
 
                   {courses.map((course) => (
-                    <option
-                      key={course}
-                      value={course}
-                    >
+                    <option key={course} value={course}>
                       {course}
                     </option>
                   ))}
@@ -2063,22 +1817,13 @@ export default function InquiriesPage() {
 
                 <select
                   value={sourceFilter}
-                  onChange={(event) =>
-                    setSourceFilter(
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => setSourceFilter(event.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
-                  <option value="All">
-                    All Sources
-                  </option>
+                  <option value="All">All Sources</option>
 
                   {sources.map((source) => (
-                    <option
-                      key={source}
-                      value={source}
-                    >
+                    <option key={source} value={source}>
                       {source}
                     </option>
                   ))}
@@ -2086,28 +1831,14 @@ export default function InquiriesPage() {
 
                 <select
                   value={followUpFilter}
-                  onChange={(event) =>
-                    setFollowUpFilter(
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => setFollowUpFilter(event.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
-                  <option value="All">
-                    All Follow-ups
-                  </option>
-                  <option value="Overdue">
-                    Overdue
-                  </option>
-                  <option value="Due Today">
-                    Due Today
-                  </option>
-                  <option value="Upcoming">
-                    Upcoming
-                  </option>
-                  <option value="No Follow-up">
-                    No Follow-up
-                  </option>
+                  <option value="All">All Follow-ups</option>
+                  <option value="Overdue">Overdue</option>
+                  <option value="Due Today">Due Today</option>
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="No Follow-up">No Follow-up</option>
                 </select>
 
                 {(searchQuery ||
@@ -2173,377 +1904,276 @@ export default function InquiriesPage() {
                 </thead>
 
                 <tbody>
-                  {paginatedInquiries.map(
-                    (inquiry) => {
-                      const followUpStatus =
-                        getFollowUpStatus(
-                          inquiry.followUpDate,
-                        );
+                  {paginatedInquiries.map((inquiry) => {
+                    const followUpStatus = getFollowUpStatus(
+                      inquiry.followUpDate,
+                    );
 
-                      return (
-                        <tr
-                          key={inquiry.id}
-                          className="border-b border-slate-100 transition hover:bg-blue-50/40"
-                          onClick={(event) =>
-                            event.stopPropagation()
-                          }
-                        >
-                          <td className="px-4 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-700">
-                                {inquiry.name
-                                  .charAt(0)
-                                  .toUpperCase()}
-                              </div>
-
-                              <div>
-                                <p className="text-sm font-bold text-slate-900">
-                                  {inquiry.name}
-                                </p>
-
-                                <p className="mt-0.5 text-xs text-slate-500">
-                                  {inquiry.id}
-                                </p>
-
-                                <p className="mt-1 text-xs font-medium text-slate-400">
-                                  {inquiry.phone}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <p className="text-sm font-semibold text-slate-700">
-                              {inquiry.course}
-                            </p>
-
-                            <p className="mt-1 text-xs text-slate-500">
-                              {inquiry.batch}
-                            </p>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
-                              {inquiry.source}
-                            </span>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <p className="text-sm font-bold text-slate-800">
-                              {formatCurrency(
-                                inquiry.expectedFee,
-                              )}
-                            </p>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <div className="flex flex-col gap-1">
-                              <span className="text-sm font-semibold text-slate-700">
-                                {inquiry.followUpDate ||
-                                  "—"}
-                              </span>
-
-                              {inquiry.followUpDate && (
-                                <span
-                                  className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${getFollowUpStatusClasses(
-                                    followUpStatus,
-                                  )}`}
-                                >
-                                  {followUpStatus}
-                                </span>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <div className="flex flex-col gap-1">
-                              <select
-                                value={
-                                  inquiry.priority
-                                }
-                                onChange={(event) =>
-                                  handlePriorityChange(
-                                    inquiry.id,
-                                    event.target
-                                      .value as InquiryPriority,
-                                  )
-                                }
-                                className={`rounded-full border-0 px-3 py-1.5 text-xs font-bold outline-none ${getPriorityClasses(
-                                  inquiry.priority,
-                                )}`}
-                              >
-                                <option value="Hot">
-                                  Hot
-                                </option>
-                                <option value="Warm">
-                                  Warm
-                                </option>
-                                <option value="Cold">
-                                  Cold
-                                </option>
-                              </select>
-
-                              {changingPriorityInquiryId ===
-                                inquiry.id && (
-                                <span className="text-[11px] font-semibold text-emerald-600">
-                                  Saved
-                                </span>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <div className="flex flex-col gap-1">
-                              <select
-                                value={
-                                  inquiry.status
-                                }
-                                onChange={(event) =>
-                                  handleStatusChange(
-                                    inquiry.id,
-                                    event.target
-                                      .value as InquiryStatus,
-                                  )
-                                }
-                                className={`rounded-full border-0 px-3 py-1.5 text-xs font-bold outline-none ${getStatusClasses(
-                                  inquiry.status,
-                                )}`}
-                              >
-                                <option value="New">
-                                  New
-                                </option>
-
-                                <option value="Contacted">
-                                  Contacted
-                                </option>
-
-                                <option value="Follow-up">
-                                  Follow-up
-                                </option>
-
-                                <option value="Converted">
-                                  Converted
-                                </option>
-
-                                <option value="Lost">
-                                  Lost
-                                </option>
-                              </select>
-
-                              {changingStatusInquiryId ===
-                                inquiry.id && (
-                                <span className="text-[11px] font-semibold text-emerald-600">
-                                  Saved
-                                </span>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <div className="flex items-center gap-2">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
-                                <UserCheck
-                                  size={15}
-                                />
-                              </div>
-
-                              <span className="text-xs font-semibold text-slate-600">
-                                {inquiry.assignedTo}
-                              </span>
-                            </div>
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <div className="relative flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setViewingInquiryId(
-                                    inquiry.id,
-                                  )
-                                }
-                                className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50"
-                                title="View"
-                              >
-                                <Eye size={16} />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  openEditInquiry(
-                                    inquiry,
-                                  )
-                                }
-                                className="rounded-lg border border-slate-200 p-2 text-blue-600 transition hover:bg-blue-50"
-                                title="Edit"
-                              >
-                                <Pencil
-                                  size={16}
-                                />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  callInquiry(
-                                    inquiry.phone,
-                                  )
-                                }
-                                className="rounded-lg border border-slate-200 p-2 text-emerald-600 transition hover:bg-emerald-50"
-                                title="Call"
-                              >
-                                <Phone
-                                  size={16}
-                                />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  whatsappInquiry(
-                                    inquiry.phone,
-                                  )
-                                }
-                                className="rounded-lg border border-slate-200 p-2 text-green-600 transition hover:bg-green-50"
-                                title="WhatsApp"
-                              >
-                                <MessageCircle
-                                  size={16}
-                                />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  openFollowUp(
-                                    inquiry.id,
-                                  )
-                                }
-                                className="rounded-lg border border-slate-200 p-2 text-violet-600 transition hover:bg-violet-50"
-                                title="Follow-up"
-                              >
-                                <CalendarDays
-                                  size={16}
-                                />
-                              </button>
-
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-
-                                    setOpenActionMenu(
-                                      openActionMenu ===
-                                        inquiry.id
-                                        ? null
-                                        : inquiry.id,
-                                    );
-                                  }}
-                                  className="rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50"
-                                >
-                                  <MoreHorizontal
-                                    size={16}
-                                  />
-                                </button>
-
-                                {openActionMenu ===
-                                  inquiry.id && (
-                                  <div
-                                    className="absolute right-0 top-11 z-30 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl"
-                                    onClick={(event) =>
-                                      event.stopPropagation()
-                                    }
-                                  >
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setViewingInquiryId(
-                                          inquiry.id,
-                                        );
-                                        setOpenActionMenu(
-                                          null,
-                                        );
-                                      }}
-                                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                                    >
-                                      <Eye
-                                        size={15}
-                                      />
-                                      View Profile
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        openEditInquiry(
-                                          inquiry,
-                                        )
-                                      }
-                                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                                    >
-                                      <Pencil
-                                        size={15}
-                                      />
-                                      Edit Inquiry
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        openFollowUp(
-                                          inquiry.id,
-                                        )
-                                      }
-                                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                                    >
-                                      <CalendarDays
-                                        size={15}
-                                      />
-                                      Follow-up
-                                    </button>
-
-                                    <div className="my-1 border-t border-slate-100" />
-
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setShowDeleteConfirm(
-                                          inquiry.id,
-                                        );
-                                        setOpenActionMenu(
-                                          null,
-                                        );
-                                      }}
-                                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
-                                    >
-                                      <Trash2
-                                        size={15}
-                                      />
-                                      Delete
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    },
-                  )}
-
-                  {paginatedInquiries.length ===
-                    0 && (
-                    <tr>
-                      <td
-                        colSpan={9}
-                        className="px-5 py-16 text-center"
+                    return (
+                      <tr
+                        key={inquiry.id}
+                        className="border-b border-slate-100 transition hover:bg-blue-50/40"
+                        onClick={(event) => event.stopPropagation()}
                       >
-                        <Filter
-                          size={32}
-                          className="mx-auto text-slate-300"
-                        />
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-700">
+                              {inquiry.name.charAt(0).toUpperCase()}
+                            </div>
+
+                            <div>
+                              <p className="text-sm font-bold text-slate-900">
+                                {inquiry.name}
+                              </p>
+
+                              <p className="mt-0.5 text-xs text-slate-500">
+                                {inquiry.id}
+                              </p>
+
+                              <p className="mt-1 text-xs font-medium text-slate-400">
+                                {inquiry.phone}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <p className="text-sm font-semibold text-slate-700">
+                            {inquiry.course}
+                          </p>
+
+                          <p className="mt-1 text-xs text-slate-500">
+                            {inquiry.batch}
+                          </p>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                            {inquiry.source}
+                          </span>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <p className="text-sm font-bold text-slate-800">
+                            {formatCurrency(inquiry.expectedFee)}
+                          </p>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-semibold text-slate-700">
+                              {inquiry.followUpDate || "—"}
+                            </span>
+
+                            {inquiry.followUpDate && (
+                              <span
+                                className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${getFollowUpStatusClasses(
+                                  followUpStatus,
+                                )}`}
+                              >
+                                {followUpStatus}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <div className="flex flex-col gap-1">
+                            <select
+                              value={inquiry.priority}
+                              onChange={(event) =>
+                                handlePriorityChange(
+                                  inquiry.id,
+                                  event.target.value as InquiryPriority,
+                                )
+                              }
+                              className={`rounded-full border-0 px-3 py-1.5 text-xs font-bold outline-none ${getPriorityClasses(
+                                inquiry.priority,
+                              )}`}
+                            >
+                              <option value="Hot">Hot</option>
+                              <option value="Warm">Warm</option>
+                              <option value="Cold">Cold</option>
+                            </select>
+
+                            {changingPriorityInquiryId === inquiry.id && (
+                              <span className="text-[11px] font-semibold text-emerald-600">
+                                Saved
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <div className="flex flex-col gap-1">
+                            <select
+                              value={inquiry.status}
+                              onChange={(event) =>
+                                handleStatusChange(
+                                  inquiry.id,
+                                  event.target.value as InquiryStatus,
+                                )
+                              }
+                              className={`rounded-full border-0 px-3 py-1.5 text-xs font-bold outline-none ${getStatusClasses(
+                                inquiry.status,
+                              )}`}
+                            >
+                              <option value="New">New</option>
+
+                              <option value="Contacted">Contacted</option>
+
+                              <option value="Follow-up">Follow-up</option>
+
+                              <option value="Converted">Converted</option>
+
+                              <option value="Lost">Lost</option>
+                            </select>
+
+                            {changingStatusInquiryId === inquiry.id && (
+                              <span className="text-[11px] font-semibold text-emerald-600">
+                                Saved
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+                              <UserCheck size={15} />
+                            </div>
+
+                            <span className="text-xs font-semibold text-slate-600">
+                              {inquiry.assignedTo}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <div className="relative flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setViewingInquiryId(inquiry.id)}
+                              className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50"
+                              title="View"
+                            >
+                              <Eye size={16} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => openEditInquiry(inquiry)}
+                              className="rounded-lg border border-slate-200 p-2 text-blue-600 transition hover:bg-blue-50"
+                              title="Edit"
+                            >
+                              <Pencil size={16} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => callInquiry(inquiry.phone)}
+                              className="rounded-lg border border-slate-200 p-2 text-emerald-600 transition hover:bg-emerald-50"
+                              title="Call"
+                            >
+                              <Phone size={16} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => whatsappInquiry(inquiry.phone)}
+                              className="rounded-lg border border-slate-200 p-2 text-green-600 transition hover:bg-green-50"
+                              title="WhatsApp"
+                            >
+                              <MessageCircle size={16} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => openFollowUp(inquiry.id)}
+                              className="rounded-lg border border-slate-200 p-2 text-violet-600 transition hover:bg-violet-50"
+                              title="Follow-up"
+                            >
+                              <CalendarDays size={16} />
+                            </button>
+
+                            <div className="relative">
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+
+                                  setOpenActionMenu(
+                                    openActionMenu === inquiry.id
+                                      ? null
+                                      : inquiry.id,
+                                  );
+                                }}
+                                className="rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50"
+                              >
+                                <MoreHorizontal size={16} />
+                              </button>
+
+                              {openActionMenu === inquiry.id && (
+                                <div
+                                  className="absolute right-0 top-11 z-30 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl"
+                                  onClick={(event) => event.stopPropagation()}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setViewingInquiryId(inquiry.id);
+                                      setOpenActionMenu(null);
+                                    }}
+                                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                  >
+                                    <Eye size={15} />
+                                    View Profile
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => openEditInquiry(inquiry)}
+                                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                  >
+                                    <Pencil size={15} />
+                                    Edit Inquiry
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => openFollowUp(inquiry.id)}
+                                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                  >
+                                    <CalendarDays size={15} />
+                                    Follow-up
+                                  </button>
+
+                                  <div className="my-1 border-t border-slate-100" />
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowDeleteConfirm(inquiry.id);
+                                      setOpenActionMenu(null);
+                                    }}
+                                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
+                                  >
+                                    <Trash2 size={15} />
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {paginatedInquiries.length === 0 && (
+                    <tr>
+                      <td colSpan={9} className="px-5 py-16 text-center">
+                        <Filter size={32} className="mx-auto text-slate-300" />
 
                         <p className="mt-3 text-sm font-bold text-slate-700">
                           No inquiries found
@@ -2573,15 +2203,12 @@ export default function InquiriesPage() {
               <p className="text-sm text-slate-500">
                 Showing{" "}
                 <span className="font-semibold text-slate-700">
-                  {filteredInquiries.length === 0
-                    ? 0
-                    : inquiryStartIndex + 1}
+                  {filteredInquiries.length === 0 ? 0 : inquiryStartIndex + 1}
                 </span>{" "}
                 to{" "}
                 <span className="font-semibold text-slate-700">
                   {Math.min(
-                    inquiryStartIndex +
-                      rowsPerPage,
+                    inquiryStartIndex + rowsPerPage,
                     filteredInquiries.length,
                   )}
                 </span>{" "}
@@ -2597,9 +2224,7 @@ export default function InquiriesPage() {
                   type="button"
                   disabled={safeInquiryPage === 1}
                   onClick={() =>
-                    setInquiryPage((page) =>
-                      Math.max(1, page - 1),
-                    )
+                    setInquiryPage((page) => Math.max(1, page - 1))
                   }
                   className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
@@ -2615,9 +2240,7 @@ export default function InquiriesPage() {
                   <button
                     key={page}
                     type="button"
-                    onClick={() =>
-                      setInquiryPage(page)
-                    }
+                    onClick={() => setInquiryPage(page)}
                     className={`h-9 min-w-9 rounded-lg px-3 text-sm font-semibold transition ${
                       safeInquiryPage === page
                         ? "bg-blue-600 text-white"
@@ -2630,16 +2253,10 @@ export default function InquiriesPage() {
 
                 <button
                   type="button"
-                  disabled={
-                    safeInquiryPage ===
-                    inquiryTotalPages
-                  }
+                  disabled={safeInquiryPage === inquiryTotalPages}
                   onClick={() =>
                     setInquiryPage((page) =>
-                      Math.min(
-                        inquiryTotalPages,
-                        page + 1,
-                      ),
+                      Math.min(inquiryTotalPages, page + 1),
                     )
                   }
                   className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
@@ -2655,10 +2272,7 @@ export default function InquiriesPage() {
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-center gap-2">
-                <TrendingUp
-                  size={19}
-                  className="text-emerald-500"
-                />
+                <TrendingUp size={19} className="text-emerald-500" />
 
                 <h2 className="text-lg font-bold text-slate-900">
                   Lead Source Performance
@@ -2670,59 +2284,48 @@ export default function InquiriesPage() {
               </p>
 
               <div className="mt-5 space-y-3">
-                {sourcePerformance
-                  .slice(0, 6)
-                  .map((item) => (
-                    <div
-                      key={item.source}
-                      className="rounded-xl border border-slate-100 p-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-slate-800">
-                          {item.source}
-                        </span>
+                {sourcePerformance.slice(0, 6).map((item) => (
+                  <div
+                    key={item.source}
+                    className="rounded-xl border border-slate-100 p-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-slate-800">
+                        {item.source}
+                      </span>
 
-                        <span className="text-xs font-bold text-slate-500">
-                          {item.total} leads
-                        </span>
-                      </div>
-
-                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
-                        <div
-                          className="h-full rounded-full bg-blue-600"
-                          style={{
-                            width: `${Math.min(
-                              100,
-                              Math.max(
-                                8,
-                                item.total *
-                                  12,
-                              ),
-                            )}%`,
-                          }}
-                        />
-                      </div>
-
-                      <div className="mt-2 flex items-center justify-between text-xs">
-                        <span className="text-slate-500">
-                          Conversion
-                        </span>
-
-                        <span className="font-bold text-emerald-600">
-                          {item.rate}%
-                        </span>
-                      </div>
+                      <span className="text-xs font-bold text-slate-500">
+                        {item.total} leads
+                      </span>
                     </div>
-                  ))}
+
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-blue-600"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.max(8, item.total * 12),
+                          )}%`,
+                        }}
+                      />
+                    </div>
+
+                    <div className="mt-2 flex items-center justify-between text-xs">
+                      <span className="text-slate-500">Conversion</span>
+
+                      <span className="font-bold text-emerald-600">
+                        {item.rate}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-center gap-2">
-                <GraduationCap
-                  size={19}
-                  className="text-blue-500"
-                />
+                <GraduationCap size={19} className="text-blue-500" />
 
                 <h2 className="text-lg font-bold text-slate-900">
                   Course Demand
@@ -2734,46 +2337,41 @@ export default function InquiriesPage() {
               </p>
 
               <div className="mt-5 space-y-4">
-                {courseDemand
-                  .slice(0, 6)
-                  .map((item, index) => {
-                    const maxCount =
-                      courseDemand[0]?.count || 1;
+                {courseDemand.slice(0, 6).map((item, index) => {
+                  const maxCount = courseDemand[0]?.count || 1;
 
-                    return (
-                      <div key={item.course}>
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">
-                              {index + 1}
-                            </div>
-
-                            <span className="text-sm font-semibold text-slate-700">
-                              {item.course}
-                            </span>
+                  return (
+                    <div key={item.course}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">
+                            {index + 1}
                           </div>
 
-                          <span className="text-sm font-bold text-slate-900">
-                            {item.count}
+                          <span className="text-sm font-semibold text-slate-700">
+                            {item.course}
                           </span>
                         </div>
 
-                        <div className="ml-11 mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            className="h-full rounded-full bg-blue-500"
-                            style={{
-                              width: `${Math.max(
-                                10,
-                                (item.count /
-                                  maxCount) *
-                                  100,
-                              )}%`,
-                            }}
-                          />
-                        </div>
+                        <span className="text-sm font-bold text-slate-900">
+                          {item.count}
+                        </span>
                       </div>
-                    );
-                  })}
+
+                      <div className="ml-11 mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className="h-full rounded-full bg-blue-500"
+                          style={{
+                            width: `${Math.max(
+                              10,
+                              (item.count / maxCount) * 100,
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -2792,17 +2390,13 @@ export default function InquiriesPage() {
         >
           <div
             className="w-full max-w-4xl rounded-2xl bg-white shadow-2xl"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-slate-900">
-                    {editingInquiryId
-                      ? "Edit Inquiry"
-                      : "Add New Inquiry"}
+                    {editingInquiryId ? "Edit Inquiry" : "Add New Inquiry"}
                   </h2>
 
                   <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700">
@@ -2811,7 +2405,8 @@ export default function InquiriesPage() {
                 </div>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  Capture complete lead information for better conversion tracking.
+                  Capture complete lead information for better conversion
+                  tracking.
                 </p>
               </div>
 
@@ -2836,10 +2431,7 @@ export default function InquiriesPage() {
 
               <div className="mb-5 rounded-xl border border-blue-100 bg-blue-50/50 p-4">
                 <div className="flex items-start gap-3">
-                  <Sparkles
-                    size={18}
-                    className="mt-0.5 text-blue-600"
-                  />
+                  <Sparkles size={18} className="mt-0.5 text-blue-600" />
 
                   <div>
                     <p className="text-sm font-bold text-blue-900">
@@ -2847,7 +2439,9 @@ export default function InquiriesPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-blue-700">
-                      The information below will later be used by the AI engine to predict lead quality, recommend follow-ups and identify conversion opportunities.
+                      The information below will later be used by the AI engine
+                      to predict lead quality, recommend follow-ups and identify
+                      conversion opportunities.
                     </p>
                   </div>
                 </div>
@@ -2862,11 +2456,7 @@ export default function InquiriesPage() {
                   <input
                     type="text"
                     value={inquiryName}
-                    onChange={(event) =>
-                      setInquiryName(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setInquiryName(event.target.value)}
                     placeholder="Enter full name"
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
@@ -2880,11 +2470,7 @@ export default function InquiriesPage() {
                   <input
                     type="tel"
                     value={inquiryPhone}
-                    onChange={(event) =>
-                      setInquiryPhone(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setInquiryPhone(event.target.value)}
                     placeholder="Enter phone number"
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
@@ -2898,11 +2484,7 @@ export default function InquiriesPage() {
                   <input
                     type="email"
                     value={inquiryEmail}
-                    onChange={(event) =>
-                      setInquiryEmail(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setInquiryEmail(event.target.value)}
                     placeholder="Enter email address"
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
@@ -2915,18 +2497,11 @@ export default function InquiriesPage() {
 
                   <select
                     value={inquirySource}
-                    onChange={(event) =>
-                      setInquirySource(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setInquirySource(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
                     {sources.map((source) => (
-                      <option
-                        key={source}
-                        value={source}
-                      >
+                      <option key={source} value={source}>
                         {source}
                       </option>
                     ))}
@@ -2940,22 +2515,13 @@ export default function InquiriesPage() {
 
                   <select
                     value={inquiryCourse}
-                    onChange={(event) =>
-                      setInquiryCourse(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setInquiryCourse(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
-                    <option value="">
-                      Select course
-                    </option>
+                    <option value="">Select course</option>
 
                     {courses.map((course) => (
-                      <option
-                        key={course}
-                        value={course}
-                      >
+                      <option key={course} value={course}>
                         {course}
                       </option>
                     ))}
@@ -2969,22 +2535,13 @@ export default function InquiriesPage() {
 
                   <select
                     value={inquiryBatch}
-                    onChange={(event) =>
-                      setInquiryBatch(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setInquiryBatch(event.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
-                    <option value="">
-                      Select batch
-                    </option>
+                    <option value="">Select batch</option>
 
                     {batches.map((batch) => (
-                      <option
-                        key={batch}
-                        value={batch}
-                      >
+                      <option key={batch} value={batch}>
                         {batch}
                       </option>
                     ))}
@@ -3007,9 +2564,7 @@ export default function InquiriesPage() {
                       min="0"
                       value={inquiryExpectedFee}
                       onChange={(event) =>
-                        setInquiryExpectedFee(
-                          event.target.value,
-                        )
+                        setInquiryExpectedFee(event.target.value)
                       }
                       placeholder="Expected admission fee"
                       className="w-full rounded-xl border border-slate-200 px-4 py-3 pl-10 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -3025,24 +2580,15 @@ export default function InquiriesPage() {
                   <select
                     value={inquiryPriority}
                     onChange={(event) =>
-                      setInquiryPriority(
-                        event.target
-                          .value as InquiryPriority,
-                      )
+                      setInquiryPriority(event.target.value as InquiryPriority)
                     }
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
-                    <option value="Hot">
-                      🔥 Hot
-                    </option>
+                    <option value="Hot">🔥 Hot</option>
 
-                    <option value="Warm">
-                      🌡️ Warm
-                    </option>
+                    <option value="Warm">🌡️ Warm</option>
 
-                    <option value="Cold">
-                      ❄️ Cold
-                    </option>
+                    <option value="Cold">❄️ Cold</option>
                   </select>
                 </div>
 
@@ -3055,9 +2601,7 @@ export default function InquiriesPage() {
                     type="date"
                     value={inquiryFollowUpDate}
                     onChange={(event) =>
-                      setInquiryFollowUpDate(
-                        event.target.value,
-                      )
+                      setInquiryFollowUpDate(event.target.value)
                     }
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
@@ -3071,17 +2615,12 @@ export default function InquiriesPage() {
                   <select
                     value={inquiryAssignedTo}
                     onChange={(event) =>
-                      setInquiryAssignedTo(
-                        event.target.value,
-                      )
+                      setInquiryAssignedTo(event.target.value)
                     }
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
                     {staffMembers.map((member) => (
-                      <option
-                        key={member}
-                        value={member}
-                      >
+                      <option key={member} value={member}>
                         {member}
                       </option>
                     ))}
@@ -3097,9 +2636,7 @@ export default function InquiriesPage() {
                     type="text"
                     value={inquiryLostReason}
                     onChange={(event) =>
-                      setInquiryLostReason(
-                        event.target.value,
-                      )
+                      setInquiryLostReason(event.target.value)
                     }
                     placeholder="Only required when lead is lost"
                     className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -3113,11 +2650,7 @@ export default function InquiriesPage() {
 
                   <textarea
                     value={inquiryNotes}
-                    onChange={(event) =>
-                      setInquiryNotes(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => setInquiryNotes(event.target.value)}
                     rows={5}
                     placeholder="Add detailed notes about the student, parent, requirements, objections or conversations..."
                     className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium leading-6 text-slate-800 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -3145,9 +2678,7 @@ export default function InquiriesPage() {
               >
                 <Save size={16} />
 
-                {editingInquiryId
-                  ? "Save Changes"
-                  : "Add Inquiry"}
+                {editingInquiryId ? "Save Changes" : "Add Inquiry"}
               </button>
             </div>
           </div>
@@ -3159,15 +2690,11 @@ export default function InquiriesPage() {
       {selectedInquiry && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
-          onClick={() =>
-            setViewingInquiryId(null)
-          }
+          onClick={() => setViewingInquiryId(null)}
         >
           <div
             className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
@@ -3186,16 +2713,13 @@ export default function InquiriesPage() {
                 </div>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  {selectedInquiry.name} ·{" "}
-                  {selectedInquiry.id}
+                  {selectedInquiry.name} · {selectedInquiry.id}
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setViewingInquiryId(null)
-                }
+                onClick={() => setViewingInquiryId(null)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
               >
                 <X size={20} />
@@ -3207,9 +2731,7 @@ export default function InquiriesPage() {
                 <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                   <div className="flex items-center gap-4">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/10 text-2xl font-bold">
-                      {selectedInquiry.name
-                        .charAt(0)
-                        .toUpperCase()}
+                      {selectedInquiry.name.charAt(0).toUpperCase()}
                     </div>
 
                     <div>
@@ -3239,9 +2761,7 @@ export default function InquiriesPage() {
                     </p>
 
                     <p className="mt-1 text-2xl font-bold">
-                      {formatCurrency(
-                        selectedInquiry.expectedFee,
-                      )}
+                      {formatCurrency(selectedInquiry.expectedFee)}
                     </p>
                   </div>
                 </div>
@@ -3270,16 +2790,13 @@ export default function InquiriesPage() {
                   </div>
 
                   <p className="mt-2 break-all text-sm font-bold text-slate-800">
-                    {selectedInquiry.email ||
-                      "Not provided"}
+                    {selectedInquiry.email || "Not provided"}
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-slate-200 p-4">
                   <div className="flex items-center gap-2 text-slate-400">
-                    <GraduationCap
-                      size={16}
-                    />
+                    <GraduationCap size={16} />
 
                     <p className="text-xs font-bold uppercase tracking-wide">
                       Course
@@ -3293,9 +2810,7 @@ export default function InquiriesPage() {
 
                 <div className="rounded-xl border border-slate-200 p-4">
                   <div className="flex items-center gap-2 text-slate-400">
-                    <CalendarDays
-                      size={16}
-                    />
+                    <CalendarDays size={16} />
 
                     <p className="text-xs font-bold uppercase tracking-wide">
                       Batch
@@ -3330,10 +2845,7 @@ export default function InquiriesPage() {
 
               <div className="mt-5 rounded-xl border border-slate-200 p-5">
                 <div className="flex items-center gap-2">
-                  <Brain
-                    size={18}
-                    className="text-blue-600"
-                  />
+                  <Brain size={18} className="text-blue-600" />
 
                   <h3 className="text-sm font-bold text-slate-900">
                     AI Lead Assessment
@@ -3342,16 +2854,12 @@ export default function InquiriesPage() {
 
                 <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div className="rounded-xl bg-red-50 p-4">
-                    <p className="text-xs font-semibold text-red-600">
-                      Intent
-                    </p>
+                    <p className="text-xs font-semibold text-red-600">Intent</p>
 
                     <p className="mt-1 text-lg font-bold text-red-700">
-                      {selectedInquiry.priority ===
-                      "Hot"
+                      {selectedInquiry.priority === "Hot"
                         ? "High"
-                        : selectedInquiry.priority ===
-                            "Warm"
+                        : selectedInquiry.priority === "Warm"
                           ? "Medium"
                           : "Low"}
                     </p>
@@ -3363,14 +2871,11 @@ export default function InquiriesPage() {
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-blue-700">
-                      {selectedInquiry.status ===
-                      "New"
+                      {selectedInquiry.status === "New"
                         ? "Contact immediately"
-                        : selectedInquiry.status ===
-                            "Follow-up"
+                        : selectedInquiry.status === "Follow-up"
                           ? "Continue nurturing"
-                          : selectedInquiry.status ===
-                              "Contacted"
+                          : selectedInquiry.status === "Contacted"
                             ? "Schedule next step"
                             : "Monitor"}
                     </p>
@@ -3382,9 +2887,7 @@ export default function InquiriesPage() {
                     </p>
 
                     <p className="mt-1 text-lg font-bold text-emerald-700">
-                      {formatCurrency(
-                        selectedInquiry.expectedFee,
-                      )}
+                      {formatCurrency(selectedInquiry.expectedFee)}
                     </p>
                   </div>
                 </div>
@@ -3396,8 +2899,7 @@ export default function InquiriesPage() {
                 </p>
 
                 <div className="mt-2 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-                  {selectedInquiry.notes ||
-                    "No notes added."}
+                  {selectedInquiry.notes || "No notes added."}
                 </div>
               </div>
 
@@ -3416,11 +2918,7 @@ export default function InquiriesPage() {
               <div className="mt-5 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() =>
-                    callInquiry(
-                      selectedInquiry.phone,
-                    )
-                  }
+                  onClick={() => callInquiry(selectedInquiry.phone)}
                   className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
                 >
                   <PhoneCall size={16} />
@@ -3429,11 +2927,7 @@ export default function InquiriesPage() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    whatsappInquiry(
-                      selectedInquiry.phone,
-                    )
-                  }
+                  onClick={() => whatsappInquiry(selectedInquiry.phone)}
                   className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
                 >
                   <MessageCircle size={16} />
@@ -3444,9 +2938,7 @@ export default function InquiriesPage() {
                   type="button"
                   onClick={() => {
                     setViewingInquiryId(null);
-                    openFollowUp(
-                      selectedInquiry.id,
-                    );
+                    openFollowUp(selectedInquiry.id);
                   }}
                   className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
                 >
@@ -3461,9 +2953,7 @@ export default function InquiriesPage() {
                 type="button"
                 onClick={() => {
                   setViewingInquiryId(null);
-                  openEditInquiry(
-                    selectedInquiry,
-                  );
+                  openEditInquiry(selectedInquiry);
                 }}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-blue-600 hover:bg-blue-50"
               >
@@ -3473,9 +2963,7 @@ export default function InquiriesPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setViewingInquiryId(null)
-                }
+                onClick={() => setViewingInquiryId(null)}
                 className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
               >
                 Close
@@ -3494,9 +2982,7 @@ export default function InquiriesPage() {
         >
           <div
             className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
@@ -3506,16 +2992,12 @@ export default function InquiriesPage() {
                   </h2>
 
                   <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-                    {getInquiryFollowUps(
-                      followUpInquiry.id,
-                    ).length}{" "}
-                    activities
+                    {getInquiryFollowUps(followUpInquiry.id).length} activities
                   </span>
                 </div>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  {followUpInquiry.name} ·{" "}
-                  {followUpInquiry.id}
+                  {followUpInquiry.name} · {followUpInquiry.id}
                 </p>
               </div>
 
@@ -3547,9 +3029,7 @@ export default function InquiriesPage() {
                 <div className="mb-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-5">
                   <div className="mb-4 flex items-start gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
-                      <MessageCircle
-                        size={17}
-                      />
+                      <MessageCircle size={17} />
                     </div>
 
                     <div>
@@ -3578,35 +3058,23 @@ export default function InquiriesPage() {
                       <select
                         value={followUpOutcome}
                         onChange={(event) =>
-                          setFollowUpOutcome(
-                            event.target.value,
-                          )
+                          setFollowUpOutcome(event.target.value)
                         }
                         className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                       >
-                        <option value="Interested">
-                          Interested
-                        </option>
+                        <option value="Interested">Interested</option>
 
-                        <option value="Call Back">
-                          Call Back
-                        </option>
+                        <option value="Call Back">Call Back</option>
 
                         <option value="Requested Details">
                           Requested Details
                         </option>
 
-                        <option value="No Response">
-                          No Response
-                        </option>
+                        <option value="No Response">No Response</option>
 
-                        <option value="Converted">
-                          Converted
-                        </option>
+                        <option value="Converted">Converted</option>
 
-                        <option value="Not Interested">
-                          Not Interested
-                        </option>
+                        <option value="Not Interested">Not Interested</option>
                       </select>
                     </div>
 
@@ -3619,15 +3087,11 @@ export default function InquiriesPage() {
                         type="date"
                         value={followUpNextDate}
                         onChange={(event) =>
-                          setFollowUpNextDate(
-                            event.target.value,
-                          )
+                          setFollowUpNextDate(event.target.value)
                         }
                         disabled={
-                          followUpOutcome ===
-                            "Converted" ||
-                          followUpOutcome ===
-                            "Not Interested"
+                          followUpOutcome === "Converted" ||
+                          followUpOutcome === "Not Interested"
                         }
                         className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-800 outline-none disabled:bg-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                       />
@@ -3641,22 +3105,15 @@ export default function InquiriesPage() {
                       <select
                         value={followUpAssignedTo}
                         onChange={(event) =>
-                          setFollowUpAssignedTo(
-                            event.target.value,
-                          )
+                          setFollowUpAssignedTo(event.target.value)
                         }
                         className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                       >
-                        {staffMembers.map(
-                          (member) => (
-                            <option
-                              key={member}
-                              value={member}
-                            >
-                              {member}
-                            </option>
-                          ),
-                        )}
+                        {staffMembers.map((member) => (
+                          <option key={member} value={member}>
+                            {member}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -3666,11 +3123,9 @@ export default function InquiriesPage() {
                       </p>
 
                       <p className="mt-1 text-xs font-semibold text-blue-700">
-                        {followUpInquiry.priority ===
-                        "Hot"
+                        {followUpInquiry.priority === "Hot"
                           ? "High-priority lead: follow up quickly."
-                          : followUpInquiry.priority ===
-                              "Warm"
+                          : followUpInquiry.priority === "Warm"
                             ? "Continue nurturing with useful information."
                             : "Use educational content to increase interest."}
                       </p>
@@ -3684,9 +3139,7 @@ export default function InquiriesPage() {
                       <textarea
                         value={followUpNotes}
                         onChange={(event) =>
-                          setFollowUpNotes(
-                            event.target.value,
-                          )
+                          setFollowUpNotes(event.target.value)
                         }
                         rows={4}
                         placeholder="What was discussed? What did the student/parent ask? What should happen next?"
@@ -3712,23 +3165,16 @@ export default function InquiriesPage() {
                       onClick={handleSaveFollowUp}
                       className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
                     >
-                      <CheckCircle2
-                        size={16}
-                      />
+                      <CheckCircle2 size={16} />
                       Save Follow-up
                     </button>
                   </div>
                 </div>
               )}
 
-              {getInquiryFollowUps(
-                followUpInquiry.id,
-              ).length === 0 ? (
+              {getInquiryFollowUps(followUpInquiry.id).length === 0 ? (
                 <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center">
-                  <CalendarDays
-                    size={30}
-                    className="mx-auto text-slate-300"
-                  />
+                  <CalendarDays size={30} className="mx-auto text-slate-300" />
 
                   <p className="mt-3 text-sm font-bold text-slate-700">
                     No follow-ups recorded yet.
@@ -3742,18 +3188,10 @@ export default function InquiriesPage() {
                 <div className="relative space-y-4">
                   <div className="absolute bottom-5 left-5 top-5 w-px bg-slate-200" />
 
-                  {getInquiryFollowUps(
-                    followUpInquiry.id,
-                  ).map((followUp) => (
-                    <div
-                      key={followUp.id}
-                      className="relative pl-12"
-                    >
+                  {getInquiryFollowUps(followUpInquiry.id).map((followUp) => (
+                    <div key={followUp.id} className="relative pl-12">
                       <div className="absolute left-2 top-4 flex h-7 w-7 items-center justify-center rounded-full border-4 border-white bg-blue-600 shadow-sm">
-                        <MessageCircle
-                          size={12}
-                          className="text-white"
-                        />
+                        <MessageCircle size={12} className="text-white" />
                       </div>
 
                       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -3772,9 +3210,7 @@ export default function InquiriesPage() {
                             <p className="mt-1 text-xs text-slate-500">
                               Assigned to{" "}
                               <span className="font-semibold text-slate-700">
-                                {
-                                  followUp.assignedTo
-                                }
+                                {followUp.assignedTo}
                               </span>
                             </p>
                           </div>
@@ -3792,8 +3228,7 @@ export default function InquiriesPage() {
                           <span>
                             Next action:{" "}
                             <span className="font-bold text-slate-700">
-                              {followUp.nextFollowUpDate ||
-                                "No next follow-up"}
+                              {followUp.nextFollowUpDate || "No next follow-up"}
                             </span>
                           </span>
                         </div>
@@ -3826,9 +3261,7 @@ export default function InquiriesPage() {
         >
           <div
             className="w-full max-w-5xl rounded-2xl bg-white shadow-2xl"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
@@ -3851,9 +3284,7 @@ export default function InquiriesPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowAiCenter(false)
-                }
+                onClick={() => setShowAiCenter(false)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
               >
                 <X size={20} />
@@ -3870,9 +3301,7 @@ export default function InquiriesPage() {
                   </p>
 
                   <p className="mt-2 text-xl font-bold">
-                    {hotLeads > 2
-                      ? "Strong"
-                      : "Moderate"}
+                    {hotLeads > 2 ? "Strong" : "Moderate"}
                   </p>
 
                   <p className="mt-1 text-xs text-slate-400">
@@ -3881,10 +3310,7 @@ export default function InquiriesPage() {
                 </div>
 
                 <div className="rounded-2xl bg-red-50 p-5">
-                  <ShieldAlert
-                    size={20}
-                    className="text-red-600"
-                  />
+                  <ShieldAlert size={20} className="text-red-600" />
 
                   <p className="mt-4 text-xs font-semibold text-red-500">
                     AI RISK
@@ -3900,19 +3326,14 @@ export default function InquiriesPage() {
                 </div>
 
                 <div className="rounded-2xl bg-emerald-50 p-5">
-                  <TrendingUp
-                    size={20}
-                    className="text-emerald-600"
-                  />
+                  <TrendingUp size={20} className="text-emerald-600" />
 
                   <p className="mt-4 text-xs font-semibold text-emerald-600">
                     AI OPPORTUNITY
                   </p>
 
                   <p className="mt-2 text-xl font-bold text-emerald-700">
-                    {formatCurrency(
-                      totalPipelineValue,
-                    )}
+                    {formatCurrency(totalPipelineValue)}
                   </p>
 
                   <p className="mt-1 text-xs text-emerald-600">
@@ -3921,10 +3342,7 @@ export default function InquiriesPage() {
                 </div>
 
                 <div className="rounded-2xl bg-blue-50 p-5">
-                  <Target
-                    size={20}
-                    className="text-blue-600"
-                  />
+                  <Target size={20} className="text-blue-600" />
 
                   <p className="mt-4 text-xs font-semibold text-blue-600">
                     AI CONVERSION
@@ -3945,10 +3363,7 @@ export default function InquiriesPage() {
 
                 <div className="rounded-2xl border border-slate-200 p-5">
                   <div className="flex items-center gap-2">
-                    <Lightbulb
-                      size={19}
-                      className="text-amber-500"
-                    />
+                    <Lightbulb size={19} className="text-amber-500" />
 
                     <h3 className="text-base font-bold text-slate-900">
                       AI Priority Opportunities
@@ -3960,59 +3375,48 @@ export default function InquiriesPage() {
                   </p>
 
                   <div className="mt-4 space-y-3">
-                    {aiHotOpportunities.length ===
-                    0 ? (
+                    {aiHotOpportunities.length === 0 ? (
                       <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
                         No high-priority opportunities detected.
                       </div>
                     ) : (
-                      aiHotOpportunities.map(
-                        (inquiry) => (
-                          <button
-                            key={inquiry.id}
-                            type="button"
-                            onClick={() => {
-                              setShowAiCenter(
-                                false,
-                              );
-                              setViewingInquiryId(
-                                inquiry.id,
-                              );
-                            }}
-                            className="flex w-full items-center justify-between rounded-xl border border-slate-100 p-4 text-left transition hover:bg-slate-50"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-sm font-bold text-red-700">
-                                {inquiry.name
-                                  .charAt(0)
-                                  .toUpperCase()}
-                              </div>
-
-                              <div>
-                                <p className="text-sm font-bold text-slate-800">
-                                  {inquiry.name}
-                                </p>
-
-                                <p className="mt-0.5 text-xs text-slate-500">
-                                  {inquiry.course}
-                                </p>
-                              </div>
+                      aiHotOpportunities.map((inquiry) => (
+                        <button
+                          key={inquiry.id}
+                          type="button"
+                          onClick={() => {
+                            setShowAiCenter(false);
+                            setViewingInquiryId(inquiry.id);
+                          }}
+                          className="flex w-full items-center justify-between rounded-xl border border-slate-100 p-4 text-left transition hover:bg-slate-50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-sm font-bold text-red-700">
+                              {inquiry.name.charAt(0).toUpperCase()}
                             </div>
 
-                            <div className="text-right">
+                            <div>
                               <p className="text-sm font-bold text-slate-800">
-                                {formatCurrency(
-                                  inquiry.expectedFee,
-                                )}
+                                {inquiry.name}
                               </p>
 
-                              <p className="mt-1 text-xs font-semibold text-red-600">
-                                High intent
+                              <p className="mt-0.5 text-xs text-slate-500">
+                                {inquiry.course}
                               </p>
                             </div>
-                          </button>
-                        ),
-                      )
+                          </div>
+
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-slate-800">
+                              {formatCurrency(inquiry.expectedFee)}
+                            </p>
+
+                            <p className="mt-1 text-xs font-semibold text-red-600">
+                              High intent
+                            </p>
+                          </div>
+                        </button>
+                      ))
                     )}
                   </div>
                 </div>
@@ -4021,10 +3425,7 @@ export default function InquiriesPage() {
 
                 <div className="rounded-2xl border border-slate-200 p-5">
                   <div className="flex items-center gap-2">
-                    <ShieldAlert
-                      size={19}
-                      className="text-red-500"
-                    />
+                    <ShieldAlert size={19} className="text-red-500" />
 
                     <h3 className="text-base font-bold text-slate-900">
                       AI Risk Detection
@@ -4041,38 +3442,29 @@ export default function InquiriesPage() {
                         No overdue leads detected.
                       </div>
                     ) : (
-                      aiRiskLeads.map(
-                        (inquiry) => (
-                          <button
-                            key={inquiry.id}
-                            type="button"
-                            onClick={() => {
-                              setShowAiCenter(
-                                false,
-                              );
-                              openFollowUp(
-                                inquiry.id,
-                              );
-                            }}
-                            className="flex w-full items-center justify-between rounded-xl border border-red-100 bg-red-50/40 p-4 text-left transition hover:bg-red-50"
-                          >
-                            <div>
-                              <p className="text-sm font-bold text-slate-800">
-                                {inquiry.name}
-                              </p>
+                      aiRiskLeads.map((inquiry) => (
+                        <button
+                          key={inquiry.id}
+                          type="button"
+                          onClick={() => {
+                            setShowAiCenter(false);
+                            openFollowUp(inquiry.id);
+                          }}
+                          className="flex w-full items-center justify-between rounded-xl border border-red-100 bg-red-50/40 p-4 text-left transition hover:bg-red-50"
+                        >
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">
+                              {inquiry.name}
+                            </p>
 
-                              <p className="mt-1 text-xs text-red-600">
-                                Follow-up overdue
-                              </p>
-                            </div>
+                            <p className="mt-1 text-xs text-red-600">
+                              Follow-up overdue
+                            </p>
+                          </div>
 
-                            <ArrowRight
-                              size={17}
-                              className="text-red-500"
-                            />
-                          </button>
-                        ),
-                      )
+                          <ArrowRight size={17} className="text-red-500" />
+                        </button>
+                      ))
                     )}
                   </div>
                 </div>
@@ -4082,10 +3474,7 @@ export default function InquiriesPage() {
 
               <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-5">
                 <div className="flex items-center gap-2">
-                  <Sparkles
-                    size={19}
-                    className="text-blue-600"
-                  />
+                  <Sparkles size={19} className="text-blue-600" />
 
                   <h3 className="text-base font-bold text-blue-900">
                     AI Recommendations
@@ -4099,7 +3488,8 @@ export default function InquiriesPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-slate-500">
-                      Contact high-intent leads first, especially those with high expected fee value.
+                      Contact high-intent leads first, especially those with
+                      high expected fee value.
                     </p>
                   </div>
 
@@ -4119,7 +3509,8 @@ export default function InquiriesPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-slate-500">
-                      Use course demand data to improve counselling capacity and batch planning.
+                      Use course demand data to improve counselling capacity and
+                      batch planning.
                     </p>
                   </div>
 
@@ -4129,7 +3520,8 @@ export default function InquiriesPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-slate-500">
-                      Compare lead volume against conversion rate before increasing marketing spend.
+                      Compare lead volume against conversion rate before
+                      increasing marketing spend.
                     </p>
                   </div>
                 </div>
@@ -4145,7 +3537,9 @@ export default function InquiriesPage() {
                 </p>
 
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Real AI scoring, predictive conversion models, natural-language CRM queries and automated recommendations will be connected to the backend AI service later.
+                  Real AI scoring, predictive conversion models,
+                  natural-language CRM queries and automated recommendations
+                  will be connected to the backend AI service later.
                 </p>
               </div>
             </div>
@@ -4153,9 +3547,7 @@ export default function InquiriesPage() {
             <div className="flex justify-end border-t border-slate-200 px-6 py-4">
               <button
                 type="button"
-                onClick={() =>
-                  setShowAiCenter(false)
-                }
+                onClick={() => setShowAiCenter(false)}
                 className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
               >
                 Close
@@ -4170,15 +3562,11 @@ export default function InquiriesPage() {
       {showDeleteConfirm && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
-          onClick={() =>
-            setShowDeleteConfirm(null)
-          }
+          onClick={() => setShowDeleteConfirm(null)}
         >
           <div
             className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-red-600">
               <Trash2 size={21} />
@@ -4189,15 +3577,14 @@ export default function InquiriesPage() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              This will remove the inquiry and its follow-up history from the current demo state. This action cannot be undone.
+              This will remove the inquiry and its follow-up history from the
+              current demo state. This action cannot be undone.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowDeleteConfirm(null)
-                }
+                onClick={() => setShowDeleteConfirm(null)}
                 className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
@@ -4205,11 +3592,7 @@ export default function InquiriesPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  handleDeleteInquiry(
-                    showDeleteConfirm,
-                  )
-                }
+                onClick={() => handleDeleteInquiry(showDeleteConfirm)}
                 className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
               >
                 <Trash2 size={16} />
@@ -4225,10 +3608,7 @@ export default function InquiriesPage() {
       {toast && (
         <div className="fixed bottom-6 right-6 z-[70] max-w-sm rounded-xl bg-slate-900 px-5 py-3.5 text-sm font-semibold text-white shadow-2xl">
           <div className="flex items-center gap-3">
-            <CheckCircle2
-              size={18}
-              className="text-emerald-400"
-            />
+            <CheckCircle2 size={18} className="text-emerald-400" />
 
             <span>{toast}</span>
           </div>

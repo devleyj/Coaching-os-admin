@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   Bell,
   Search,
@@ -100,11 +101,7 @@ type ChannelType = "In-App" | "WhatsApp" | "Email";
 
 type ToneType = "Professional" | "Friendly" | "Urgent" | "Concise";
 
-type RecurrenceType =
-  | "None"
-  | "Daily"
-  | "Weekly"
-  | "Monthly";
+type RecurrenceType = "None" | "Daily" | "Weekly" | "Monthly";
 
 type Notification = {
   id: string;
@@ -385,16 +382,17 @@ const initialTemplates: Template[] = [
 const getToday = () => {
   const date = new Date();
 
-  return `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0",
+  )}-${String(date.getDate()).padStart(2, "0")}`;
 };
 
 const getCurrentTime = () => {
   const date = new Date();
 
   return `${String(date.getHours()).padStart(2, "0")}:${String(
-    date.getMinutes()
+    date.getMinutes(),
   ).padStart(2, "0")}`;
 };
 
@@ -543,8 +541,7 @@ export default function NotificationsPage() {
     "date" | "title" | "recipients" | "status" | "read"
   >("date");
 
-  const [sortDirection, setSortDirection] =
-    useState<"asc" | "desc">("desc");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   const [page, setPage] = useState(1);
 
@@ -556,31 +553,31 @@ export default function NotificationsPage() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const [editingNotificationId, setEditingNotificationId] =
-    useState<string | null>(null);
+  const [editingNotificationId, setEditingNotificationId] = useState<
+    string | null
+  >(null);
 
-  const [viewingNotificationId, setViewingNotificationId] =
-    useState<string | null>(null);
+  const [viewingNotificationId, setViewingNotificationId] = useState<
+    string | null
+  >(null);
 
-  const [deleteNotificationId, setDeleteNotificationId] =
-    useState<string | null>(null);
+  const [deleteNotificationId, setDeleteNotificationId] = useState<
+    string | null
+  >(null);
 
-  const [openActionMenu, setOpenActionMenu] =
-    useState<string | null>(null);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
 
   const [showAIModal, setShowAIModal] = useState(false);
 
-  const [showAnalyticsModal, setShowAnalyticsModal] =
-    useState(false);
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
 
-  const [showPreviewModal, setShowPreviewModal] =
-    useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
-  const [showTemplateModal, setShowTemplateModal] =
-    useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
 
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<Template | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
+    null,
+  );
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -601,31 +598,24 @@ export default function NotificationsPage() {
   const [notificationType, setNotificationType] =
     useState<NotificationType>("General");
 
-  const [audience, setAudience] =
-    useState<AudienceType>("All Students");
+  const [audience, setAudience] = useState<AudienceType>("All Students");
 
   const [target, setTarget] = useState("All Students");
 
-  const [channels, setChannels] =
-    useState<ChannelType[]>(["In-App"]);
+  const [channels, setChannels] = useState<ChannelType[]>(["In-App"]);
 
-  const [scheduleType, setScheduleType] =
-    useState<"now" | "schedule">("now");
+  const [scheduleType, setScheduleType] = useState<"now" | "schedule">("now");
 
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
 
-  const [tone, setTone] =
-    useState<ToneType>("Professional");
+  const [tone, setTone] = useState<ToneType>("Professional");
 
-  const [recurrence, setRecurrence] =
-    useState<RecurrenceType>("None");
+  const [recurrence, setRecurrence] = useState<RecurrenceType>("None");
 
-  const [sendCopyToAdmin, setSendCopyToAdmin] =
-    useState(false);
+  const [sendCopyToAdmin, setSendCopyToAdmin] = useState(false);
 
-  const [trackEngagement, setTrackEngagement] =
-    useState(true);
+  const [trackEngagement, setTrackEngagement] = useState(true);
 
   /* =========================================================
      AI STATE
@@ -648,10 +638,7 @@ export default function NotificationsPage() {
      TOAST
   ========================================================= */
 
-  const showToast = (
-    message: string,
-    type: ToastType = "success"
-  ) => {
+  const showToast = (message: string, type: ToastType = "success") => {
     setToast({ message, type });
 
     window.setTimeout(() => {
@@ -675,22 +662,17 @@ export default function NotificationsPage() {
         notification.target.toLowerCase().includes(searchText);
 
       const matchesStatus =
-        statusFilter === "All" ||
-        notification.status === statusFilter;
+        statusFilter === "All" || notification.status === statusFilter;
 
       const matchesType =
-        typeFilter === "All" ||
-        notification.type === typeFilter;
+        typeFilter === "All" || notification.type === typeFilter;
 
       const matchesAudience =
-        audienceFilter === "All" ||
-        notification.audience === audienceFilter;
+        audienceFilter === "All" || notification.audience === audienceFilter;
 
       const matchesChannel =
         channelFilter === "All" ||
-        notification.channels.includes(
-          channelFilter as ChannelType
-        );
+        notification.channels.includes(channelFilter as ChannelType);
 
       return (
         matchesSearch &&
@@ -717,15 +699,9 @@ export default function NotificationsPage() {
       }
 
       if (sortBy === "read") {
-        const aRate =
-          a.recipients > 0
-            ? a.readCount / a.recipients
-            : 0;
+        const aRate = a.recipients > 0 ? a.readCount / a.recipients : 0;
 
-        const bRate =
-          b.recipients > 0
-            ? b.readCount / b.recipients
-            : 0;
+        const bRate = b.recipients > 0 ? b.readCount / b.recipients : 0;
 
         comparison = aRate - bRate;
       }
@@ -737,9 +713,7 @@ export default function NotificationsPage() {
         comparison = aDate.localeCompare(bDate);
       }
 
-      return sortDirection === "asc"
-        ? comparison
-        : -comparison;
+      return sortDirection === "asc" ? comparison : -comparison;
     });
 
     return result;
@@ -756,21 +730,17 @@ export default function NotificationsPage() {
 
   const totalPages = Math.max(
     1,
-    Math.ceil(
-      filteredNotifications.length / rowsPerPage
-    )
+    Math.ceil(filteredNotifications.length / rowsPerPage),
   );
 
   const currentPage = Math.min(page, totalPages);
 
-  const startIndex =
-    (currentPage - 1) * rowsPerPage;
+  const startIndex = (currentPage - 1) * rowsPerPage;
 
-  const paginatedNotifications =
-    filteredNotifications.slice(
-      startIndex,
-      startIndex + rowsPerPage
-    );
+  const paginatedNotifications = filteredNotifications.slice(
+    startIndex,
+    startIndex + rowsPerPage,
+  );
 
   /* =========================================================
      STATS
@@ -779,72 +749,62 @@ export default function NotificationsPage() {
   const totalNotifications = notifications.length;
 
   const sentNotifications = notifications.filter(
-    (item) => item.status === "Sent"
+    (item) => item.status === "Sent",
   ).length;
 
   const scheduledNotifications = notifications.filter(
-    (item) => item.status === "Scheduled"
+    (item) => item.status === "Scheduled",
   ).length;
 
   const draftNotifications = notifications.filter(
-    (item) => item.status === "Draft"
+    (item) => item.status === "Draft",
   ).length;
 
   const failedNotifications = notifications.filter(
-    (item) => item.status === "Failed"
+    (item) => item.status === "Failed",
   ).length;
 
   const totalRecipients = notifications.reduce(
     (sum, item) => sum + item.recipients,
-    0
+    0,
   );
 
   const totalDelivered = notifications.reduce(
     (sum, item) => sum + item.deliveredCount,
-    0
+    0,
   );
 
   const totalRead = notifications.reduce(
     (sum, item) => sum + item.readCount,
-    0
+    0,
   );
 
   const totalFailed = notifications.reduce(
     (sum, item) => sum + item.failedCount,
-    0
+    0,
   );
 
   const readRate =
-    totalRecipients > 0
-      ? Math.round(
-          (totalRead / totalRecipients) * 100
-        )
-      : 0;
+    totalRecipients > 0 ? Math.round((totalRead / totalRecipients) * 100) : 0;
 
   const deliveryRate =
     totalRecipients > 0
-      ? Math.round(
-          (totalDelivered / totalRecipients) * 100
-        )
+      ? Math.round((totalDelivered / totalRecipients) * 100)
       : 0;
 
   const failureRate =
-    totalRecipients > 0
-      ? Math.round(
-          (totalFailed / totalRecipients) * 100
-        )
-      : 0;
+    totalRecipients > 0 ? Math.round((totalFailed / totalRecipients) * 100) : 0;
 
   const whatsappCount = notifications.filter((item) =>
-    item.channels.includes("WhatsApp")
+    item.channels.includes("WhatsApp"),
   ).length;
 
   const emailCount = notifications.filter((item) =>
-    item.channels.includes("Email")
+    item.channels.includes("Email"),
   ).length;
 
   const inAppCount = notifications.filter((item) =>
-    item.channels.includes("In-App")
+    item.channels.includes("In-App"),
   ).length;
 
   /* =========================================================
@@ -882,9 +842,7 @@ export default function NotificationsPage() {
      EDIT
   ========================================================= */
 
-  const openEditModal = (
-    notification: Notification
-  ) => {
+  const openEditModal = (notification: Notification) => {
     setNotificationTitle(notification.title);
     setNotificationMessage(notification.message);
     setNotificationType(notification.type);
@@ -917,38 +875,28 @@ export default function NotificationsPage() {
     setFormError("");
 
     if (!notificationTitle.trim()) {
-      setFormError(
-        "Notification title is required."
-      );
+      setFormError("Notification title is required.");
       return;
     }
 
     if (!notificationMessage.trim()) {
-      setFormError(
-        "Notification message is required."
-      );
+      setFormError("Notification message is required.");
       return;
     }
 
     if (channels.length === 0) {
-      setFormError(
-        "Please select at least one notification channel."
-      );
+      setFormError("Please select at least one notification channel.");
       return;
     }
 
     if (scheduleType === "schedule") {
       if (!scheduledDate) {
-        setFormError(
-          "Please select a scheduled date."
-        );
+        setFormError("Please select a scheduled date.");
         return;
       }
 
       if (!scheduledTime) {
-        setFormError(
-          "Please select a scheduled time."
-        );
+        setFormError("Please select a scheduled time.");
         return;
       }
     }
@@ -956,10 +904,7 @@ export default function NotificationsPage() {
     if (editingNotificationId) {
       setNotifications((current) =>
         current.map((notification) => {
-          if (
-            notification.id !==
-            editingNotificationId
-          ) {
+          if (notification.id !== editingNotificationId) {
             return notification;
           }
 
@@ -977,8 +922,8 @@ export default function NotificationsPage() {
               scheduleType === "schedule"
                 ? "Scheduled"
                 : notification.status === "Sent"
-                ? "Sent"
-                : "Draft",
+                  ? "Sent"
+                  : "Draft",
             scheduledDate:
               scheduleType === "schedule"
                 ? scheduledDate
@@ -988,51 +933,39 @@ export default function NotificationsPage() {
                 ? scheduledTime
                 : notification.scheduledTime,
           };
-        })
+        }),
       );
 
-      showToast(
-        "Notification updated successfully."
-      );
+      showToast("Notification updated successfully.");
     } else {
       const numericIds = notifications
-        .map((notification) =>
-          Number(
-            notification.id.replace("NOT-", "")
-          )
-        )
-        .filter(
-          (value) => !Number.isNaN(value)
-        );
+        .map((notification) => Number(notification.id.replace("NOT-", "")))
+        .filter((value) => !Number.isNaN(value));
 
-      const nextId =
-        numericIds.length > 0
-          ? Math.max(...numericIds) + 1
-          : 1001;
+      const nextId = numericIds.length > 0 ? Math.max(...numericIds) + 1 : 1001;
 
-      const isScheduled =
-        scheduleType === "schedule";
+      const isScheduled = scheduleType === "schedule";
 
       const recipientCount =
         audience === "All Students"
           ? 1248
           : audience === "Parents"
-          ? 1248
-          : audience === "Teachers"
-          ? 42
-          : audience === "Staff"
-          ? 28
-          : audience === "Specific Batch"
-          ? 186
-          : audience === "Specific Course"
-          ? 310
-          : audience === "Fee Defaulters"
-          ? 142
-          : audience === "Low Attendance"
-          ? 97
-          : audience === "At Risk Students"
-          ? 64
-          : 12;
+            ? 1248
+            : audience === "Teachers"
+              ? 42
+              : audience === "Staff"
+                ? 28
+                : audience === "Specific Batch"
+                  ? 186
+                  : audience === "Specific Course"
+                    ? 310
+                    : audience === "Fee Defaulters"
+                      ? 142
+                      : audience === "Low Attendance"
+                        ? 97
+                        : audience === "At Risk Students"
+                          ? 64
+                          : 12;
 
       const newNotification: Notification = {
         id: `NOT-${nextId}`,
@@ -1042,25 +975,13 @@ export default function NotificationsPage() {
         audience,
         target,
         channels,
-        status: isScheduled
-          ? "Scheduled"
-          : "Sent",
-        scheduledDate: isScheduled
-          ? scheduledDate
-          : getToday(),
-        scheduledTime: isScheduled
-          ? scheduledTime
-          : getCurrentTime(),
-        sentDate: isScheduled
-          ? ""
-          : getToday(),
-        sentTime: isScheduled
-          ? ""
-          : getCurrentTime(),
+        status: isScheduled ? "Scheduled" : "Sent",
+        scheduledDate: isScheduled ? scheduledDate : getToday(),
+        scheduledTime: isScheduled ? scheduledTime : getCurrentTime(),
+        sentDate: isScheduled ? "" : getToday(),
+        sentTime: isScheduled ? "" : getCurrentTime(),
         recipients: recipientCount,
-        deliveredCount: isScheduled
-          ? 0
-          : recipientCount,
+        deliveredCount: isScheduled ? 0 : recipientCount,
         readCount: 0,
         failedCount: 0,
         createdBy: "Admin",
@@ -1069,15 +990,12 @@ export default function NotificationsPage() {
         recurrence,
       };
 
-      setNotifications((current) => [
-        newNotification,
-        ...current,
-      ]);
+      setNotifications((current) => [newNotification, ...current]);
 
       showToast(
         isScheduled
           ? "Notification scheduled successfully."
-          : "Notification sent successfully."
+          : "Notification sent successfully.",
       );
     }
 
@@ -1095,18 +1013,15 @@ export default function NotificationsPage() {
 
     setNotifications((current) =>
       current.filter(
-        (notification) =>
-          notification.id !== deleteNotificationId
-      )
+        (notification) => notification.id !== deleteNotificationId,
+      ),
     );
 
     setDeleteNotificationId(null);
     setOpenActionMenu(null);
     setPage(1);
 
-    showToast(
-      "Notification deleted successfully."
-    );
+    showToast("Notification deleted successfully.");
   };
 
   /* =========================================================
@@ -1124,7 +1039,7 @@ export default function NotificationsPage() {
           ...notification,
           readCount: notification.recipients,
         };
-      })
+      }),
     );
 
     setOpenActionMenu(null);
@@ -1136,21 +1051,12 @@ export default function NotificationsPage() {
      DUPLICATE
   ========================================================= */
 
-  const handleDuplicate = (
-    notification: Notification
-  ) => {
+  const handleDuplicate = (notification: Notification) => {
     const numericIds = notifications
-      .map((item) =>
-        Number(item.id.replace("NOT-", ""))
-      )
-      .filter(
-        (value) => !Number.isNaN(value)
-      );
+      .map((item) => Number(item.id.replace("NOT-", "")))
+      .filter((value) => !Number.isNaN(value));
 
-    const nextId =
-      numericIds.length > 0
-        ? Math.max(...numericIds) + 1
-        : 1001;
+    const nextId = numericIds.length > 0 ? Math.max(...numericIds) + 1 : 1001;
 
     const duplicate: Notification = {
       ...notification,
@@ -1165,10 +1071,7 @@ export default function NotificationsPage() {
       createdAt: getToday(),
     };
 
-    setNotifications((current) => [
-      duplicate,
-      ...current,
-    ]);
+    setNotifications((current) => [duplicate, ...current]);
 
     setOpenActionMenu(null);
     setPage(1);
@@ -1180,9 +1083,7 @@ export default function NotificationsPage() {
      RESEND
   ========================================================= */
 
-  const handleResend = (
-    notification: Notification
-  ) => {
+  const handleResend = (notification: Notification) => {
     setNotifications((current) =>
       current.map((item) =>
         item.id === notification.id
@@ -1195,24 +1096,20 @@ export default function NotificationsPage() {
               readCount: 0,
               failedCount: 0,
             }
-          : item
-      )
+          : item,
+      ),
     );
 
     setOpenActionMenu(null);
 
-    showToast(
-      "Notification queued for resend."
-    );
+    showToast("Notification queued for resend.");
   };
 
   /* =========================================================
      CANCEL SCHEDULE
   ========================================================= */
 
-  const handleCancelSchedule = (
-    notification: Notification
-  ) => {
+  const handleCancelSchedule = (notification: Notification) => {
     setNotifications((current) =>
       current.map((item) =>
         item.id === notification.id
@@ -1220,29 +1117,23 @@ export default function NotificationsPage() {
               ...item,
               status: "Cancelled",
             }
-          : item
-      )
+          : item,
+      ),
     );
 
     setOpenActionMenu(null);
 
-    showToast(
-      "Scheduled notification cancelled."
-    );
+    showToast("Scheduled notification cancelled.");
   };
 
   /* =========================================================
      CHANNEL
   ========================================================= */
 
-  const toggleChannel = (
-    channel: ChannelType
-  ) => {
+  const toggleChannel = (channel: ChannelType) => {
     setChannels((current) => {
       if (current.includes(channel)) {
-        return current.filter(
-          (item) => item !== channel
-        );
+        return current.filter((item) => item !== channel);
       }
 
       return [...current, channel];
@@ -1253,9 +1144,7 @@ export default function NotificationsPage() {
      AUDIENCE
   ========================================================= */
 
-  const handleAudienceChange = (
-    value: AudienceType
-  ) => {
+  const handleAudienceChange = (value: AudienceType) => {
     setAudience(value);
 
     switch (value) {
@@ -1321,38 +1210,24 @@ export default function NotificationsPage() {
   ========================================================= */
 
   const toggleSelectAll = () => {
-    const pageIds =
-      paginatedNotifications.map(
-        (item) => item.id
-      );
+    const pageIds = paginatedNotifications.map((item) => item.id);
 
-    const allSelected = pageIds.every((id) =>
-      selectedIds.includes(id)
-    );
+    const allSelected = pageIds.every((id) => selectedIds.includes(id));
 
     if (allSelected) {
       setSelectedIds((current) =>
-        current.filter(
-          (id) => !pageIds.includes(id)
-        )
+        current.filter((id) => !pageIds.includes(id)),
       );
     } else {
-      setSelectedIds((current) => [
-        ...new Set([
-          ...current,
-          ...pageIds,
-        ]),
-      ]);
+      setSelectedIds((current) => [...new Set([...current, ...pageIds])]);
     }
   };
 
   const toggleSelected = (id: string) => {
     setSelectedIds((current) =>
       current.includes(id)
-        ? current.filter(
-            (item) => item !== id
-          )
-        : [...current, id]
+        ? current.filter((item) => item !== id)
+        : [...current, id],
     );
   };
 
@@ -1366,33 +1241,26 @@ export default function NotificationsPage() {
               ...item,
               readCount: item.recipients,
             }
-          : item
-      )
+          : item,
+      ),
     );
 
     setSelectedIds([]);
 
-    showToast(
-      "Selected notifications marked as read."
-    );
+    showToast("Selected notifications marked as read.");
   };
 
   const bulkDelete = () => {
     if (selectedIds.length === 0) return;
 
     setNotifications((current) =>
-      current.filter(
-        (item) =>
-          !selectedIds.includes(item.id)
-      )
+      current.filter((item) => !selectedIds.includes(item.id)),
     );
 
     setSelectedIds([]);
     setPage(1);
 
-    showToast(
-      "Selected notifications deleted."
-    );
+    showToast("Selected notifications deleted.");
   };
 
   /* =========================================================
@@ -1416,35 +1284,26 @@ export default function NotificationsPage() {
         "Scheduled Date",
         "Scheduled Time",
       ],
-      ...filteredNotifications.map(
-        (item) => [
-          item.id,
-          item.title,
-          item.type,
-          item.audience,
-          item.target,
-          item.channels.join(" | "),
-          item.status,
-          item.recipients,
-          item.deliveredCount,
-          item.readCount,
-          item.failedCount,
-          item.scheduledDate,
-          item.scheduledTime,
-        ]
-      ),
+      ...filteredNotifications.map((item) => [
+        item.id,
+        item.title,
+        item.type,
+        item.audience,
+        item.target,
+        item.channels.join(" | "),
+        item.status,
+        item.recipients,
+        item.deliveredCount,
+        item.readCount,
+        item.failedCount,
+        item.scheduledDate,
+        item.scheduledTime,
+      ]),
     ];
 
     const csv = rows
       .map((row) =>
-        row
-          .map((value) =>
-            `"${String(value).replace(
-              /"/g,
-              '""'
-            )}"`
-          )
-          .join(",")
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","),
       )
       .join("\n");
 
@@ -1452,15 +1311,12 @@ export default function NotificationsPage() {
       type: "text/csv;charset=utf-8;",
     });
 
-    const url =
-      URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
-    const link =
-      document.createElement("a");
+    const link = document.createElement("a");
 
     link.href = url;
-    link.download =
-      "notifications-report.csv";
+    link.download = "notifications-report.csv";
 
     document.body.appendChild(link);
     link.click();
@@ -1468,9 +1324,7 @@ export default function NotificationsPage() {
 
     URL.revokeObjectURL(url);
 
-    showToast(
-      "Notification report exported."
-    );
+    showToast("Notification report exported.");
   };
 
   /* =========================================================
@@ -1485,7 +1339,7 @@ export default function NotificationsPage() {
       | "whatsapp"
       | "email"
       | "audience"
-      | "timing"
+      | "timing",
   ) => {
     setAiAction(action);
 
@@ -1498,10 +1352,9 @@ export default function NotificationsPage() {
       }
 
       if (action === "improve") {
-        result =
-          notificationMessage.trim()
-            ? `${notificationMessage.trim()}\n\nPlease make sure to review the latest information in your student portal and take the necessary action before the deadline.`
-            : "Please review the latest information in your student portal and take the required action before the deadline.";
+        result = notificationMessage.trim()
+          ? `${notificationMessage.trim()}\n\nPlease make sure to review the latest information in your student portal and take the necessary action before the deadline.`
+          : "Please review the latest information in your student portal and take the required action before the deadline.";
       }
 
       if (action === "shorten") {
@@ -1537,60 +1390,38 @@ export default function NotificationsPage() {
   const applyAIResult = () => {
     if (!aiResult) return;
 
-    if (
-      aiAction === "audience" ||
-      aiAction === "timing"
-    ) {
-      showToast(
-        "AI recommendation reviewed."
-      );
+    if (aiAction === "audience" || aiAction === "timing") {
+      showToast("AI recommendation reviewed.");
       return;
     }
 
     if (aiResult.includes("Subject:")) {
-      setNotificationMessage(
-        aiResult.replace(
-          /^Subject:.*\n\n/,
-          ""
-        )
-      );
+      setNotificationMessage(aiResult.replace(/^Subject:.*\n\n/, ""));
     } else {
       setNotificationMessage(aiResult);
     }
 
     setShowAIModal(false);
 
-    showToast(
-      "AI suggestion applied to message."
-    );
+    showToast("AI suggestion applied to message.");
   };
 
   /* =========================================================
      TEMPLATE
   ========================================================= */
 
-  const useTemplate = (
-    template: Template
-  ) => {
-    setNotificationTitle(
-      template.title
-    );
+  const useTemplate = (template: Template) => {
+    setNotificationTitle(template.title);
 
-    setNotificationMessage(
-      template.message
-    );
+    setNotificationMessage(template.message);
 
-    setNotificationType(
-      template.type
-    );
+    setNotificationType(template.type);
 
     setSelectedTemplate(null);
     setShowTemplateModal(false);
     setShowCreateModal(true);
 
-    showToast(
-      `${template.name} template loaded.`
-    );
+    showToast(`${template.name} template loaded.`);
   };
 
   /* =========================================================
@@ -1599,16 +1430,12 @@ export default function NotificationsPage() {
 
   const previewCurrentMessage = () => {
     if (!notificationTitle.trim()) {
-      setFormError(
-        "Add a notification title before previewing."
-      );
+      setFormError("Add a notification title before previewing.");
       return;
     }
 
     if (!notificationMessage.trim()) {
-      setFormError(
-        "Add a notification message before previewing."
-      );
+      setFormError("Add a notification message before previewing.");
       return;
     }
 
@@ -1634,54 +1461,32 @@ export default function NotificationsPage() {
         {/* =====================================================
             HEADER
         ===================================================== */}
+        <PageHeader
+          title="Notifications"
+          description="Create, automate and analyze institute communication."
+          icon={<Bell size={20} />}
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => setShowAIModal(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:border-purple-300 hover:bg-purple-100"
+              >
+                <Sparkles size={16} />
+                AI Assistant
+              </button>
 
-        <div className="mb-7 flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
-                <Bell className="h-6 w-6" />
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                    Notifications
-                  </h1>
-
-                  <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-700">
-                    Command Center
-                  </span>
-                </div>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Create, automate and analyze institute communication.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() =>
-                setShowAIModal(true)
-              }
-              className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm font-semibold text-purple-700 transition hover:bg-purple-100"
-            >
-              <Sparkles className="h-4 w-4" />
-              AI Assistant
-            </button>
-
-            <button
-              type="button"
-              onClick={openCreateModal}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <Plus className="h-4 w-4" />
-              Create Notification
-            </button>
-          </div>
-        </div>
+              <button
+                type="button"
+                onClick={openCreateModal}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <Plus size={17} />
+                Create Notification
+              </button>
+            </>
+          }
+        />
 
         {/* =====================================================
             TABS
@@ -1690,9 +1495,7 @@ export default function NotificationsPage() {
         <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
           <button
             type="button"
-            onClick={() =>
-              setActiveTab("overview")
-            }
+            onClick={() => setActiveTab("overview")}
             className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
               activeTab === "overview"
                 ? "bg-blue-600 text-white"
@@ -1704,9 +1507,7 @@ export default function NotificationsPage() {
 
           <button
             type="button"
-            onClick={() =>
-              setActiveTab("campaigns")
-            }
+            onClick={() => setActiveTab("campaigns")}
             className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
               activeTab === "campaigns"
                 ? "bg-blue-600 text-white"
@@ -1718,9 +1519,7 @@ export default function NotificationsPage() {
 
           <button
             type="button"
-            onClick={() =>
-              setActiveTab("templates")
-            }
+            onClick={() => setActiveTab("templates")}
             className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
               activeTab === "templates"
                 ? "bg-blue-600 text-white"
@@ -1760,9 +1559,7 @@ export default function NotificationsPage() {
                   </div>
                 </div>
 
-                <p className="mt-3 text-xs text-slate-500">
-                  All campaigns
-                </p>
+                <p className="mt-3 text-xs text-slate-500">All campaigns</p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -1899,9 +1696,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowAIModal(true)
-                    }
+                    onClick={() => setShowAIModal(true)}
                     className="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700"
                   >
                     <Sparkles className="h-4 w-4" />
@@ -1929,7 +1724,8 @@ export default function NotificationsPage() {
                   </div>
 
                   <p className="mt-3 text-xs leading-5 text-slate-500">
-                    Your recent campaigns are receiving strong audience engagement.
+                    Your recent campaigns are receiving strong audience
+                    engagement.
                   </p>
                 </div>
 
@@ -1951,7 +1747,8 @@ export default function NotificationsPage() {
                   </div>
 
                   <p className="mt-3 text-xs leading-5 text-slate-500">
-                    Batch-specific messages can reduce unnecessary notifications.
+                    Batch-specific messages can reduce unnecessary
+                    notifications.
                   </p>
                 </div>
 
@@ -1984,9 +1781,7 @@ export default function NotificationsPage() {
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="font-bold text-slate-900">
-                      Channel Mix
-                    </h2>
+                    <h2 className="font-bold text-slate-900">Channel Mix</h2>
 
                     <p className="mt-1 text-xs text-slate-500">
                       Campaign usage by channel
@@ -2019,9 +1814,7 @@ export default function NotificationsPage() {
                             totalNotifications
                               ? Math.min(
                                   100,
-                                  (inAppCount /
-                                    totalNotifications) *
-                                    100
+                                  (inAppCount / totalNotifications) * 100,
                                 )
                               : 0
                           }%`,
@@ -2052,9 +1845,7 @@ export default function NotificationsPage() {
                             totalNotifications
                               ? Math.min(
                                   100,
-                                  (whatsappCount /
-                                    totalNotifications) *
-                                    100
+                                  (whatsappCount / totalNotifications) * 100,
                                 )
                               : 0
                           }%`,
@@ -2085,9 +1876,7 @@ export default function NotificationsPage() {
                             totalNotifications
                               ? Math.min(
                                   100,
-                                  (emailCount /
-                                    totalNotifications) *
-                                    100
+                                  (emailCount / totalNotifications) * 100,
                                 )
                               : 0
                           }%`,
@@ -2112,9 +1901,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowAnalyticsModal(true)
-                    }
+                    onClick={() => setShowAnalyticsModal(true)}
                     className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                   >
                     <BarChart3 className="h-4 w-4" />
@@ -2242,94 +2029,50 @@ export default function NotificationsPage() {
                 <select
                   value={statusFilter}
                   onChange={(event) => {
-                    setStatusFilter(
-                      event.target.value
-                    );
+                    setStatusFilter(event.target.value);
                     setPage(1);
                   }}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
                 >
-                  <option value="All">
-                    All Status
-                  </option>
-                  <option value="Draft">
-                    Draft
-                  </option>
-                  <option value="Scheduled">
-                    Scheduled
-                  </option>
-                  <option value="Sent">
-                    Sent
-                  </option>
-                  <option value="Failed">
-                    Failed
-                  </option>
-                  <option value="Cancelled">
-                    Cancelled
-                  </option>
+                  <option value="All">All Status</option>
+                  <option value="Draft">Draft</option>
+                  <option value="Scheduled">Scheduled</option>
+                  <option value="Sent">Sent</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
 
                 <select
                   value={typeFilter}
                   onChange={(event) => {
-                    setTypeFilter(
-                      event.target.value
-                    );
+                    setTypeFilter(event.target.value);
                     setPage(1);
                   }}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
                 >
-                  <option value="All">
-                    All Types
-                  </option>
-                  <option value="General">
-                    General
-                  </option>
-                  <option value="Announcement">
-                    Announcement
-                  </option>
-                  <option value="Fee Reminder">
-                    Fee Reminder
-                  </option>
-                  <option value="Attendance">
-                    Attendance
-                  </option>
-                  <option value="Exam">
-                    Exam
-                  </option>
-                  <option value="Class">
-                    Class
-                  </option>
-                  <option value="Important">
-                    Important
-                  </option>
-                  <option value="System">
-                    System
-                  </option>
+                  <option value="All">All Types</option>
+                  <option value="General">General</option>
+                  <option value="Announcement">Announcement</option>
+                  <option value="Fee Reminder">Fee Reminder</option>
+                  <option value="Attendance">Attendance</option>
+                  <option value="Exam">Exam</option>
+                  <option value="Class">Class</option>
+                  <option value="Important">Important</option>
+                  <option value="System">System</option>
                 </select>
 
                 <select
                   value={channelFilter}
                   onChange={(event) => {
-                    setChannelFilter(
-                      event.target.value
-                    );
+                    setChannelFilter(event.target.value);
                     setPage(1);
                   }}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
                 >
-                  <option value="All">
-                    All Channels
-                  </option>
-                  <option value="In-App">
-                    In-App
-                  </option>
-                  <option value="WhatsApp">
-                    WhatsApp
-                  </option>
-                  <option value="Email">
-                    Email
-                  </option>
+                  <option value="All">All Channels</option>
+                  <option value="In-App">In-App</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="Email">Email</option>
                 </select>
               </div>
 
@@ -2337,46 +2080,22 @@ export default function NotificationsPage() {
                 <select
                   value={audienceFilter}
                   onChange={(event) => {
-                    setAudienceFilter(
-                      event.target.value
-                    );
+                    setAudienceFilter(event.target.value);
                     setPage(1);
                   }}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
                 >
-                  <option value="All">
-                    All Audiences
-                  </option>
-                  <option value="All Students">
-                    All Students
-                  </option>
-                  <option value="Specific Students">
-                    Specific Students
-                  </option>
-                  <option value="Specific Batch">
-                    Specific Batch
-                  </option>
-                  <option value="Specific Course">
-                    Specific Course
-                  </option>
-                  <option value="Teachers">
-                    Teachers
-                  </option>
-                  <option value="Staff">
-                    Staff
-                  </option>
-                  <option value="Parents">
-                    Parents
-                  </option>
-                  <option value="Fee Defaulters">
-                    Fee Defaulters
-                  </option>
-                  <option value="Low Attendance">
-                    Low Attendance
-                  </option>
-                  <option value="At Risk Students">
-                    At Risk Students
-                  </option>
+                  <option value="All">All Audiences</option>
+                  <option value="All Students">All Students</option>
+                  <option value="Specific Students">Specific Students</option>
+                  <option value="Specific Batch">Specific Batch</option>
+                  <option value="Specific Course">Specific Course</option>
+                  <option value="Teachers">Teachers</option>
+                  <option value="Staff">Staff</option>
+                  <option value="Parents">Parents</option>
+                  <option value="Fee Defaulters">Fee Defaulters</option>
+                  <option value="Low Attendance">Low Attendance</option>
+                  <option value="At Risk Students">At Risk Students</option>
                 </select>
 
                 <div className="flex flex-wrap gap-2">
@@ -2389,44 +2108,29 @@ export default function NotificationsPage() {
                           | "title"
                           | "recipients"
                           | "status"
-                          | "read"
+                          | "read",
                       );
                       setPage(1);
                     }}
                     className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
                   >
-                    <option value="date">
-                      Sort by Date
-                    </option>
-                    <option value="title">
-                      Sort by Title
-                    </option>
-                    <option value="recipients">
-                      Sort by Recipients
-                    </option>
-                    <option value="status">
-                      Sort by Status
-                    </option>
-                    <option value="read">
-                      Sort by Read Rate
-                    </option>
+                    <option value="date">Sort by Date</option>
+                    <option value="title">Sort by Title</option>
+                    <option value="recipients">Sort by Recipients</option>
+                    <option value="status">Sort by Status</option>
+                    <option value="read">Sort by Read Rate</option>
                   </select>
 
                   <button
                     type="button"
                     onClick={() =>
-                      setSortDirection(
-                        (current) =>
-                          current === "asc"
-                            ? "desc"
-                            : "asc"
+                      setSortDirection((current) =>
+                        current === "asc" ? "desc" : "asc",
                       )
                     }
                     className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                   >
-                    {sortDirection === "asc"
-                      ? "Ascending ↑"
-                      : "Descending ↓"}
+                    {sortDirection === "asc" ? "Ascending ↑" : "Descending ↓"}
                   </button>
                 </div>
               </div>
@@ -2503,13 +2207,9 @@ export default function NotificationsPage() {
                         <input
                           type="checkbox"
                           checked={
-                            paginatedNotifications.length >
-                              0 &&
-                            paginatedNotifications.every(
-                              (item) =>
-                                selectedIds.includes(
-                                  item.id
-                                )
+                            paginatedNotifications.length > 0 &&
+                            paginatedNotifications.every((item) =>
+                              selectedIds.includes(item.id),
                             )
                           }
                           onChange={toggleSelectAll}
@@ -2548,13 +2248,9 @@ export default function NotificationsPage() {
                   </thead>
 
                   <tbody className="divide-y divide-slate-100">
-                    {paginatedNotifications.length ===
-                    0 ? (
+                    {paginatedNotifications.length === 0 ? (
                       <tr>
-                        <td
-                          colSpan={8}
-                          className="px-5 py-16 text-center"
-                        >
+                        <td colSpan={8} className="px-5 py-16 text-center">
                           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
                             <Bell className="h-6 w-6 text-slate-400" />
                           </div>
@@ -2569,418 +2265,330 @@ export default function NotificationsPage() {
                         </td>
                       </tr>
                     ) : (
-                      paginatedNotifications.map(
-                        (notification) => {
-                          const TypeIcon =
-                            getNotificationTypeIcon(
-                              notification.type
-                            );
+                      paginatedNotifications.map((notification) => {
+                        const TypeIcon = getNotificationTypeIcon(
+                          notification.type,
+                        );
 
-                          const AudienceIcon =
-                            getAudienceIcon(
-                              notification.audience
-                            );
+                        const AudienceIcon = getAudienceIcon(
+                          notification.audience,
+                        );
 
-                          const readPercentage =
-                            notification.recipients >
-                            0
-                              ? Math.round(
-                                  (notification.readCount /
-                                    notification.recipients) *
-                                    100
-                                )
-                              : 0;
+                        const readPercentage =
+                          notification.recipients > 0
+                            ? Math.round(
+                                (notification.readCount /
+                                  notification.recipients) *
+                                  100,
+                              )
+                            : 0;
 
-                          const deliveryPercentage =
-                            notification.recipients >
-                            0
-                              ? Math.round(
-                                  (notification.deliveredCount /
-                                    notification.recipients) *
-                                    100
-                                )
-                              : 0;
+                        const deliveryPercentage =
+                          notification.recipients > 0
+                            ? Math.round(
+                                (notification.deliveredCount /
+                                  notification.recipients) *
+                                  100,
+                              )
+                            : 0;
 
-                          return (
-                            <tr
-                              key={
-                                notification.id
-                              }
-                              className="group transition hover:bg-blue-50/40"
-                            >
-                              <td className="px-5 py-4">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedIds.includes(
-                                    notification.id
-                                  )}
-                                  onChange={() =>
-                                    toggleSelected(
-                                      notification.id
-                                    )
-                                  }
-                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                />
-                              </td>
+                        return (
+                          <tr
+                            key={notification.id}
+                            className="group transition hover:bg-blue-50/40"
+                          >
+                            <td className="px-5 py-4">
+                              <input
+                                type="checkbox"
+                                checked={selectedIds.includes(notification.id)}
+                                onChange={() => toggleSelected(notification.id)}
+                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                              />
+                            </td>
 
-                              <td className="px-5 py-4">
-                                <div className="flex min-w-[300px] items-start gap-3">
-                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                                    <TypeIcon className="h-5 w-5" />
-                                  </div>
+                            <td className="px-5 py-4">
+                              <div className="flex min-w-[300px] items-start gap-3">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                  <TypeIcon className="h-5 w-5" />
+                                </div>
 
-                                  <div className="min-w-0">
-                                    <div className="flex items-center gap-2">
-                                      <p className="truncate font-bold text-slate-900">
-                                        {
-                                          notification.title
-                                        }
-                                      </p>
-
-                                      {notification.aiGenerated && (
-                                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-purple-500" />
-                                      )}
-                                    </div>
-
-                                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
-                                      {
-                                        notification.message
-                                      }
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <p className="truncate font-bold text-slate-900">
+                                      {notification.title}
                                     </p>
 
-                                    <div className="mt-1 flex flex-wrap items-center gap-2">
-                                      <span className="text-[11px] font-semibold text-slate-400">
-                                        {
-                                          notification.id
-                                        }
-                                      </span>
-
-                                      <span className="text-[11px] text-slate-300">
-                                        •
-                                      </span>
-
-                                      <span className="text-[11px] font-medium text-slate-400">
-                                        {
-                                          notification.recipients
-                                        }{" "}
-                                        recipients
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-
-                              <td className="px-5 py-4">
-                                <div className="flex items-center gap-2">
-                                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
-                                    <AudienceIcon className="h-4 w-4" />
-                                  </div>
-
-                                  <div>
-                                    <p className="text-sm font-semibold text-slate-800">
-                                      {
-                                        notification.audience
-                                      }
-                                    </p>
-
-                                    <p className="max-w-[160px] truncate text-xs text-slate-500">
-                                      {
-                                        notification.target
-                                      }
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-
-                              <td className="px-5 py-4">
-                                <div className="flex items-center gap-1.5">
-                                  {notification.channels.map(
-                                    (channel) => {
-                                      const Icon =
-                                        getChannelIcon(
-                                          channel
-                                        );
-
-                                      return (
-                                        <div
-                                          key={
-                                            channel
-                                          }
-                                          title={
-                                            channel
-                                          }
-                                          className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                                            channel ===
-                                            "WhatsApp"
-                                              ? "bg-emerald-50 text-emerald-600"
-                                              : channel ===
-                                                "Email"
-                                              ? "bg-purple-50 text-purple-600"
-                                              : "bg-blue-50 text-blue-600"
-                                          }`}
-                                        >
-                                          <Icon className="h-4 w-4" />
-                                        </div>
-                                      );
-                                    }
-                                  )}
-                                </div>
-                              </td>
-
-                              <td className="px-5 py-4">
-                                {notification.scheduledDate ? (
-                                  <div>
-                                    <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-800">
-                                      <CalendarDays className="h-3.5 w-3.5 text-slate-400" />
-                                      {
-                                        notification.scheduledDate
-                                      }
-                                    </div>
-
-                                    {notification.scheduledTime && (
-                                      <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                                        <Clock3 className="h-3.5 w-3.5" />
-                                        {
-                                          notification.scheduledTime
-                                        }
-                                      </div>
+                                    {notification.aiGenerated && (
+                                      <Sparkles className="h-3.5 w-3.5 shrink-0 text-purple-500" />
                                     )}
                                   </div>
-                                ) : (
-                                  <span className="text-xs text-slate-400">
-                                    Not scheduled
-                                  </span>
-                                )}
-                              </td>
 
-                              <td className="px-5 py-4">
-                                <div className="flex flex-col items-start gap-2">
-                                  <span
-                                    className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClass(
-                                      notification.status
-                                    )}`}
-                                  >
-                                    {
-                                      notification.status
-                                    }
-                                  </span>
+                                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
+                                    {notification.message}
+                                  </p>
 
-                                  {notification.recurrence !==
-                                    "None" && (
-                                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400">
-                                      <RefreshCw className="h-3 w-3" />
-                                      {
-                                        notification.recurrence
-                                      }
+                                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                                    <span className="text-[11px] font-semibold text-slate-400">
+                                      {notification.id}
                                     </span>
+
+                                    <span className="text-[11px] text-slate-300">
+                                      •
+                                    </span>
+
+                                    <span className="text-[11px] font-medium text-slate-400">
+                                      {notification.recipients} recipients
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                  <AudienceIcon className="h-4 w-4" />
+                                </div>
+
+                                <div>
+                                  <p className="text-sm font-semibold text-slate-800">
+                                    {notification.audience}
+                                  </p>
+
+                                  <p className="max-w-[160px] truncate text-xs text-slate-500">
+                                    {notification.target}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-1.5">
+                                {notification.channels.map((channel) => {
+                                  const Icon = getChannelIcon(channel);
+
+                                  return (
+                                    <div
+                                      key={channel}
+                                      title={channel}
+                                      className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                                        channel === "WhatsApp"
+                                          ? "bg-emerald-50 text-emerald-600"
+                                          : channel === "Email"
+                                            ? "bg-purple-50 text-purple-600"
+                                            : "bg-blue-50 text-blue-600"
+                                      }`}
+                                    >
+                                      <Icon className="h-4 w-4" />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </td>
+
+                            <td className="px-5 py-4">
+                              {notification.scheduledDate ? (
+                                <div>
+                                  <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-800">
+                                    <CalendarDays className="h-3.5 w-3.5 text-slate-400" />
+                                    {notification.scheduledDate}
+                                  </div>
+
+                                  {notification.scheduledTime && (
+                                    <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                                      <Clock3 className="h-3.5 w-3.5" />
+                                      {notification.scheduledTime}
+                                    </div>
                                   )}
                                 </div>
-                              </td>
+                              ) : (
+                                <span className="text-xs text-slate-400">
+                                  Not scheduled
+                                </span>
+                              )}
+                            </td>
 
-                              <td className="px-5 py-4">
-                                {notification.status ===
-                                "Sent" ? (
-                                  <div className="w-40">
-                                    <div className="mb-2 flex items-center justify-between">
-                                      <span className="text-xs font-semibold text-slate-600">
-                                        Delivery
-                                      </span>
+                            <td className="px-5 py-4">
+                              <div className="flex flex-col items-start gap-2">
+                                <span
+                                  className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClass(
+                                    notification.status,
+                                  )}`}
+                                >
+                                  {notification.status}
+                                </span>
 
-                                      <span className="text-xs font-bold text-emerald-600">
-                                        {
-                                          deliveryPercentage
-                                        }
-                                        %
-                                      </span>
-                                    </div>
-
-                                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
-                                      <div
-                                        className="h-full rounded-full bg-emerald-500"
-                                        style={{
-                                          width: `${deliveryPercentage}%`,
-                                        }}
-                                      />
-                                    </div>
-
-                                    <div className="mt-2 flex items-center justify-between">
-                                      <span className="text-[11px] text-slate-400">
-                                        Read{" "}
-                                        {
-                                          readPercentage
-                                        }
-                                        %
-                                      </span>
-
-                                      <span className="text-[11px] font-medium text-slate-400">
-                                        {
-                                          notification.readCount
-                                        }
-                                        /
-                                        {
-                                          notification.recipients
-                                        }
-                                      </span>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <span className="text-xs text-slate-400">
-                                    —
+                                {notification.recurrence !== "None" && (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                                    <RefreshCw className="h-3 w-3" />
+                                    {notification.recurrence}
                                   </span>
                                 )}
-                              </td>
+                              </div>
+                            </td>
 
-                              <td className="px-5 py-4">
-                                <div className="relative flex justify-end">
-                                  <button
-                                    type="button"
-                                    onClick={(
-                                      event
-                                    ) => {
-                                      event.stopPropagation();
+                            <td className="px-5 py-4">
+                              {notification.status === "Sent" ? (
+                                <div className="w-40">
+                                  <div className="mb-2 flex items-center justify-between">
+                                    <span className="text-xs font-semibold text-slate-600">
+                                      Delivery
+                                    </span>
 
-                                      setOpenActionMenu(
-                                        (
-                                          current
-                                        ) =>
-                                          current ===
-                                          notification.id
-                                            ? null
-                                            : notification.id
-                                      );
-                                    }}
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                                  >
-                                    <MoreHorizontal className="h-5 w-5" />
-                                  </button>
+                                    <span className="text-xs font-bold text-emerald-600">
+                                      {deliveryPercentage}%
+                                    </span>
+                                  </div>
 
-                                  {openActionMenu ===
-                                    notification.id && (
+                                  <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
                                     <div
-                                      onClick={(
-                                        event
-                                      ) =>
-                                        event.stopPropagation()
-                                      }
-                                      className="absolute right-0 top-11 z-40 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl"
+                                      className="h-full rounded-full bg-emerald-500"
+                                      style={{
+                                        width: `${deliveryPercentage}%`,
+                                      }}
+                                    />
+                                  </div>
+
+                                  <div className="mt-2 flex items-center justify-between">
+                                    <span className="text-[11px] text-slate-400">
+                                      Read {readPercentage}%
+                                    </span>
+
+                                    <span className="text-[11px] font-medium text-slate-400">
+                                      {notification.readCount}/
+                                      {notification.recipients}
+                                    </span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-slate-400">
+                                  —
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <div className="relative flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+
+                                    setOpenActionMenu((current) =>
+                                      current === notification.id
+                                        ? null
+                                        : notification.id,
+                                    );
+                                  }}
+                                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                                >
+                                  <MoreHorizontal className="h-5 w-5" />
+                                </button>
+
+                                {openActionMenu === notification.id && (
+                                  <div
+                                    onClick={(event) => event.stopPropagation()}
+                                    className="absolute right-0 top-11 z-40 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl"
+                                  >
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setViewingNotificationId(
+                                          notification.id,
+                                        );
+                                        setOpenActionMenu(null);
+                                      }}
+                                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                                     >
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setViewingNotificationId(
-                                            notification.id
-                                          );
-                                          setOpenActionMenu(
-                                            null
-                                          );
-                                        }}
-                                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-                                      >
-                                        <Eye className="h-4 w-4" />
-                                        View Details
-                                      </button>
+                                      <Eye className="h-4 w-4" />
+                                      View Details
+                                    </button>
 
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          openEditModal(
-                                            notification
-                                          )
-                                        }
-                                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-                                      >
-                                        <Pencil className="h-4 w-4" />
-                                        Edit
-                                      </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        openEditModal(notification)
+                                      }
+                                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                      Edit
+                                    </button>
 
-                                      {notification.status ===
-                                        "Sent" &&
-                                        notification.readCount <
-                                          notification.recipients && (
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              handleMarkAsRead(
-                                                notification.id
-                                              )
-                                            }
-                                            className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-                                          >
-                                            <CheckCheck className="h-4 w-4" />
-                                            Mark Read
-                                          </button>
-                                        )}
-
-                                      {notification.status ===
-                                        "Sent" && (
+                                    {notification.status === "Sent" &&
+                                      notification.readCount <
+                                        notification.recipients && (
                                         <button
                                           type="button"
                                           onClick={() =>
-                                            handleResend(
-                                              notification
-                                            )
+                                            handleMarkAsRead(notification.id)
                                           }
                                           className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                                         >
-                                          <RotateCcw className="h-4 w-4" />
-                                          Resend
+                                          <CheckCheck className="h-4 w-4" />
+                                          Mark Read
                                         </button>
                                       )}
 
-                                      {notification.status ===
-                                        "Scheduled" && (
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            handleCancelSchedule(
-                                              notification
-                                            )
-                                          }
-                                          className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-orange-600 hover:bg-orange-50"
-                                        >
-                                          <PauseCircle className="h-4 w-4" />
-                                          Cancel Schedule
-                                        </button>
-                                      )}
-
+                                    {notification.status === "Sent" && (
                                       <button
                                         type="button"
                                         onClick={() =>
-                                          handleDuplicate(
-                                            notification
-                                          )
+                                          handleResend(notification)
                                         }
                                         className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
                                       >
-                                        <Copy className="h-4 w-4" />
-                                        Duplicate
+                                        <RotateCcw className="h-4 w-4" />
+                                        Resend
                                       </button>
+                                    )}
 
-                                      <div className="my-1 border-t border-slate-100" />
-
+                                    {notification.status === "Scheduled" && (
                                       <button
                                         type="button"
-                                        onClick={() => {
-                                          setDeleteNotificationId(
-                                            notification.id
-                                          );
-                                          setOpenActionMenu(
-                                            null
-                                          );
-                                        }}
-                                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+                                        onClick={() =>
+                                          handleCancelSchedule(notification)
+                                        }
+                                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-orange-600 hover:bg-orange-50"
                                       >
-                                        <Trash2 className="h-4 w-4" />
-                                        Delete
+                                        <PauseCircle className="h-4 w-4" />
+                                        Cancel Schedule
                                       </button>
-                                    </div>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        }
-                      )
+                                    )}
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleDuplicate(notification)
+                                      }
+                                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    >
+                                      <Copy className="h-4 w-4" />
+                                      Duplicate
+                                    </button>
+
+                                    <div className="my-1 border-t border-slate-100" />
+
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setDeleteNotificationId(
+                                          notification.id,
+                                        );
+                                        setOpenActionMenu(null);
+                                      }}
+                                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                      Delete
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -2992,24 +2600,18 @@ export default function NotificationsPage() {
                 <p className="text-sm text-slate-500">
                   Showing{" "}
                   <span className="font-semibold text-slate-800">
-                    {filteredNotifications.length ===
-                    0
-                      ? 0
-                      : startIndex + 1}
+                    {filteredNotifications.length === 0 ? 0 : startIndex + 1}
                   </span>{" "}
                   to{" "}
                   <span className="font-semibold text-slate-800">
                     {Math.min(
-                      startIndex +
-                        rowsPerPage,
-                      filteredNotifications.length
+                      startIndex + rowsPerPage,
+                      filteredNotifications.length,
                     )}
                   </span>{" "}
                   of{" "}
                   <span className="font-semibold text-slate-800">
-                    {
-                      filteredNotifications.length
-                    }
+                    {filteredNotifications.length}
                   </span>{" "}
                   campaigns
                 </p>
@@ -3019,70 +2621,38 @@ export default function NotificationsPage() {
                     type="button"
                     disabled={currentPage === 1}
                     onClick={() =>
-                      setPage((current) =>
-                        Math.max(
-                          1,
-                          current - 1
-                        )
-                      )
+                      setPage((current) => Math.max(1, current - 1))
                     }
                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
 
-                  {Array.from(
-                    { length: totalPages },
-                    (_, index) =>
-                      index + 1
-                  )
+                  {Array.from({ length: totalPages }, (_, index) => index + 1)
                     .slice(
-                      Math.max(
-                        0,
-                        currentPage - 3
-                      ),
-                      Math.min(
-                        totalPages,
-                        currentPage + 2
-                      )
+                      Math.max(0, currentPage - 3),
+                      Math.min(totalPages, currentPage + 2),
                     )
-                    .map(
-                      (pageNumber) => (
-                        <button
-                          key={pageNumber}
-                          type="button"
-                          onClick={() =>
-                            setPage(
-                              pageNumber
-                            )
-                          }
-                          className={`h-9 min-w-9 rounded-lg px-2 text-sm font-semibold ${
-                            currentPage ===
-                            pageNumber
-                              ? "bg-blue-600 text-white"
-                              : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                          }`}
-                        >
-                          {
-                            pageNumber
-                          }
-                        </button>
-                      )
-                    )}
+                    .map((pageNumber) => (
+                      <button
+                        key={pageNumber}
+                        type="button"
+                        onClick={() => setPage(pageNumber)}
+                        className={`h-9 min-w-9 rounded-lg px-2 text-sm font-semibold ${
+                          currentPage === pageNumber
+                            ? "bg-blue-600 text-white"
+                            : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    ))}
 
                   <button
                     type="button"
-                    disabled={
-                      currentPage ===
-                      totalPages
-                    }
+                    disabled={currentPage === totalPages}
                     onClick={() =>
-                      setPage((current) =>
-                        Math.min(
-                          totalPages,
-                          current + 1
-                        )
-                      )
+                      setPage((current) => Math.min(totalPages, current + 1))
                     }
                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
                   >
@@ -3107,7 +2677,8 @@ export default function NotificationsPage() {
                 </h2>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  Reusable communication templates for common institute workflows.
+                  Reusable communication templates for common institute
+                  workflows.
                 </p>
               </div>
 
@@ -3123,10 +2694,7 @@ export default function NotificationsPage() {
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
               {templates.map((template) => {
-                const Icon =
-                  getNotificationTypeIcon(
-                    template.type
-                  );
+                const Icon = getNotificationTypeIcon(template.type);
 
                 return (
                   <div
@@ -3140,7 +2708,7 @@ export default function NotificationsPage() {
 
                       <span
                         className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${getNotificationTypeClass(
-                          template.type
+                          template.type,
                         )}`}
                       >
                         {template.type}
@@ -3162,11 +2730,7 @@ export default function NotificationsPage() {
                     <div className="mt-5 flex gap-2">
                       <button
                         type="button"
-                        onClick={() =>
-                          useTemplate(
-                            template
-                          )
-                        }
+                        onClick={() => useTemplate(template)}
                         className="flex-1 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white hover:bg-blue-700"
                       >
                         Use Template
@@ -3175,12 +2739,8 @@ export default function NotificationsPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setSelectedTemplate(
-                            template
-                          );
-                          setShowTemplateModal(
-                            true
-                          );
+                          setSelectedTemplate(template);
+                          setShowTemplateModal(true);
                         }}
                         className="rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                       >
@@ -3207,9 +2767,7 @@ export default function NotificationsPage() {
             }}
           >
             <div
-              onClick={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
               className="max-h-[94vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
             >
               <div className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5">
@@ -3248,9 +2806,7 @@ export default function NotificationsPage() {
                   <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
 
-                    <p className="font-medium">
-                      {formError}
-                    </p>
+                    <p className="font-medium">{formError}</p>
                   </div>
                 )}
 
@@ -3259,9 +2815,7 @@ export default function NotificationsPage() {
                 <section>
                   <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-slate-900">
-                        Message
-                      </h3>
+                      <h3 className="font-bold text-slate-900">Message</h3>
 
                       <p className="text-sm text-slate-500">
                         Create the main communication content.
@@ -3270,11 +2824,7 @@ export default function NotificationsPage() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        setShowTemplateModal(
-                          true
-                        )
-                      }
+                      onClick={() => setShowTemplateModal(true)}
                       className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                     >
                       <FileText className="h-4 w-4" />
@@ -3292,9 +2842,7 @@ export default function NotificationsPage() {
                         type="text"
                         value={notificationTitle}
                         onChange={(event) =>
-                          setNotificationTitle(
-                            event.target.value
-                          )
+                          setNotificationTitle(event.target.value)
                         }
                         placeholder="e.g. Fee Payment Reminder"
                         className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -3308,10 +2856,7 @@ export default function NotificationsPage() {
                         </label>
 
                         <span className="text-xs text-slate-400">
-                          {
-                            notificationMessage.length
-                          }{" "}
-                          characters
+                          {notificationMessage.length} characters
                         </span>
                       </div>
 
@@ -3319,9 +2864,7 @@ export default function NotificationsPage() {
                         rows={6}
                         value={notificationMessage}
                         onChange={(event) =>
-                          setNotificationMessage(
-                            event.target.value
-                          )
+                          setNotificationMessage(event.target.value)
                         }
                         placeholder="Write your notification message..."
                         className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium leading-6 text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -3331,12 +2874,8 @@ export default function NotificationsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setShowAIModal(
-                              true
-                            );
-                            runAI(
-                              "improve"
-                            );
+                            setShowAIModal(true);
+                            runAI("improve");
                           }}
                           className="inline-flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-100"
                         >
@@ -3347,12 +2886,8 @@ export default function NotificationsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setShowAIModal(
-                              true
-                            );
-                            runAI(
-                              "shorten"
-                            );
+                            setShowAIModal(true);
+                            runAI("shorten");
                           }}
                           className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
                         >
@@ -3363,12 +2898,8 @@ export default function NotificationsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setShowAIModal(
-                              true
-                            );
-                            runAI(
-                              "whatsapp"
-                            );
+                            setShowAIModal(true);
+                            runAI("whatsapp");
                           }}
                           className="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
                         >
@@ -3379,12 +2910,8 @@ export default function NotificationsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setShowAIModal(
-                              true
-                            );
-                            runAI(
-                              "email"
-                            );
+                            setShowAIModal(true);
+                            runAI("email");
                           }}
                           className="inline-flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-100"
                         >
@@ -3401,41 +2928,22 @@ export default function NotificationsPage() {
                         </label>
 
                         <select
-                          value={
-                            notificationType
-                          }
+                          value={notificationType}
                           onChange={(event) =>
                             setNotificationType(
-                              event.target
-                                .value as NotificationType
+                              event.target.value as NotificationType,
                             )
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                         >
-                          <option value="General">
-                            General
-                          </option>
-                          <option value="Announcement">
-                            Announcement
-                          </option>
-                          <option value="Fee Reminder">
-                            Fee Reminder
-                          </option>
-                          <option value="Attendance">
-                            Attendance
-                          </option>
-                          <option value="Exam">
-                            Exam
-                          </option>
-                          <option value="Class">
-                            Class
-                          </option>
-                          <option value="Important">
-                            Important
-                          </option>
-                          <option value="System">
-                            System
-                          </option>
+                          <option value="General">General</option>
+                          <option value="Announcement">Announcement</option>
+                          <option value="Fee Reminder">Fee Reminder</option>
+                          <option value="Attendance">Attendance</option>
+                          <option value="Exam">Exam</option>
+                          <option value="Class">Class</option>
+                          <option value="Important">Important</option>
+                          <option value="System">System</option>
                         </select>
                       </div>
 
@@ -3447,25 +2955,14 @@ export default function NotificationsPage() {
                         <select
                           value={tone}
                           onChange={(event) =>
-                            setTone(
-                              event.target
-                                .value as ToneType
-                            )
+                            setTone(event.target.value as ToneType)
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                         >
-                          <option value="Professional">
-                            Professional
-                          </option>
-                          <option value="Friendly">
-                            Friendly
-                          </option>
-                          <option value="Urgent">
-                            Urgent
-                          </option>
-                          <option value="Concise">
-                            Concise
-                          </option>
+                          <option value="Professional">Professional</option>
+                          <option value="Friendly">Friendly</option>
+                          <option value="Urgent">Urgent</option>
+                          <option value="Concise">Concise</option>
                         </select>
                       </div>
                     </div>
@@ -3489,12 +2986,8 @@ export default function NotificationsPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setShowAIModal(
-                          true
-                        );
-                        runAI(
-                          "audience"
-                        );
+                        setShowAIModal(true);
+                        runAI("audience");
                       }}
                       className="inline-flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-100"
                     >
@@ -3513,39 +3006,22 @@ export default function NotificationsPage() {
                         value={audience}
                         onChange={(event) =>
                           handleAudienceChange(
-                            event.target
-                              .value as AudienceType
+                            event.target.value as AudienceType,
                           )
                         }
                         className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                       >
-                        <option value="All Students">
-                          All Students
-                        </option>
+                        <option value="All Students">All Students</option>
                         <option value="Specific Students">
                           Specific Students
                         </option>
-                        <option value="Specific Batch">
-                          Specific Batch
-                        </option>
-                        <option value="Specific Course">
-                          Specific Course
-                        </option>
-                        <option value="Teachers">
-                          Teachers
-                        </option>
-                        <option value="Staff">
-                          Staff
-                        </option>
-                        <option value="Parents">
-                          Parents
-                        </option>
-                        <option value="Fee Defaulters">
-                          Fee Defaulters
-                        </option>
-                        <option value="Low Attendance">
-                          Low Attendance
-                        </option>
+                        <option value="Specific Batch">Specific Batch</option>
+                        <option value="Specific Course">Specific Course</option>
+                        <option value="Teachers">Teachers</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Parents">Parents</option>
+                        <option value="Fee Defaulters">Fee Defaulters</option>
+                        <option value="Low Attendance">Low Attendance</option>
                         <option value="At Risk Students">
                           At Risk Students
                         </option>
@@ -3557,41 +3033,23 @@ export default function NotificationsPage() {
                         Target
                       </label>
 
-                      {audience ===
-                        "Specific Batch" ? (
+                      {audience === "Specific Batch" ? (
                         <select
                           value={target}
-                          onChange={(event) =>
-                            setTarget(
-                              event.target
-                                .value
-                            )
-                          }
+                          onChange={(event) => setTarget(event.target.value)}
                           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                         >
-                          <option value="JEE Advanced">
-                            JEE Advanced
-                          </option>
-                          <option value="JEE Main">
-                            JEE Main
-                          </option>
-                          <option value="NEET 2027">
-                            NEET 2027
-                          </option>
+                          <option value="JEE Advanced">JEE Advanced</option>
+                          <option value="JEE Main">JEE Main</option>
+                          <option value="NEET 2027">NEET 2027</option>
                           <option value="Class 10 Foundation">
                             Class 10 Foundation
                           </option>
                         </select>
-                      ) : audience ===
-                        "Specific Course" ? (
+                      ) : audience === "Specific Course" ? (
                         <select
                           value={target}
-                          onChange={(event) =>
-                            setTarget(
-                              event.target
-                                .value
-                            )
-                          }
+                          onChange={(event) => setTarget(event.target.value)}
                           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                         >
                           <option value="JEE Preparation">
@@ -3604,15 +3062,12 @@ export default function NotificationsPage() {
                             Foundation Course
                           </option>
                         </select>
-                      ) : audience ===
-                        "Specific Students" ? (
+                      ) : audience === "Specific Students" ? (
                         <button
                           type="button"
                           className="flex w-full items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
                         >
-                          <span>
-                            Select Students
-                          </span>
+                          <span>Select Students</span>
 
                           <UsersRound className="h-4 w-4 text-slate-400" />
                         </button>
@@ -3634,36 +3089,28 @@ export default function NotificationsPage() {
                         </p>
 
                         <p className="mt-1 text-xs leading-5 text-blue-700">
-                          Based on the selected audience, this campaign may reach approximately{" "}
+                          Based on the selected audience, this campaign may
+                          reach approximately{" "}
                           <span className="font-bold">
-                            {audience ===
-                            "All Students"
+                            {audience === "All Students"
                               ? "1,248"
-                              : audience ===
-                                "Parents"
-                              ? "1,248"
-                              : audience ===
-                                "Teachers"
-                              ? "42"
-                              : audience ===
-                                "Staff"
-                              ? "28"
-                              : audience ===
-                                "Specific Batch"
-                              ? "186"
-                              : audience ===
-                                "Specific Course"
-                              ? "310"
-                              : audience ===
-                                "Fee Defaulters"
-                              ? "142"
-                              : audience ===
-                                "Low Attendance"
-                              ? "97"
-                              : audience ===
-                                "At Risk Students"
-                              ? "64"
-                              : "selected students"}{" "}
+                              : audience === "Parents"
+                                ? "1,248"
+                                : audience === "Teachers"
+                                  ? "42"
+                                  : audience === "Staff"
+                                    ? "28"
+                                    : audience === "Specific Batch"
+                                      ? "186"
+                                      : audience === "Specific Course"
+                                        ? "310"
+                                        : audience === "Fee Defaulters"
+                                          ? "142"
+                                          : audience === "Low Attendance"
+                                            ? "97"
+                                            : audience === "At Risk Students"
+                                              ? "64"
+                                              : "selected students"}{" "}
                             recipients.
                           </span>
                         </p>
@@ -3700,79 +3147,56 @@ export default function NotificationsPage() {
                           "Green",
                           "WhatsApp Business delivery",
                         ],
-                        [
-                          "Email",
-                          Mail,
-                          "Purple",
-                          "Email communication",
-                        ],
+                        ["Email", Mail, "Purple", "Email communication"],
                       ] as const
-                    ).map(
-                      ([
-                        channel,
-                        Icon,
-                        color,
-                        description,
-                      ]) => {
-                        const active =
-                          channels.includes(
-                            channel
-                          );
+                    ).map(([channel, Icon, color, description]) => {
+                      const active = channels.includes(channel);
 
-                        return (
-                          <button
-                            key={channel}
-                            type="button"
-                            onClick={() =>
-                              toggleChannel(
-                                channel
-                              )
-                            }
-                            className={`rounded-xl border p-4 text-left transition ${
-                              active
-                                ? channel ===
-                                  "WhatsApp"
-                                  ? "border-emerald-300 bg-emerald-50"
-                                  : channel ===
-                                    "Email"
+                      return (
+                        <button
+                          key={channel}
+                          type="button"
+                          onClick={() => toggleChannel(channel)}
+                          className={`rounded-xl border p-4 text-left transition ${
+                            active
+                              ? channel === "WhatsApp"
+                                ? "border-emerald-300 bg-emerald-50"
+                                : channel === "Email"
                                   ? "border-purple-300 bg-purple-50"
                                   : "border-blue-300 bg-blue-50"
-                                : "border-slate-200 bg-white hover:bg-slate-50"
-                            }`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div
-                                className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                                  color ===
-                                  "Green"
-                                    ? "bg-emerald-100 text-emerald-600"
-                                    : color ===
-                                      "Purple"
+                              : "border-slate-200 bg-white hover:bg-slate-50"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div
+                              className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                                color === "Green"
+                                  ? "bg-emerald-100 text-emerald-600"
+                                  : color === "Purple"
                                     ? "bg-purple-100 text-purple-600"
                                     : "bg-blue-100 text-blue-600"
-                                }`}
-                              >
-                                <Icon className="h-5 w-5" />
-                              </div>
-
-                              {active && (
-                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white">
-                                  <Check className="h-4 w-4" />
-                                </div>
-                              )}
+                              }`}
+                            >
+                              <Icon className="h-5 w-5" />
                             </div>
 
-                            <p className="mt-3 font-semibold text-slate-900">
-                              {channel}
-                            </p>
+                            {active && (
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white">
+                                <Check className="h-4 w-4" />
+                              </div>
+                            )}
+                          </div>
 
-                            <p className="mt-1 text-xs text-slate-500">
-                              {description}
-                            </p>
-                          </button>
-                        );
-                      }
-                    )}
+                          <p className="mt-3 font-semibold text-slate-900">
+                            {channel}
+                          </p>
+
+                          <p className="mt-1 text-xs text-slate-500">
+                            {description}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </section>
 
@@ -3786,19 +3210,16 @@ export default function NotificationsPage() {
                       </h3>
 
                       <p className="text-sm text-slate-500">
-                        Send now, schedule later, or create a recurring workflow.
+                        Send now, schedule later, or create a recurring
+                        workflow.
                       </p>
                     </div>
 
                     <button
                       type="button"
                       onClick={() => {
-                        setShowAIModal(
-                          true
-                        );
-                        runAI(
-                          "timing"
-                        );
+                        setShowAIModal(true);
+                        runAI("timing");
                       }}
                       className="inline-flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-100"
                     >
@@ -3810,11 +3231,7 @@ export default function NotificationsPage() {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <button
                       type="button"
-                      onClick={() =>
-                        setScheduleType(
-                          "now"
-                        )
-                      }
+                      onClick={() => setScheduleType("now")}
                       className={`rounded-xl border p-4 text-left ${
                         scheduleType === "now"
                           ? "border-blue-300 bg-blue-50"
@@ -3840,14 +3257,9 @@ export default function NotificationsPage() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        setScheduleType(
-                          "schedule"
-                        )
-                      }
+                      onClick={() => setScheduleType("schedule")}
                       className={`rounded-xl border p-4 text-left ${
-                        scheduleType ===
-                        "schedule"
+                        scheduleType === "schedule"
                           ? "border-purple-300 bg-purple-50"
                           : "border-slate-200 hover:bg-slate-50"
                       }`}
@@ -3870,8 +3282,7 @@ export default function NotificationsPage() {
                     </button>
                   </div>
 
-                  {scheduleType ===
-                    "schedule" && (
+                  {scheduleType === "schedule" && (
                     <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <div>
                         <label className="mb-1.5 block text-sm font-semibold text-slate-700">
@@ -3880,14 +3291,9 @@ export default function NotificationsPage() {
 
                         <input
                           type="date"
-                          value={
-                            scheduledDate
-                          }
+                          value={scheduledDate}
                           onChange={(event) =>
-                            setScheduledDate(
-                              event.target
-                                .value
-                            )
+                            setScheduledDate(event.target.value)
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                         />
@@ -3900,14 +3306,9 @@ export default function NotificationsPage() {
 
                         <input
                           type="time"
-                          value={
-                            scheduledTime
-                          }
+                          value={scheduledTime}
                           onChange={(event) =>
-                            setScheduledTime(
-                              event.target
-                                .value
-                            )
+                            setScheduledTime(event.target.value)
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                         />
@@ -3919,29 +3320,16 @@ export default function NotificationsPage() {
                         </label>
 
                         <select
-                          value={
-                            recurrence
-                          }
+                          value={recurrence}
                           onChange={(event) =>
-                            setRecurrence(
-                              event.target
-                                .value as RecurrenceType
-                            )
+                            setRecurrence(event.target.value as RecurrenceType)
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                         >
-                          <option value="None">
-                            Does not repeat
-                          </option>
-                          <option value="Daily">
-                            Daily
-                          </option>
-                          <option value="Weekly">
-                            Weekly
-                          </option>
-                          <option value="Monthly">
-                            Monthly
-                          </option>
+                          <option value="None">Does not repeat</option>
+                          <option value="Daily">Daily</option>
+                          <option value="Weekly">Weekly</option>
+                          <option value="Monthly">Monthly</option>
                         </select>
                       </div>
                     </div>
@@ -3955,13 +3343,9 @@ export default function NotificationsPage() {
                     <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:bg-slate-50">
                       <input
                         type="checkbox"
-                        checked={
-                          trackEngagement
-                        }
+                        checked={trackEngagement}
                         onChange={(event) =>
-                          setTrackEngagement(
-                            event.target.checked
-                          )
+                          setTrackEngagement(event.target.checked)
                         }
                         className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600"
                       />
@@ -3980,13 +3364,9 @@ export default function NotificationsPage() {
                     <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:bg-slate-50">
                       <input
                         type="checkbox"
-                        checked={
-                          sendCopyToAdmin
-                        }
+                        checked={sendCopyToAdmin}
                         onChange={(event) =>
-                          setSendCopyToAdmin(
-                            event.target.checked
-                          )
+                          setSendCopyToAdmin(event.target.checked)
                         }
                         className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600"
                       />
@@ -4021,9 +3401,7 @@ export default function NotificationsPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      setShowCreateModal(
-                        false
-                      );
+                      setShowCreateModal(false);
                       resetForm();
                     }}
                     className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -4033,13 +3411,10 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={
-                      handleSaveNotification
-                    }
+                    onClick={handleSaveNotification}
                     className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
                   >
-                    {scheduleType ===
-                    "schedule" ? (
+                    {scheduleType === "schedule" ? (
                       <CalendarClock className="h-4 w-4" />
                     ) : (
                       <Send className="h-4 w-4" />
@@ -4047,10 +3422,9 @@ export default function NotificationsPage() {
 
                     {editingNotificationId
                       ? "Save Changes"
-                      : scheduleType ===
-                        "schedule"
-                      ? "Schedule Notification"
-                      : "Send Notification"}
+                      : scheduleType === "schedule"
+                        ? "Schedule Notification"
+                        : "Send Notification"}
                   </button>
                 </div>
               </div>
@@ -4065,59 +3439,38 @@ export default function NotificationsPage() {
         {viewingNotificationId && (
           <>
             {(() => {
-              const notification =
-                notifications.find(
-                  (item) =>
-                    item.id ===
-                    viewingNotificationId
-                );
+              const notification = notifications.find(
+                (item) => item.id === viewingNotificationId,
+              );
 
-              if (!notification)
-                return null;
+              if (!notification) return null;
 
-              const TypeIcon =
-                getNotificationTypeIcon(
-                  notification.type
-                );
+              const TypeIcon = getNotificationTypeIcon(notification.type);
 
-              const AudienceIcon =
-                getAudienceIcon(
-                  notification.audience
-                );
+              const AudienceIcon = getAudienceIcon(notification.audience);
 
               const readPercentage =
-                notification.recipients >
-                0
+                notification.recipients > 0
                   ? Math.round(
-                      (notification.readCount /
-                        notification.recipients) *
-                        100
+                      (notification.readCount / notification.recipients) * 100,
                     )
                   : 0;
 
               const deliveryPercentage =
-                notification.recipients >
-                0
+                notification.recipients > 0
                   ? Math.round(
-                      (notification.deliveredCount /
-                        notification.recipients) *
-                        100
+                      (notification.deliveredCount / notification.recipients) *
+                        100,
                     )
                   : 0;
 
               return (
                 <div
                   className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
-                  onClick={() =>
-                    setViewingNotificationId(
-                      null
-                    )
-                  }
+                  onClick={() => setViewingNotificationId(null)}
                 >
                   <div
-                    onClick={(event) =>
-                      event.stopPropagation()
-                    }
+                    onClick={(event) => event.stopPropagation()}
                     className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
                   >
                     <div className="flex items-start justify-between border-b border-slate-200 p-6">
@@ -4129,37 +3482,27 @@ export default function NotificationsPage() {
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
                             <h2 className="text-xl font-bold text-slate-900">
-                              {
-                                notification.title
-                              }
+                              {notification.title}
                             </h2>
 
                             <span
                               className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${getStatusClass(
-                                notification.status
+                                notification.status,
                               )}`}
                             >
-                              {
-                                notification.status
-                              }
+                              {notification.status}
                             </span>
                           </div>
 
                           <p className="mt-1 text-sm text-slate-500">
-                            {
-                              notification.id
-                            }
+                            {notification.id}
                           </p>
                         </div>
                       </div>
 
                       <button
                         type="button"
-                        onClick={() =>
-                          setViewingNotificationId(
-                            null
-                          )
-                        }
+                        onClick={() => setViewingNotificationId(null)}
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
                       >
                         <X className="h-5 w-5" />
@@ -4174,17 +3517,12 @@ export default function NotificationsPage() {
                           </p>
 
                           <span className="text-xs font-semibold text-slate-400">
-                            {
-                              notification.tone
-                            }{" "}
-                            tone
+                            {notification.tone} tone
                           </span>
                         </div>
 
                         <p className="whitespace-pre-wrap text-sm leading-7 text-slate-800">
-                          {
-                            notification.message
-                          }
+                          {notification.message}
                         </p>
                       </div>
 
@@ -4195,9 +3533,7 @@ export default function NotificationsPage() {
                           </p>
 
                           <p className="mt-2 text-xl font-bold text-slate-900">
-                            {
-                              notification.recipients
-                            }
+                            {notification.recipients}
                           </p>
                         </div>
 
@@ -4207,9 +3543,7 @@ export default function NotificationsPage() {
                           </p>
 
                           <p className="mt-2 text-xl font-bold text-emerald-600">
-                            {
-                              notification.deliveredCount
-                            }
+                            {notification.deliveredCount}
                           </p>
                         </div>
 
@@ -4219,9 +3553,7 @@ export default function NotificationsPage() {
                           </p>
 
                           <p className="mt-2 text-xl font-bold text-blue-600">
-                            {
-                              notification.readCount
-                            }
+                            {notification.readCount}
                           </p>
                         </div>
                       </div>
@@ -4234,14 +3566,10 @@ export default function NotificationsPage() {
                             </div>
 
                             <div>
-                              <p className="text-xs text-slate-500">
-                                Audience
-                              </p>
+                              <p className="text-xs text-slate-500">Audience</p>
 
                               <p className="font-semibold text-slate-900">
-                                {
-                                  notification.audience
-                                }
+                                {notification.audience}
                               </p>
                             </div>
                           </div>
@@ -4249,9 +3577,7 @@ export default function NotificationsPage() {
                           <p className="mt-3 text-sm text-slate-600">
                             Target:{" "}
                             <span className="font-semibold text-slate-800">
-                              {
-                                notification.target
-                              }
+                              {notification.target}
                             </span>
                           </p>
                         </div>
@@ -4263,24 +3589,17 @@ export default function NotificationsPage() {
                             </div>
 
                             <div>
-                              <p className="text-xs text-slate-500">
-                                Schedule
-                              </p>
+                              <p className="text-xs text-slate-500">Schedule</p>
 
                               <p className="font-semibold text-slate-900">
-                                {
-                                  notification.scheduledDate ||
-                                  "Not scheduled"
-                                }
+                                {notification.scheduledDate || "Not scheduled"}
                               </p>
                             </div>
                           </div>
 
                           {notification.scheduledTime && (
                             <p className="mt-3 text-sm text-slate-600">
-                              {
-                                notification.scheduledTime
-                              }
+                              {notification.scheduledTime}
                             </p>
                           )}
                         </div>
@@ -4292,31 +3611,23 @@ export default function NotificationsPage() {
                         </p>
 
                         <div className="flex flex-wrap gap-2">
-                          {notification.channels.map(
-                            (channel) => {
-                              const Icon =
-                                getChannelIcon(
-                                  channel
-                                );
+                          {notification.channels.map((channel) => {
+                            const Icon = getChannelIcon(channel);
 
-                              return (
-                                <span
-                                  key={
-                                    channel
-                                  }
-                                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
-                                >
-                                  <Icon className="h-4 w-4" />
-                                  {channel}
-                                </span>
-                              );
-                            }
-                          )}
+                            return (
+                              <span
+                                key={channel}
+                                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+                              >
+                                <Icon className="h-4 w-4" />
+                                {channel}
+                              </span>
+                            );
+                          })}
                         </div>
                       </div>
 
-                      {notification.status ===
-                        "Sent" && (
+                      {notification.status === "Sent" && (
                         <div className="space-y-5">
                           <div>
                             <div className="mb-2 flex justify-between">
@@ -4325,10 +3636,7 @@ export default function NotificationsPage() {
                               </p>
 
                               <p className="text-sm font-bold text-emerald-600">
-                                {
-                                  deliveryPercentage
-                                }
-                                %
+                                {deliveryPercentage}%
                               </p>
                             </div>
 
@@ -4375,7 +3683,9 @@ export default function NotificationsPage() {
                             </p>
 
                             <p className="mt-1 text-xs leading-5 text-purple-700">
-                              This campaign can be analyzed against audience, channel, delivery and engagement performance once connected to the backend analytics engine.
+                              This campaign can be analyzed against audience,
+                              channel, delivery and engagement performance once
+                              connected to the backend analytics engine.
                             </p>
                           </div>
                         </div>
@@ -4384,15 +3694,11 @@ export default function NotificationsPage() {
                       <div className="border-t border-slate-100 pt-4 text-xs text-slate-500">
                         Created by{" "}
                         <span className="font-semibold text-slate-700">
-                          {
-                            notification.createdBy
-                          }
+                          {notification.createdBy}
                         </span>{" "}
                         on{" "}
                         <span className="font-semibold text-slate-700">
-                          {
-                            notification.createdAt
-                          }
+                          {notification.createdAt}
                         </span>
                       </div>
                     </div>
@@ -4400,26 +3706,17 @@ export default function NotificationsPage() {
                     <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
                       <button
                         type="button"
-                        onClick={() =>
-                          openEditModal(
-                            notification
-                          )
-                        }
+                        onClick={() => openEditModal(notification)}
                         className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100"
                       >
                         <Pencil className="h-4 w-4" />
                         Edit
                       </button>
 
-                      {notification.status ===
-                        "Sent" && (
+                      {notification.status === "Sent" && (
                         <button
                           type="button"
-                          onClick={() =>
-                            handleResend(
-                              notification
-                            )
-                          }
+                          onClick={() => handleResend(notification)}
                           className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
                         >
                           <RotateCcw className="h-4 w-4" />
@@ -4429,11 +3726,7 @@ export default function NotificationsPage() {
 
                       <button
                         type="button"
-                        onClick={() =>
-                          setViewingNotificationId(
-                            null
-                          )
-                        }
+                        onClick={() => setViewingNotificationId(null)}
                         className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
                       >
                         Close
@@ -4460,9 +3753,7 @@ export default function NotificationsPage() {
             }}
           >
             <div
-              onClick={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
               className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl"
             >
               <div className="flex items-center justify-between border-b border-slate-200 bg-gradient-to-r from-purple-50 to-blue-50 p-6">
@@ -4485,9 +3776,7 @@ export default function NotificationsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setShowAIModal(
-                      false
-                    );
+                    setShowAIModal(false);
                     setAiResult("");
                     setAiAction(null);
                   }}
@@ -4501,9 +3790,7 @@ export default function NotificationsPage() {
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("generate")
-                    }
+                    onClick={() => runAI("generate")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-purple-50"
                   >
                     <Sparkles className="h-5 w-5 text-purple-600" />
@@ -4514,9 +3801,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("improve")
-                    }
+                    onClick={() => runAI("improve")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-purple-50"
                   >
                     <WandSparkles className="h-5 w-5 text-purple-600" />
@@ -4527,9 +3812,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("shorten")
-                    }
+                    onClick={() => runAI("shorten")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-blue-50"
                   >
                     <Zap className="h-5 w-5 text-blue-600" />
@@ -4540,9 +3823,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("whatsapp")
-                    }
+                    onClick={() => runAI("whatsapp")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-emerald-50"
                   >
                     <MessageCircle className="h-5 w-5 text-emerald-600" />
@@ -4553,9 +3834,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("email")
-                    }
+                    onClick={() => runAI("email")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-purple-50"
                   >
                     <Mail className="h-5 w-5 text-purple-600" />
@@ -4566,9 +3845,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("audience")
-                    }
+                    onClick={() => runAI("audience")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-orange-50"
                   >
                     <Target className="h-5 w-5 text-orange-600" />
@@ -4579,9 +3856,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("timing")
-                    }
+                    onClick={() => runAI("timing")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-blue-50"
                   >
                     <Timer className="h-5 w-5 text-blue-600" />
@@ -4592,9 +3867,7 @@ export default function NotificationsPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      runAI("generate")
-                    }
+                    onClick={() => runAI("generate")}
                     className="rounded-xl border border-slate-200 p-3 text-left hover:bg-purple-50"
                   >
                     <Bot className="h-5 w-5 text-purple-600" />
@@ -4627,9 +3900,7 @@ export default function NotificationsPage() {
                       <div className="mt-4 flex flex-wrap justify-end gap-2">
                         <button
                           type="button"
-                          onClick={() =>
-                            setAiResult("")
-                          }
+                          onClick={() => setAiResult("")}
                           className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
                         >
                           Clear
@@ -4637,9 +3908,7 @@ export default function NotificationsPage() {
 
                         <button
                           type="button"
-                          onClick={
-                            applyAIResult
-                          }
+                          onClick={applyAIResult}
                           className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700"
                         >
                           <Check className="h-4 w-4" />
@@ -4649,7 +3918,9 @@ export default function NotificationsPage() {
                     </>
                   ) : (
                     <p className="mt-3 text-sm leading-6 text-purple-700">
-                      Choose an AI action above. The current frontend simulates the assistant so we can build the complete UX before connecting the real AI API.
+                      Choose an AI action above. The current frontend simulates
+                      the assistant so we can build the complete UX before
+                      connecting the real AI API.
                     </p>
                   )}
                 </div>
@@ -4665,16 +3936,10 @@ export default function NotificationsPage() {
         {showAnalyticsModal && (
           <div
             className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
-            onClick={() =>
-              setShowAnalyticsModal(
-                false
-              )
-            }
+            onClick={() => setShowAnalyticsModal(false)}
           >
             <div
-              onClick={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
               className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
             >
               <div className="flex items-center justify-between border-b border-slate-200 p-6">
@@ -4690,11 +3955,7 @@ export default function NotificationsPage() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowAnalyticsModal(
-                      false
-                    )
-                  }
+                  onClick={() => setShowAnalyticsModal(false)}
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
                 >
                   <X className="h-5 w-5" />
@@ -4707,9 +3968,7 @@ export default function NotificationsPage() {
                     <TrendingUp className="h-5 w-5 text-emerald-600" />
 
                     <div>
-                      <p className="text-xs text-slate-500">
-                        Delivery Rate
-                      </p>
+                      <p className="text-xs text-slate-500">Delivery Rate</p>
 
                       <p className="text-2xl font-bold text-slate-900">
                         {deliveryRate}%
@@ -4723,9 +3982,7 @@ export default function NotificationsPage() {
                     <Eye className="h-5 w-5 text-blue-600" />
 
                     <div>
-                      <p className="text-xs text-slate-500">
-                        Read Rate
-                      </p>
+                      <p className="text-xs text-slate-500">Read Rate</p>
 
                       <p className="text-2xl font-bold text-slate-900">
                         {readRate}%
@@ -4739,9 +3996,7 @@ export default function NotificationsPage() {
                     <Users className="h-5 w-5 text-purple-600" />
 
                     <div>
-                      <p className="text-xs text-slate-500">
-                        Total Recipients
-                      </p>
+                      <p className="text-xs text-slate-500">Total Recipients</p>
 
                       <p className="text-2xl font-bold text-slate-900">
                         {totalRecipients.toLocaleString()}
@@ -4773,12 +4028,13 @@ export default function NotificationsPage() {
                     <Sparkles className="mt-0.5 h-5 w-5 text-purple-600" />
 
                     <div>
-                      <p className="font-bold text-purple-900">
-                        AI Analytics
-                      </p>
+                      <p className="font-bold text-purple-900">AI Analytics</p>
 
                       <p className="mt-1 text-sm leading-6 text-purple-700">
-                        Once connected to real delivery events, this section can automatically identify engagement trends, failed channels, optimal send windows, audience fatigue and high-performing campaign types.
+                        Once connected to real delivery events, this section can
+                        automatically identify engagement trends, failed
+                        channels, optimal send windows, audience fatigue and
+                        high-performing campaign types.
                       </p>
                     </div>
                   </div>
@@ -4843,16 +4099,12 @@ export default function NotificationsPage() {
           <div
             className="fixed inset-0 z-[130] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
             onClick={() => {
-              setShowTemplateModal(
-                false
-              );
+              setShowTemplateModal(false);
               setSelectedTemplate(null);
             }}
           >
             <div
-              onClick={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
               className="w-full max-w-xl rounded-2xl bg-white shadow-2xl"
             >
               <div className="flex items-center justify-between border-b border-slate-200 p-5">
@@ -4871,12 +4123,8 @@ export default function NotificationsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setShowTemplateModal(
-                      false
-                    );
-                    setSelectedTemplate(
-                      null
-                    );
+                    setShowTemplateModal(false);
+                    setSelectedTemplate(null);
                   }}
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
                 >
@@ -4892,26 +4140,18 @@ export default function NotificationsPage() {
                     </p>
 
                     <h3 className="mt-2 font-bold text-slate-900">
-                      {
-                        selectedTemplate.title
-                      }
+                      {selectedTemplate.title}
                     </h3>
 
                     <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                      {
-                        selectedTemplate.message
-                      }
+                      {selectedTemplate.message}
                     </p>
                   </div>
 
                   <div className="mt-5 flex justify-end gap-2">
                     <button
                       type="button"
-                      onClick={() =>
-                        setSelectedTemplate(
-                          null
-                        )
-                      }
+                      onClick={() => setSelectedTemplate(null)}
                       className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700"
                     >
                       Back
@@ -4919,11 +4159,7 @@ export default function NotificationsPage() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        useTemplate(
-                          selectedTemplate
-                        )
-                      }
+                      onClick={() => useTemplate(selectedTemplate)}
                       className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
                     >
                       Use Template
@@ -4932,42 +4168,30 @@ export default function NotificationsPage() {
                 </div>
               ) : (
                 <div className="max-h-[65vh] space-y-2 overflow-y-auto p-5">
-                  {templates.map(
-                    (template) => (
-                      <button
-                        key={
-                          template.id
-                        }
-                        type="button"
-                        onClick={() =>
-                          setSelectedTemplate(
-                            template
-                          )
-                        }
-                        className="flex w-full items-center gap-3 rounded-xl border border-slate-200 p-4 text-left hover:bg-slate-50"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                          <FileText className="h-4 w-4" />
-                        </div>
+                  {templates.map((template) => (
+                    <button
+                      key={template.id}
+                      type="button"
+                      onClick={() => setSelectedTemplate(template)}
+                      className="flex w-full items-center gap-3 rounded-xl border border-slate-200 p-4 text-left hover:bg-slate-50"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                        <FileText className="h-4 w-4" />
+                      </div>
 
-                        <div className="min-w-0">
-                          <p className="font-semibold text-slate-900">
-                            {
-                              template.name
-                            }
-                          </p>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900">
+                          {template.name}
+                        </p>
 
-                          <p className="mt-1 truncate text-xs text-slate-500">
-                            {
-                              template.message
-                            }
-                          </p>
-                        </div>
+                        <p className="mt-1 truncate text-xs text-slate-500">
+                          {template.message}
+                        </p>
+                      </div>
 
-                        <ChevronRight className="ml-auto h-4 w-4 text-slate-400" />
-                      </button>
-                    )
-                  )}
+                      <ChevronRight className="ml-auto h-4 w-4 text-slate-400" />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -4981,16 +4205,10 @@ export default function NotificationsPage() {
         {showPreviewModal && (
           <div
             className="fixed inset-0 z-[140] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
-            onClick={() =>
-              setShowPreviewModal(
-                false
-              )
-            }
+            onClick={() => setShowPreviewModal(false)}
           >
             <div
-              onClick={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
               className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl"
             >
               <div className="flex items-center justify-between border-b border-slate-200 p-5">
@@ -5006,11 +4224,7 @@ export default function NotificationsPage() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPreviewModal(
-                      false
-                    )
-                  }
+                  onClick={() => setShowPreviewModal(false)}
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
                 >
                   <X className="h-5 w-5" />
@@ -5031,58 +4245,43 @@ export default function NotificationsPage() {
                         </p>
 
                         <p className="font-bold text-slate-900">
-                          {
-                            notificationTitle
-                          }
+                          {notificationTitle}
                         </p>
                       </div>
                     </div>
 
                     <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                      {
-                        notificationMessage
-                      }
+                      {notificationMessage}
                     </p>
 
-                    <p className="mt-5 text-[10px] text-slate-400">
-                      Just now
-                    </p>
+                    <p className="mt-5 text-[10px] text-slate-400">Just now</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  {channels.map(
-                    (channel) => {
-                      const Icon =
-                        getChannelIcon(
-                          channel
-                        );
+                  {channels.map((channel) => {
+                    const Icon = getChannelIcon(channel);
 
-                      return (
-                        <div
-                          key={channel}
-                          className="rounded-xl border border-slate-200 p-3 text-center"
-                        >
-                          <Icon className="mx-auto h-5 w-5 text-slate-500" />
+                    return (
+                      <div
+                        key={channel}
+                        className="rounded-xl border border-slate-200 p-3 text-center"
+                      >
+                        <Icon className="mx-auto h-5 w-5 text-slate-500" />
 
-                          <p className="mt-2 text-xs font-semibold text-slate-700">
-                            {channel}
-                          </p>
-                        </div>
-                      );
-                    }
-                  )}
+                        <p className="mt-2 text-xs font-semibold text-slate-700">
+                          {channel}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="flex justify-end border-t border-slate-200 bg-slate-50 px-5 py-4">
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPreviewModal(
-                      false
-                    )
-                  }
+                  onClick={() => setShowPreviewModal(false)}
                   className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white"
                 >
                   Close Preview
@@ -5099,16 +4298,10 @@ export default function NotificationsPage() {
         {deleteNotificationId && (
           <div
             className="fixed inset-0 z-[150] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
-            onClick={() =>
-              setDeleteNotificationId(
-                null
-              )
-            }
+            onClick={() => setDeleteNotificationId(null)}
           >
             <div
-              onClick={(event) =>
-                event.stopPropagation()
-              }
+              onClick={(event) => event.stopPropagation()}
               className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-red-600">
@@ -5120,17 +4313,14 @@ export default function NotificationsPage() {
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                This campaign will be permanently removed from the current notification history. This action cannot be undone.
+                This campaign will be permanently removed from the current
+                notification history. This action cannot be undone.
               </p>
 
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() =>
-                    setDeleteNotificationId(
-                      null
-                    )
-                  }
+                  onClick={() => setDeleteNotificationId(null)}
                   className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Cancel
@@ -5138,9 +4328,7 @@ export default function NotificationsPage() {
 
                 <button
                   type="button"
-                  onClick={
-                    handleDeleteNotification
-                  }
+                  onClick={handleDeleteNotification}
                   className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
                 >
                   Delete Notification
@@ -5158,29 +4346,25 @@ export default function NotificationsPage() {
           <div className="fixed bottom-6 right-6 z-[200]">
             <div
               className={`flex min-w-[280px] items-start gap-3 rounded-2xl border bg-white p-4 shadow-2xl ${
-                toast.type ===
-                "success"
+                toast.type === "success"
                   ? "border-emerald-200"
                   : toast.type === "error"
-                  ? "border-red-200"
-                  : "border-blue-200"
+                    ? "border-red-200"
+                    : "border-blue-200"
               }`}
             >
               <div
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                  toast.type ===
-                  "success"
+                  toast.type === "success"
                     ? "bg-emerald-50 text-emerald-600"
                     : toast.type === "error"
-                    ? "bg-red-50 text-red-600"
-                    : "bg-blue-50 text-blue-600"
+                      ? "bg-red-50 text-red-600"
+                      : "bg-blue-50 text-blue-600"
                 }`}
               >
-                {toast.type ===
-                "success" ? (
+                {toast.type === "success" ? (
                   <CheckCircle2 className="h-4 w-4" />
-                ) : toast.type ===
-                  "error" ? (
+                ) : toast.type === "error" ? (
                   <AlertCircle className="h-4 w-4" />
                 ) : (
                   <Info className="h-4 w-4" />
@@ -5189,25 +4373,19 @@ export default function NotificationsPage() {
 
               <div>
                 <p className="text-sm font-semibold text-slate-900">
-                  {toast.type ===
-                  "success"
+                  {toast.type === "success"
                     ? "Success"
-                    : toast.type ===
-                      "error"
-                    ? "Error"
-                    : "Information"}
+                    : toast.type === "error"
+                      ? "Error"
+                      : "Information"}
                 </p>
 
-                <p className="mt-1 text-xs text-slate-500">
-                  {toast.message}
-                </p>
+                <p className="mt-1 text-xs text-slate-500">{toast.message}</p>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setToast(null)
-                }
+                onClick={() => setToast(null)}
                 className="ml-auto text-slate-400 hover:text-slate-700"
               >
                 <X className="h-4 w-4" />

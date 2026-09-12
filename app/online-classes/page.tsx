@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 
 import {
   Activity,
@@ -219,8 +220,7 @@ const initialClasses: OnlineClass[] = [
     recording: "Not Recorded",
     attendance: 0,
     engagement: 0,
-    description:
-      "Plant tissue systems and anatomy with visual explanations.",
+    description: "Plant tissue systems and anatomy with visual explanations.",
     topic: "Plant Tissues",
     createdAt: "2026-09-09",
   },
@@ -241,8 +241,7 @@ const initialClasses: OnlineClass[] = [
     recording: "Not Recorded",
     attendance: 0,
     engagement: 0,
-    description:
-      "Numerical problem solving and important chemistry formulas.",
+    description: "Numerical problem solving and important chemistry formulas.",
     topic: "Thermodynamics",
     createdAt: "2026-09-09",
   },
@@ -311,18 +310,9 @@ const teachers = [
   "Ms. Sneha Kapoor",
 ];
 
-const courses = [
-  "JEE Preparation",
-  "NEET Preparation",
-  "Foundation Program",
-];
+const courses = ["JEE Preparation", "NEET Preparation", "Foundation Program"];
 
-const batches = [
-  "JEE Advanced",
-  "JEE Main",
-  "NEET 2027",
-  "Foundation 2027",
-];
+const batches = ["JEE Advanced", "JEE Main", "NEET 2027", "Foundation 2027"];
 
 const rooms = [
   "Virtual Room A",
@@ -414,9 +404,7 @@ export default function OnlineClassesPage() {
     useState<ActivityItem[]>(initialActivities);
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    "All" | ClassStatus
-  >("All");
+  const [statusFilter, setStatusFilter] = useState<"All" | ClassStatus>("All");
   const [batchFilter, setBatchFilter] = useState("All");
   const [courseFilter, setCourseFilter] = useState("All");
   const [teacherFilter, setTeacherFilter] = useState("All");
@@ -432,11 +420,9 @@ export default function OnlineClassesPage() {
   const [showAiModal, setShowAiModal] = useState(false);
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
 
-  const [viewingClass, setViewingClass] =
-    useState<OnlineClass | null>(null);
+  const [viewingClass, setViewingClass] = useState<OnlineClass | null>(null);
 
-  const [editingClass, setEditingClass] =
-    useState<OnlineClass | null>(null);
+  const [editingClass, setEditingClass] = useState<OnlineClass | null>(null);
 
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
@@ -480,45 +466,34 @@ export default function OnlineClassesPage() {
 
   const totalClasses = classes.length;
 
-  const liveClasses = classes.filter(
-    (item) => item.status === "Live"
-  );
+  const liveClasses = classes.filter((item) => item.status === "Live");
 
-  const upcomingClasses = classes.filter(
-    (item) => item.status === "Upcoming"
-  );
+  const upcomingClasses = classes.filter((item) => item.status === "Upcoming");
 
   const completedClasses = classes.filter(
-    (item) => item.status === "Completed"
+    (item) => item.status === "Completed",
   );
 
-  const totalStudents = classes.reduce(
-    (sum, item) => sum + item.students,
-    0
-  );
+  const totalStudents = classes.reduce((sum, item) => sum + item.students, 0);
 
   const averageAttendance =
     completedClasses.length > 0
       ? Math.round(
-          completedClasses.reduce(
-            (sum, item) => sum + item.attendance,
-            0
-          ) / completedClasses.length
+          completedClasses.reduce((sum, item) => sum + item.attendance, 0) /
+            completedClasses.length,
         )
       : 0;
 
   const averageEngagement =
     completedClasses.length > 0
       ? Math.round(
-          completedClasses.reduce(
-            (sum, item) => sum + item.engagement,
-            0
-          ) / completedClasses.length
+          completedClasses.reduce((sum, item) => sum + item.engagement, 0) /
+            completedClasses.length,
         )
       : 0;
 
   const recordingsAvailable = classes.filter(
-    (item) => item.recording === "Available"
+    (item) => item.recording === "Available",
   ).length;
 
   const today = "2026-09-11";
@@ -527,17 +502,12 @@ export default function OnlineClassesPage() {
     return classes
       .filter((item) => item.date === today)
       .sort(
-        (a, b) =>
-          getDateValue(a.date, a.time) -
-          getDateValue(b.date, b.time)
+        (a, b) => getDateValue(a.date, a.time) - getDateValue(b.date, b.time),
       );
   }, [classes]);
 
   const batches = useMemo(() => {
-    return [
-      "All",
-      ...Array.from(new Set(classes.map((item) => item.batch))),
-    ];
+    return ["All", ...Array.from(new Set(classes.map((item) => item.batch)))];
   }, [classes]);
 
   const filteredClasses = useMemo(() => {
@@ -554,20 +524,15 @@ export default function OnlineClassesPage() {
         item.topic.toLowerCase().includes(query);
 
       const matchesStatus =
-        statusFilter === "All" ||
-        item.status === statusFilter;
+        statusFilter === "All" || item.status === statusFilter;
 
-      const matchesBatch =
-        batchFilter === "All" ||
-        item.batch === batchFilter;
+      const matchesBatch = batchFilter === "All" || item.batch === batchFilter;
 
       const matchesCourse =
-        courseFilter === "All" ||
-        item.course === courseFilter;
+        courseFilter === "All" || item.course === courseFilter;
 
       const matchesTeacher =
-        teacherFilter === "All" ||
-        item.teacher === teacherFilter;
+        teacherFilter === "All" || item.teacher === teacherFilter;
 
       return (
         matchesSearch &&
@@ -591,10 +556,7 @@ export default function OnlineClassesPage() {
         return b.engagement - a.engagement;
       }
 
-      return (
-        getDateValue(a.date, a.time) -
-        getDateValue(b.date, b.time)
-      );
+      return getDateValue(a.date, a.time) - getDateValue(b.date, b.time);
     });
   }, [
     classes,
@@ -618,15 +580,15 @@ export default function OnlineClassesPage() {
     }[] = [];
 
     const lowAttendance = completedClasses.filter(
-      (item) => item.attendance < 90
+      (item) => item.attendance < 90,
     );
 
     const highEngagement = completedClasses.filter(
-      (item) => item.engagement >= 90
+      (item) => item.engagement >= 90,
     );
 
     const highCapacity = upcomingClasses.filter(
-      (item) => getCapacityPercent(item) >= 80
+      (item) => getCapacityPercent(item) >= 80,
     );
 
     if (liveClasses.length > 0) {
@@ -843,11 +805,10 @@ export default function OnlineClassesPage() {
               room: newRoom,
               capacity: numericCapacity,
               topic: newTopic.trim() || item.topic,
-              description:
-                newDescription.trim() || item.description,
+              description: newDescription.trim() || item.description,
             }
-          : item
-      )
+          : item,
+      ),
     );
 
     closeEditModal();
@@ -866,8 +827,8 @@ export default function OnlineClassesPage() {
               ...classItem,
               status: "Live",
             }
-          : classItem
-      )
+          : classItem,
+      ),
     );
 
     setActivities((current) => [
@@ -899,8 +860,8 @@ export default function OnlineClassesPage() {
                   ? "Processing"
                   : classItem.recording,
             }
-          : classItem
-      )
+          : classItem,
+      ),
     );
 
     setActivities((current) => [
@@ -928,8 +889,8 @@ export default function OnlineClassesPage() {
               ...classItem,
               status: "Cancelled",
             }
-          : classItem
-      )
+          : classItem,
+      ),
     );
 
     setOpenMenu(null);
@@ -946,14 +907,12 @@ export default function OnlineClassesPage() {
     if (!item) return;
 
     const confirmed = window.confirm(
-      `Delete "${item.title}"?\n\nThis is demo data and cannot be recovered after deletion.`
+      `Delete "${item.title}"?\n\nThis is demo data and cannot be recovered after deletion.`,
     );
 
     if (!confirmed) return;
 
-    setClasses((current) =>
-      current.filter((classItem) => classItem.id !== id)
-    );
+    setClasses((current) => current.filter((classItem) => classItem.id !== id));
 
     setOpenMenu(null);
     setViewingClass(null);
@@ -1020,31 +979,19 @@ export default function OnlineClassesPage() {
       return "Ask me about schedule optimization, attendance, engagement, capacity, teacher workload, recordings or class performance.";
     }
 
-    if (
-      question.includes("attendance") ||
-      question.includes("absent")
-    ) {
+    if (question.includes("attendance") || question.includes("absent")) {
       return `Based on the current demo data, completed classes have an average attendance of ${averageAttendance}%. I would prioritize classes below 90% attendance for automated reminders and follow-up.`;
     }
 
-    if (
-      question.includes("engagement") ||
-      question.includes("performance")
-    ) {
+    if (question.includes("engagement") || question.includes("performance")) {
       return `Average completed-class engagement is ${averageEngagement}%. High-performing sessions can be studied for teaching patterns, duration and topic structure.`;
     }
 
-    if (
-      question.includes("schedule") ||
-      question.includes("timing")
-    ) {
+    if (question.includes("schedule") || question.includes("timing")) {
       return `There are ${upcomingClasses.length} upcoming sessions. AI recommends checking teacher availability, virtual-room conflicts and student overlap before publishing the final schedule.`;
     }
 
-    if (
-      question.includes("capacity") ||
-      question.includes("student")
-    ) {
+    if (question.includes("capacity") || question.includes("student")) {
       return `The highest-capacity upcoming sessions should be monitored. Classes approaching 80% capacity can trigger proactive capacity alerts and room scaling recommendations.`;
     }
 
@@ -1235,9 +1182,7 @@ export default function OnlineClassesPage() {
         <textarea
           rows={4}
           value={newDescription}
-          onChange={(event) =>
-            setNewDescription(event.target.value)
-          }
+          onChange={(event) => setNewDescription(event.target.value)}
           placeholder="Add notes about the class, topics or teaching plan..."
           className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
         />
@@ -1259,60 +1204,41 @@ export default function OnlineClassesPage() {
         ===================================================== */}
 
         <div className="border-b border-slate-200 bg-white">
-          <div className="px-8 py-6">
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-              <div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
-                    <Video size={23} />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <h1 className="text-2xl font-bold tracking-tight text-slate-950">
-                        Online Classes
-                      </h1>
-
-                      <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700">
-                        LIVE PLATFORM
-                      </span>
-                    </div>
-
-                    <p className="mt-1 text-sm font-medium text-slate-500">
-                      Manage live classrooms, schedules, recordings and
-                      learning analytics.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
+          <PageHeader
+            title="Online Classes"
+            description="Manage live classrooms, schedules, recordings and learning analytics."
+            icon={<Video size={20} />}
+            actions={
+              <>
                 <button
+                  type="button"
                   onClick={() => setShowAnalyticsModal(true)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                 >
-                  <BarChart3 size={17} />
+                  <BarChart3 size={16} />
                   Analytics
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setShowAiModal(true)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-100"
+                  className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:border-purple-300 hover:bg-purple-100"
                 >
-                  <Sparkles size={17} />
+                  <Sparkles size={16} />
                   Ask AI
                 </button>
 
                 <button
+                  type="button"
                   onClick={openCreateModal}
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
                 >
-                  <Plus size={18} />
+                  <Plus size={17} />
                   Schedule Class
                 </button>
-              </div>
-            </div>
-          </div>
+              </>
+            }
+          />
         </div>
 
         <div className="space-y-6 p-8">
@@ -1349,35 +1275,24 @@ export default function OnlineClassesPage() {
 
                     <div className="mt-6 flex flex-wrap gap-5 text-sm">
                       <div className="flex items-center gap-2 text-slate-300">
-                        <GraduationCap
-                          size={17}
-                          className="text-slate-500"
-                        />
+                        <GraduationCap size={17} className="text-slate-500" />
                         {liveClasses[0].teacher}
                       </div>
 
                       <div className="flex items-center gap-2 text-slate-300">
-                        <Users
-                          size={17}
-                          className="text-slate-500"
-                        />
+                        <Users size={17} className="text-slate-500" />
                         {liveClasses[0].students} students
                       </div>
 
                       <div className="flex items-center gap-2 text-slate-300">
-                        <Clock3
-                          size={17}
-                          className="text-slate-500"
-                        />
+                        <Clock3 size={17} className="text-slate-500" />
                         {liveClasses[0].duration}
                       </div>
                     </div>
 
                     <div className="mt-7 flex flex-wrap gap-3">
                       <button
-                        onClick={() =>
-                          setViewingClass(liveClasses[0])
-                        }
+                        onClick={() => setViewingClass(liveClasses[0])}
                         className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-100"
                       >
                         <Play size={17} />
@@ -1385,9 +1300,7 @@ export default function OnlineClassesPage() {
                       </button>
 
                       <button
-                        onClick={() =>
-                          setViewingClass(liveClasses[0])
-                        }
+                        onClick={() => setViewingClass(liveClasses[0])}
                         className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white ring-1 ring-white/10 transition hover:bg-white/15"
                       >
                         <Eye size={17} />
@@ -1426,8 +1339,7 @@ export default function OnlineClassesPage() {
                         </span>
 
                         <span className="text-sm font-bold text-white">
-                          {liveClasses[0].students}/
-                          {liveClasses[0].capacity}
+                          {liveClasses[0].students}/{liveClasses[0].capacity}
                         </span>
                       </div>
 
@@ -1435,9 +1347,7 @@ export default function OnlineClassesPage() {
                         <div
                           className="h-full rounded-full bg-blue-400 transition-all"
                           style={{
-                            width: `${getCapacityPercent(
-                              liveClasses[0]
-                            )}%`,
+                            width: `${getCapacityPercent(liveClasses[0])}%`,
                           }}
                         />
                       </div>
@@ -1542,9 +1452,9 @@ export default function OnlineClassesPage() {
                   </div>
 
                   <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-                    Intelligent insights for attendance, engagement,
-                    capacity and schedule operations. AI integration can
-                    be connected to your backend later.
+                    Intelligent insights for attendance, engagement, capacity
+                    and schedule operations. AI integration can be connected to
+                    your backend later.
                   </p>
                 </div>
               </div>
@@ -1633,7 +1543,10 @@ export default function OnlineClassesPage() {
               <div className="divide-y divide-slate-100">
                 {todaysClasses.length === 0 ? (
                   <div className="p-10 text-center">
-                    <CalendarDays className="mx-auto text-slate-300" size={30} />
+                    <CalendarDays
+                      className="mx-auto text-slate-300"
+                      size={30}
+                    />
                     <p className="mt-3 text-sm font-bold text-slate-700">
                       No classes today
                     </p>
@@ -1677,8 +1590,7 @@ export default function OnlineClassesPage() {
                           </div>
 
                           <p className="mt-1 text-xs font-medium text-slate-500">
-                            {item.teacher} · {item.batch} ·{" "}
-                            {item.duration}
+                            {item.teacher} · {item.batch} · {item.duration}
                           </p>
                         </div>
 
@@ -1701,10 +1613,7 @@ export default function OnlineClassesPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <Sparkles
-                      size={17}
-                      className="text-violet-600"
-                    />
+                    <Sparkles size={17} className="text-violet-600" />
 
                     <h2 className="text-lg font-bold text-slate-950">
                       Smart Insights
@@ -1788,17 +1697,15 @@ export default function OnlineClassesPage() {
 
                 <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-600">
                   The current page provides the administrative interface.
-                  Production live video, authentication, encrypted media,
-                  access control, recording protection and true end-to-end
-                  encrypted classroom media will be implemented in the
-                  dedicated video infrastructure phase.
+                  Production live video, authentication, encrypted media, access
+                  control, recording protection and true end-to-end encrypted
+                  classroom media will be implemented in the dedicated video
+                  infrastructure phase.
                 </p>
               </div>
 
               <button
-                onClick={() =>
-                  showToast("Security architecture panel opened.")
-                }
+                onClick={() => showToast("Security architecture panel opened.")}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white px-4 py-2.5 text-xs font-bold text-blue-700 shadow-sm hover:bg-blue-50"
               >
                 <Settings2 size={15} />
@@ -1860,9 +1767,7 @@ export default function OnlineClassesPage() {
 
                   <input
                     value={search}
-                    onChange={(event) =>
-                      setSearch(event.target.value)
-                    }
+                    onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search class, teacher, topic, batch..."
                     className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
                   />
@@ -1871,11 +1776,7 @@ export default function OnlineClassesPage() {
                 <select
                   value={statusFilter}
                   onChange={(event) =>
-                    setStatusFilter(
-                      event.target.value as
-                        | "All"
-                        | ClassStatus
-                    )
+                    setStatusFilter(event.target.value as "All" | ClassStatus)
                   }
                   className="rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 lg:col-span-2"
                 >
@@ -1888,9 +1789,7 @@ export default function OnlineClassesPage() {
 
                 <select
                   value={batchFilter}
-                  onChange={(event) =>
-                    setBatchFilter(event.target.value)
-                  }
+                  onChange={(event) => setBatchFilter(event.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 lg:col-span-2"
                 >
                   {batches.map((batch) => (
@@ -1902,9 +1801,7 @@ export default function OnlineClassesPage() {
 
                 <select
                   value={courseFilter}
-                  onChange={(event) =>
-                    setCourseFilter(event.target.value)
-                  }
+                  onChange={(event) => setCourseFilter(event.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 lg:col-span-2"
                 >
                   <option value="All">All courses</option>
@@ -1933,9 +1830,7 @@ export default function OnlineClassesPage() {
 
                 <select
                   value={teacherFilter}
-                  onChange={(event) =>
-                    setTeacherFilter(event.target.value)
-                  }
+                  onChange={(event) => setTeacherFilter(event.target.value)}
                   className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 outline-none"
                 >
                   <option value="All">All teachers</option>
@@ -1955,7 +1850,7 @@ export default function OnlineClassesPage() {
                         | "date"
                         | "title"
                         | "students"
-                        | "engagement"
+                        | "engagement",
                     )
                   }
                   className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 outline-none"
@@ -1963,9 +1858,7 @@ export default function OnlineClassesPage() {
                   <option value="date">Sort by schedule</option>
                   <option value="title">Sort by title</option>
                   <option value="students">Sort by students</option>
-                  <option value="engagement">
-                    Sort by engagement
-                  </option>
+                  <option value="engagement">Sort by engagement</option>
                 </select>
 
                 <span className="ml-auto rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
@@ -2001,10 +1894,7 @@ export default function OnlineClassesPage() {
                       const StatusIcon = config.icon;
 
                       return (
-                        <div
-                          key={item.id}
-                          className="relative flex gap-5"
-                        >
+                        <div key={item.id} className="relative flex gap-5">
                           <div className="relative z-10 mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-white shadow-sm">
                             <Video size={16} />
                           </div>
@@ -2322,9 +2212,7 @@ export default function OnlineClassesPage() {
                               <div className="flex items-center justify-end gap-2">
                                 {item.status === "Live" && (
                                   <button
-                                    onClick={() =>
-                                      setViewingClass(item)
-                                    }
+                                    onClick={() => setViewingClass(item)}
                                     className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-red-700"
                                   >
                                     <Play size={13} />
@@ -2334,9 +2222,7 @@ export default function OnlineClassesPage() {
 
                                 {item.status === "Upcoming" && (
                                   <button
-                                    onClick={() =>
-                                      setViewingClass(item)
-                                    }
+                                    onClick={() => setViewingClass(item)}
                                     className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100"
                                   >
                                     <Eye size={13} />
@@ -2346,9 +2232,7 @@ export default function OnlineClassesPage() {
 
                                 {item.status === "Completed" && (
                                   <button
-                                    onClick={() =>
-                                      setViewingClass(item)
-                                    }
+                                    onClick={() => setViewingClass(item)}
                                     className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                                   >
                                     <Eye size={13} />
@@ -2360,9 +2244,7 @@ export default function OnlineClassesPage() {
                                   <button
                                     onClick={() =>
                                       setOpenMenu(
-                                        openMenu === item.id
-                                          ? null
-                                          : item.id
+                                        openMenu === item.id ? null : item.id,
                                       )
                                     }
                                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
@@ -2372,12 +2254,9 @@ export default function OnlineClassesPage() {
 
                                   {openMenu === item.id && (
                                     <div className="absolute right-0 top-11 z-30 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">
-                                      {item.status ===
-                                        "Upcoming" && (
+                                      {item.status === "Upcoming" && (
                                         <button
-                                          onClick={() =>
-                                            handleStartClass(item)
-                                          }
+                                          onClick={() => handleStartClass(item)}
                                           className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-blue-50"
                                         >
                                           <Play size={15} />
@@ -2388,9 +2267,7 @@ export default function OnlineClassesPage() {
                                       {item.status === "Live" && (
                                         <button
                                           onClick={() =>
-                                            handleCompleteClass(
-                                              item
-                                            )
+                                            handleCompleteClass(item)
                                           }
                                           className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-emerald-50"
                                         >
@@ -2411,9 +2288,7 @@ export default function OnlineClassesPage() {
                                       </button>
 
                                       <button
-                                        onClick={() =>
-                                          openEditModal(item)
-                                        }
+                                        onClick={() => openEditModal(item)}
                                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-blue-50"
                                       >
                                         <Edit3 size={15} />
@@ -2421,22 +2296,17 @@ export default function OnlineClassesPage() {
                                       </button>
 
                                       <button
-                                        onClick={() =>
-                                          duplicateClass(item)
-                                        }
+                                        onClick={() => duplicateClass(item)}
                                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
                                       >
                                         <Copy size={15} />
                                         Duplicate
                                       </button>
 
-                                      {item.status ===
-                                        "Upcoming" && (
+                                      {item.status === "Upcoming" && (
                                         <button
                                           onClick={() =>
-                                            handleCancelClass(
-                                              item
-                                            )
+                                            handleCancelClass(item)
                                           }
                                           className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-amber-700 hover:bg-amber-50"
                                         >
@@ -2448,9 +2318,7 @@ export default function OnlineClassesPage() {
                                       <div className="my-1 border-t border-slate-100" />
 
                                       <button
-                                        onClick={() =>
-                                          handleDelete(item.id)
-                                        }
+                                        onClick={() => handleDelete(item.id)}
                                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
                                       >
                                         <Trash2 size={15} />
@@ -2490,9 +2358,7 @@ export default function OnlineClassesPage() {
                 </div>
 
                 <button
-                  onClick={() =>
-                    showToast("Activity refreshed.")
-                  }
+                  onClick={() => showToast("Activity refreshed.")}
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
                 >
                   <RefreshCw size={15} />
@@ -2501,10 +2367,7 @@ export default function OnlineClassesPage() {
 
               <div className="divide-y divide-slate-100">
                 {activities.slice(0, 5).map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex gap-4 px-6 py-4"
-                  >
+                  <div key={activity.id} className="flex gap-4 px-6 py-4">
                     <div
                       className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
                         activity.type === "live"
@@ -2586,9 +2449,7 @@ export default function OnlineClassesPage() {
                     description: `${recordingsAvailable} available`,
                     icon: FileText,
                     action: () =>
-                      showToast(
-                        `${recordingsAvailable} recordings available.`
-                      ),
+                      showToast(`${recordingsAvailable} recordings available.`),
                   },
                   {
                     title: "AI Insights",
@@ -2685,9 +2546,7 @@ export default function OnlineClassesPage() {
               </button>
             </div>
 
-            <div className="max-h-[70vh] overflow-y-auto">
-              {classForm}
-            </div>
+            <div className="max-h-[70vh] overflow-y-auto">{classForm}</div>
 
             {formError && (
               <div className="mx-6 mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
@@ -2747,9 +2606,7 @@ export default function OnlineClassesPage() {
               </button>
             </div>
 
-            <div className="max-h-[70vh] overflow-y-auto">
-              {classForm}
-            </div>
+            <div className="max-h-[70vh] overflow-y-auto">{classForm}</div>
 
             {formError && (
               <div className="mx-6 mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
@@ -2872,9 +2729,7 @@ export default function OnlineClassesPage() {
                 <div className="rounded-2xl border border-slate-200 p-4">
                   <div className="flex items-center gap-2 text-slate-400">
                     <Users size={16} />
-                    <span className="text-xs font-bold">
-                      Students
-                    </span>
+                    <span className="text-xs font-bold">Students</span>
                   </div>
 
                   <p className="mt-3 text-2xl font-bold text-slate-950">
@@ -2889,9 +2744,7 @@ export default function OnlineClassesPage() {
                 <div className="rounded-2xl border border-slate-200 p-4">
                   <div className="flex items-center gap-2 text-slate-400">
                     <UserCheck size={16} />
-                    <span className="text-xs font-bold">
-                      Attendance
-                    </span>
+                    <span className="text-xs font-bold">Attendance</span>
                   </div>
 
                   <p className="mt-3 text-2xl font-bold text-slate-950">
@@ -2906,9 +2759,7 @@ export default function OnlineClassesPage() {
                 <div className="rounded-2xl border border-slate-200 p-4">
                   <div className="flex items-center gap-2 text-slate-400">
                     <Activity size={16} />
-                    <span className="text-xs font-bold">
-                      Engagement
-                    </span>
+                    <span className="text-xs font-bold">Engagement</span>
                   </div>
 
                   <p className="mt-3 text-2xl font-bold text-slate-950">
@@ -2929,8 +2780,8 @@ export default function OnlineClassesPage() {
                     </p>
 
                     <p className="mt-1 text-xs font-medium text-slate-500">
-                      {viewingClass.students} of{" "}
-                      {viewingClass.capacity} students
+                      {viewingClass.students} of {viewingClass.capacity}{" "}
+                      students
                     </p>
                   </div>
 
@@ -2943,9 +2794,7 @@ export default function OnlineClassesPage() {
                   <div
                     className="h-full rounded-full bg-blue-600"
                     style={{
-                      width: `${getCapacityPercent(
-                        viewingClass
-                      )}%`,
+                      width: `${getCapacityPercent(viewingClass)}%`,
                     }}
                   />
                 </div>
@@ -3035,9 +2884,7 @@ export default function OnlineClassesPage() {
               {viewingClass.status === "Completed" &&
                 viewingClass.recording === "Available" && (
                   <button
-                    onClick={() =>
-                      showToast("Opening recording...")
-                    }
+                    onClick={() => showToast("Opening recording...")}
                     className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700"
                   >
                     <Play size={17} />
@@ -3071,9 +2918,7 @@ export default function OnlineClassesPage() {
                   </div>
 
                   <div>
-                    <h2 className="text-xl font-bold">
-                      AI Class Assistant
-                    </h2>
+                    <h2 className="text-xl font-bold">AI Class Assistant</h2>
 
                     <p className="mt-1 text-sm font-medium text-blue-100">
                       Analyze your online-class operations.
@@ -3104,9 +2949,9 @@ export default function OnlineClassesPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-violet-800">
-                      This demo uses local rules. Later we can connect
-                      this assistant to your actual AI backend for
-                      personalized recommendations.
+                      This demo uses local rules. Later we can connect this
+                      assistant to your actual AI backend for personalized
+                      recommendations.
                     </p>
                   </div>
                 </div>
@@ -3137,9 +2982,7 @@ export default function OnlineClassesPage() {
                 <div className="relative">
                   <textarea
                     value={aiQuestion}
-                    onChange={(event) =>
-                      setAiQuestion(event.target.value)
-                    }
+                    onChange={(event) => setAiQuestion(event.target.value)}
                     rows={3}
                     placeholder="e.g. Which classes need attention?"
                     className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-14 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-violet-500 focus:ring-4 focus:ring-violet-50"
@@ -3275,19 +3118,17 @@ export default function OnlineClassesPage() {
               <div className="flex items-center gap-2">
                 <Sparkles size={17} className="text-violet-600" />
 
-                <h3 className="text-sm font-bold text-slate-950">
-                  AI summary
-                </h3>
+                <h3 className="text-sm font-bold text-slate-950">AI summary</h3>
               </div>
 
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                The current schedule contains {totalClasses} classes,
-                including {liveClasses.length} live sessions and{" "}
-                {upcomingClasses.length} upcoming sessions. Average
-                completed-class attendance is {averageAttendance}% and
-                average engagement is {averageEngagement}%. A production
-                version can calculate these metrics directly from your
-                attendance, classroom and video analytics backend.
+                The current schedule contains {totalClasses} classes, including{" "}
+                {liveClasses.length} live sessions and {upcomingClasses.length}{" "}
+                upcoming sessions. Average completed-class attendance is{" "}
+                {averageAttendance}% and average engagement is{" "}
+                {averageEngagement}%. A production version can calculate these
+                metrics directly from your attendance, classroom and video
+                analytics backend.
               </p>
             </div>
 

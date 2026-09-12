@@ -1,12 +1,8 @@
 "use client";
 
-import {
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   Activity,
   AlertTriangle,
@@ -535,17 +531,14 @@ export default function SettingsPage() {
      GENERAL
      ------------------------------------------------------------------------ */
 
-  const [instituteName, setInstituteName] =
-    useState("Coaching Institute");
+  const [instituteName, setInstituteName] = useState("Coaching Institute");
   const [instituteCode, setInstituteCode] = useState("COACH-001");
-  const [instituteEmail, setInstituteEmail] =
-    useState("admin@coachinginstitute.com");
-  const [institutePhone, setInstitutePhone] =
-    useState("+91 98765 43210");
-  const [website, setWebsite] =
-    useState("https://coachinginstitute.com");
-  const [address, setAddress] =
-    useState("Indore, Madhya Pradesh, India");
+  const [instituteEmail, setInstituteEmail] = useState(
+    "admin@coachinginstitute.com",
+  );
+  const [institutePhone, setInstitutePhone] = useState("+91 98765 43210");
+  const [website, setWebsite] = useState("https://coachinginstitute.com");
+  const [address, setAddress] = useState("Indore, Madhya Pradesh, India");
   const [timezone, setTimezone] = useState("Asia/Kolkata");
   const [currency, setCurrency] = useState("INR");
   const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
@@ -558,12 +551,9 @@ export default function SettingsPage() {
      ------------------------------------------------------------------------ */
 
   const [adminName, setAdminName] = useState("Admin User");
-  const [adminEmail, setAdminEmail] =
-    useState("admin@coachinginstitute.com");
-  const [adminPhone, setAdminPhone] =
-    useState("+91 98765 43210");
-  const [jobTitle, setJobTitle] =
-    useState("Institute Administrator");
+  const [adminEmail, setAdminEmail] = useState("admin@coachinginstitute.com");
+  const [adminPhone, setAdminPhone] = useState("+91 98765 43210");
+  const [jobTitle, setJobTitle] = useState("Institute Administrator");
 
   /* ------------------------------------------------------------------------
      APPEARANCE
@@ -585,37 +575,27 @@ export default function SettingsPage() {
   const [academicYear, setAcademicYear] = useState("2026-27");
   const [weekStart, setWeekStart] = useState("Monday");
   const [gradingSystem, setGradingSystem] = useState("Marks");
-  const [defaultClassDuration, setDefaultClassDuration] =
-    useState("60");
-  const [maxStudentsPerBatch, setMaxStudentsPerBatch] =
-    useState("60");
-  const [defaultBreakDuration, setDefaultBreakDuration] =
-    useState("10");
+  const [defaultClassDuration, setDefaultClassDuration] = useState("60");
+  const [maxStudentsPerBatch, setMaxStudentsPerBatch] = useState("60");
+  const [defaultBreakDuration, setDefaultBreakDuration] = useState("10");
   const [workingDays, setWorkingDays] = useState("Monday - Saturday");
-  const [autoGenerateStudentId, setAutoGenerateStudentId] =
-    useState(true);
-  const [autoGenerateBatchId, setAutoGenerateBatchId] =
-    useState(true);
+  const [autoGenerateStudentId, setAutoGenerateStudentId] = useState(true);
+  const [autoGenerateBatchId, setAutoGenerateBatchId] = useState(true);
 
   /* ------------------------------------------------------------------------
      ATTENDANCE
      ------------------------------------------------------------------------ */
 
   const [lateAfter, setLateAfter] = useState("10");
-  const [attendanceRequired, setAttendanceRequired] =
-    useState("75");
+  const [attendanceRequired, setAttendanceRequired] = useState("75");
   const [autoAbsent, setAutoAbsent] = useState(true);
   const [faceScan, setFaceScan] = useState(true);
   const [rfid, setRfid] = useState(true);
   const [fingerprint, setFingerprint] = useState(true);
-  const [attendanceWhatsapp, setAttendanceWhatsapp] =
-    useState(true);
-  const [lowAttendanceAlert, setLowAttendanceAlert] =
-    useState(true);
-  const [attendanceDigest, setAttendanceDigest] =
-    useState(false);
-  const [allowManualOverride, setAllowManualOverride] =
-    useState(true);
+  const [attendanceWhatsapp, setAttendanceWhatsapp] = useState(true);
+  const [lowAttendanceAlert, setLowAttendanceAlert] = useState(true);
+  const [attendanceDigest, setAttendanceDigest] = useState(false);
+  const [allowManualOverride, setAllowManualOverride] = useState(true);
 
   /* ------------------------------------------------------------------------
      FEES
@@ -626,10 +606,8 @@ export default function SettingsPage() {
   const [lateFeeType, setLateFeeType] = useState("Fixed");
   const [receiptPrefix, setReceiptPrefix] = useState("RCPT");
   const [invoicePrefix, setInvoicePrefix] = useState("INV");
-  const [paymentReminderDays, setPaymentReminderDays] =
-    useState("3");
-  const [overdueReminderDays, setOverdueReminderDays] =
-    useState("1");
+  const [paymentReminderDays, setPaymentReminderDays] = useState("3");
+  const [overdueReminderDays, setOverdueReminderDays] = useState("1");
   const [onlinePayments, setOnlinePayments] = useState(true);
   const [partialPayments, setPartialPayments] = useState(true);
   const [autoReceipt, setAutoReceipt] = useState(true);
@@ -643,18 +621,13 @@ export default function SettingsPage() {
   const [defaultPassingPercentage, setDefaultPassingPercentage] =
     useState("40");
   const [negativeMarking, setNegativeMarking] = useState(false);
-  const [negativeMarksValue, setNegativeMarksValue] =
-    useState("0.25");
-  const [autoPublishResults, setAutoPublishResults] =
-    useState(false);
-  const [examNotifications, setExamNotifications] =
-    useState(true);
-  const [resultNotifications, setResultNotifications] =
-    useState(true);
+  const [negativeMarksValue, setNegativeMarksValue] = useState("0.25");
+  const [autoPublishResults, setAutoPublishResults] = useState(false);
+  const [examNotifications, setExamNotifications] = useState(true);
+  const [resultNotifications, setResultNotifications] = useState(true);
   const [showRank, setShowRank] = useState(true);
   const [showPercentile, setShowPercentile] = useState(true);
-  const [allowRevaluation, setAllowRevaluation] =
-    useState(false);
+  const [allowRevaluation, setAllowRevaluation] = useState(false);
 
   /* ------------------------------------------------------------------------
      NOTIFICATIONS
@@ -662,8 +635,7 @@ export default function SettingsPage() {
 
   const [notifyNewStudent, setNotifyNewStudent] = useState(true);
   const [notifyPayment, setNotifyPayment] = useState(true);
-  const [notifyAttendance, setNotifyAttendance] =
-    useState(true);
+  const [notifyAttendance, setNotifyAttendance] = useState(true);
   const [notifyExam, setNotifyExam] = useState(true);
   const [notifyInquiry, setNotifyInquiry] = useState(true);
   const [notifySystem, setNotifySystem] = useState(true);
@@ -672,11 +644,9 @@ export default function SettingsPage() {
   const [quietHours, setQuietHours] = useState(false);
   const [quietStart, setQuietStart] = useState("22:00");
   const [quietEnd, setQuietEnd] = useState("07:00");
-  const [criticalOverride, setCriticalOverride] =
-    useState(true);
+  const [criticalOverride, setCriticalOverride] = useState(true);
   const [dailyDigest, setDailyDigest] = useState(false);
-  const [pushNotifications, setPushNotifications] =
-    useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
 
   /* ------------------------------------------------------------------------
      WHATSAPP
@@ -686,19 +656,13 @@ export default function SettingsPage() {
   const [whatsappProvider, setWhatsappProvider] =
     useState("WhatsApp Cloud API");
   const [whatsappPhone, setWhatsappPhone] = useState("");
-  const [whatsappBusinessId, setWhatsappBusinessId] =
-    useState("");
-  const [whatsappAutoInquiry, setWhatsappAutoInquiry] =
-    useState(true);
-  const [whatsappAttendance, setWhatsappAttendance] =
-    useState(true);
-  const [whatsappFeeReminder, setWhatsappFeeReminder] =
-    useState(true);
+  const [whatsappBusinessId, setWhatsappBusinessId] = useState("");
+  const [whatsappAutoInquiry, setWhatsappAutoInquiry] = useState(true);
+  const [whatsappAttendance, setWhatsappAttendance] = useState(true);
+  const [whatsappFeeReminder, setWhatsappFeeReminder] = useState(true);
   const [whatsappExam, setWhatsappExam] = useState(true);
-  const [whatsappResults, setWhatsappResults] =
-    useState(true);
-  const [whatsappTemplates, setWhatsappTemplates] =
-    useState(true);
+  const [whatsappResults, setWhatsappResults] = useState(true);
+  const [whatsappTemplates, setWhatsappTemplates] = useState(true);
 
   /* ------------------------------------------------------------------------
      EMAIL
@@ -710,14 +674,14 @@ export default function SettingsPage() {
   const [smtpPort, setSmtpPort] = useState("587");
   const [smtpUsername, setSmtpUsername] = useState("");
   const [smtpPassword, setSmtpPassword] = useState("");
-  const [emailSenderName, setEmailSenderName] =
-    useState("Coaching Institute");
-  const [emailSenderAddress, setEmailSenderAddress] =
-    useState("noreply@coachinginstitute.com");
-  const [emailReplyTo, setEmailReplyTo] =
-    useState("admin@coachinginstitute.com");
-  const [emailNotifications, setEmailNotifications] =
-    useState(true);
+  const [emailSenderName, setEmailSenderName] = useState("Coaching Institute");
+  const [emailSenderAddress, setEmailSenderAddress] = useState(
+    "noreply@coachinginstitute.com",
+  );
+  const [emailReplyTo, setEmailReplyTo] = useState(
+    "admin@coachinginstitute.com",
+  );
+  const [emailNotifications, setEmailNotifications] = useState(true);
   const [emailReceipts, setEmailReceipts] = useState(true);
 
   /* ------------------------------------------------------------------------
@@ -727,11 +691,9 @@ export default function SettingsPage() {
   const [twoFactor, setTwoFactor] = useState(false);
   const [loginAlerts, setLoginAlerts] = useState(true);
   const [sessionTimeout, setSessionTimeout] = useState("60");
-  const [maxLoginAttempts, setMaxLoginAttempts] =
-    useState("5");
+  const [maxLoginAttempts, setMaxLoginAttempts] = useState("5");
   const [passwordExpiry, setPasswordExpiry] = useState("90");
-  const [forceStrongPasswords, setForceStrongPasswords] =
-    useState(true);
+  const [forceStrongPasswords, setForceStrongPasswords] = useState(true);
   const [singleSession, setSingleSession] = useState(false);
   const [ipRestriction, setIpRestriction] = useState(false);
   const [apiSecurity, setApiSecurity] = useState(true);
@@ -742,36 +704,28 @@ export default function SettingsPage() {
 
   const [brandName, setBrandName] = useState("Coaching OS");
   const [primaryColor, setPrimaryColor] = useState("#2563eb");
-  const [secondaryColor, setSecondaryColor] =
-    useState("#f59e0b");
+  const [secondaryColor, setSecondaryColor] = useState("#f59e0b");
   const [favicon, setFavicon] = useState("Default");
   const [logoText, setLogoText] = useState("CO");
   const [showPoweredBy, setShowPoweredBy] = useState(false);
   const [customDomain, setCustomDomain] = useState("");
-  const [loginMessage, setLoginMessage] =
-    useState("Welcome back! Sign in to continue.");
+  const [loginMessage, setLoginMessage] = useState(
+    "Welcome back! Sign in to continue.",
+  );
 
   /* ------------------------------------------------------------------------
      APPS
      ------------------------------------------------------------------------ */
 
-  const [studentAppEnabled, setStudentAppEnabled] =
-    useState(true);
-  const [teacherAppEnabled, setTeacherAppEnabled] =
-    useState(true);
-  const [parentAppEnabled, setParentAppEnabled] =
-    useState(true);
-  const [maintenanceMode, setMaintenanceMode] =
-    useState(false);
+  const [studentAppEnabled, setStudentAppEnabled] = useState(true);
+  const [teacherAppEnabled, setTeacherAppEnabled] = useState(true);
+  const [parentAppEnabled, setParentAppEnabled] = useState(true);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [publicWebsite, setPublicWebsite] = useState(true);
-  const [allowSelfRegistration, setAllowSelfRegistration] =
-    useState(true);
-  const [enableStudentPortal, setEnableStudentPortal] =
-    useState(true);
-  const [enableParentPortal, setEnableParentPortal] =
-    useState(true);
-  const [enableTeacherPortal, setEnableTeacherPortal] =
-    useState(true);
+  const [allowSelfRegistration, setAllowSelfRegistration] = useState(true);
+  const [enableStudentPortal, setEnableStudentPortal] = useState(true);
+  const [enableParentPortal, setEnableParentPortal] = useState(true);
+  const [enableTeacherPortal, setEnableTeacherPortal] = useState(true);
 
   /* ------------------------------------------------------------------------
      INTEGRATIONS
@@ -785,15 +739,11 @@ export default function SettingsPage() {
      ------------------------------------------------------------------------ */
 
   const [autoBackup, setAutoBackup] = useState(true);
-  const [backupFrequency, setBackupFrequency] =
-    useState("Daily");
-  const [backupRetention, setBackupRetention] =
-    useState("30");
+  const [backupFrequency, setBackupFrequency] = useState("Daily");
+  const [backupRetention, setBackupRetention] = useState("30");
   const [cloudBackup, setCloudBackup] = useState(false);
-  const [backupEncryption, setBackupEncryption] =
-    useState(true);
-  const [backupBeforeUpdates, setBackupBeforeUpdates] =
-    useState(true);
+  const [backupEncryption, setBackupEncryption] = useState(true);
+  const [backupBeforeUpdates, setBackupBeforeUpdates] = useState(true);
 
   /* ------------------------------------------------------------------------
      PRIVACY
@@ -801,13 +751,10 @@ export default function SettingsPage() {
 
   const [analytics, setAnalytics] = useState(true);
   const [errorTracking, setErrorTracking] = useState(true);
-  const [dataEncryption, setDataEncryption] =
-    useState(true);
-  const [maskSensitiveData, setMaskSensitiveData] =
-    useState(true);
+  const [dataEncryption, setDataEncryption] = useState(true);
+  const [maskSensitiveData, setMaskSensitiveData] = useState(true);
   const [privacyMode, setPrivacyMode] = useState(false);
-  const [activityTracking, setActivityTracking] =
-    useState(true);
+  const [activityTracking, setActivityTracking] = useState(true);
   const [dataRetention, setDataRetention] = useState("365");
 
   /* ------------------------------------------------------------------------
@@ -854,83 +801,72 @@ export default function SettingsPage() {
 
   const [selectedRoleId, setSelectedRoleId] = useState(2);
 
-  const [permissionState, setPermissionState] =
-    useState<Record<string, boolean>>({
-      "View Students": true,
-      "Create Students": true,
-      "Edit Students": true,
-      "Delete Students": false,
-      "Export Students": true,
-      "View Teachers": true,
-      "Create Teachers": false,
-      "Edit Teachers": true,
-      "Delete Teachers": false,
-      "View Fees": true,
-      "Record Payment": true,
-      "Edit Fee Records": true,
-      "Refund Payment": false,
-      "Financial Reports": true,
-      "View Attendance": true,
-      "Mark Attendance": true,
-      "Edit Attendance": true,
-      "Export Attendance": true,
-      "View Exams": true,
-      "Create Exams": true,
-      "Edit Exams": true,
-      "Delete Exams": false,
-      "Publish Results": false,
-      "View Reports": true,
-      "Export Reports": true,
-      "AI Insights": true,
-      "AI Assistant": true,
-      "System Analytics": true,
-    });
+  const [permissionState, setPermissionState] = useState<
+    Record<string, boolean>
+  >({
+    "View Students": true,
+    "Create Students": true,
+    "Edit Students": true,
+    "Delete Students": false,
+    "Export Students": true,
+    "View Teachers": true,
+    "Create Teachers": false,
+    "Edit Teachers": true,
+    "Delete Teachers": false,
+    "View Fees": true,
+    "Record Payment": true,
+    "Edit Fee Records": true,
+    "Refund Payment": false,
+    "Financial Reports": true,
+    "View Attendance": true,
+    "Mark Attendance": true,
+    "Edit Attendance": true,
+    "Export Attendance": true,
+    "View Exams": true,
+    "Create Exams": true,
+    "Edit Exams": true,
+    "Delete Exams": false,
+    "Publish Results": false,
+    "View Reports": true,
+    "Export Reports": true,
+    "AI Insights": true,
+    "AI Assistant": true,
+    "System Analytics": true,
+  });
 
   /* ------------------------------------------------------------------------
      AUDIT
      ------------------------------------------------------------------------ */
 
-  const [auditLogs, setAuditLogs] =
-    useState<AuditLog[]>(initialAuditLogs);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(initialAuditLogs);
 
   /* ------------------------------------------------------------------------
      MODALS
      ------------------------------------------------------------------------ */
 
-  const [showPasswordModal, setShowPasswordModal] =
-    useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
-  const [editingRole, setEditingRole] =
-    useState<Role | null>(null);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
-  const [showIntegrationModal, setShowIntegrationModal] =
-    useState(false);
+  const [showIntegrationModal, setShowIntegrationModal] = useState(false);
   const [selectedIntegration, setSelectedIntegration] =
     useState<Integration | null>(null);
 
-  const [showDangerModal, setShowDangerModal] =
-    useState(false);
-  const [dangerAction, setDangerAction] =
-    useState("");
+  const [showDangerModal, setShowDangerModal] = useState(false);
+  const [dangerAction, setDangerAction] = useState("");
 
-  const [showSessionModal, setShowSessionModal] =
-    useState(false);
+  const [showSessionModal, setShowSessionModal] = useState(false);
 
-  const [showTestModal, setShowTestModal] =
-    useState(false);
+  const [showTestModal, setShowTestModal] = useState(false);
   const [testType, setTestType] = useState("");
 
   const [roleName, setRoleName] = useState("");
-  const [roleDescription, setRoleDescription] =
-    useState("");
+  const [roleDescription, setRoleDescription] = useState("");
 
-  const [currentPassword, setCurrentPassword] =
-    useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
-  const [showPasswords, setShowPasswords] =
-    useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswords, setShowPasswords] = useState(false);
 
   /* ==========================================================================
      SEARCH
@@ -945,7 +881,7 @@ export default function SettingsPage() {
       (item) =>
         item.label.toLowerCase().includes(term) ||
         item.description.toLowerCase().includes(term) ||
-        item.group.toLowerCase().includes(term)
+        item.group.toLowerCase().includes(term),
     );
   }, [search]);
 
@@ -994,12 +930,11 @@ export default function SettingsPage() {
   ]);
 
   const connectedIntegrations = integrations.filter(
-    (item) => item.connected
+    (item) => item.connected,
   ).length;
 
   const currentRole =
-    roles.find((role) => role.id === selectedRoleId) ||
-    roles[0];
+    roles.find((role) => role.id === selectedRoleId) || roles[0];
 
   /* ==========================================================================
      UI HELPERS
@@ -1020,7 +955,7 @@ export default function SettingsPage() {
   const addAudit = (
     action: string,
     module: string,
-    type: AuditLog["type"] = "success"
+    type: AuditLog["type"] = "success",
   ) => {
     setAuditLogs((current) => [
       {
@@ -1040,10 +975,11 @@ export default function SettingsPage() {
     setShowSaveConfirm(false);
 
     addAudit(
-      `Saved ${settingsMenu.find(
-        (item) => item.id === activeSection
-      )?.label ?? "settings"} configuration`,
-      "Settings"
+      `Saved ${
+        settingsMenu.find((item) => item.id === activeSection)?.label ??
+        "settings"
+      } configuration`,
+      "Settings",
     );
 
     showToast("Settings saved successfully");
@@ -1061,7 +997,7 @@ export default function SettingsPage() {
   const resetSettings = () => {
     if (
       !window.confirm(
-        "Reset the current settings section to its saved configuration? Demo state will be refreshed."
+        "Reset the current settings section to its saved configuration? Demo state will be refreshed.",
       )
     ) {
       return;
@@ -1102,7 +1038,7 @@ export default function SettingsPage() {
       }}
       className={cn(
         "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition",
-        enabled ? "bg-blue-600" : "bg-slate-300"
+        enabled ? "bg-blue-600" : "bg-slate-300",
       )}
       aria-label={label || "Toggle setting"}
       aria-pressed={enabled}
@@ -1110,7 +1046,7 @@ export default function SettingsPage() {
       <span
         className={cn(
           "inline-block h-6 w-6 rounded-full bg-white shadow-md transition",
-          enabled ? "translate-x-5" : "translate-x-0.5"
+          enabled ? "translate-x-5" : "translate-x-0.5",
         )}
       />
     </button>
@@ -1137,9 +1073,7 @@ export default function SettingsPage() {
       {children}
 
       {hint && (
-        <p className="mt-1.5 text-xs leading-5 text-slate-400">
-          {hint}
-        </p>
+        <p className="mt-1.5 text-xs leading-5 text-slate-400">{hint}</p>
       )}
     </div>
   );
@@ -1158,7 +1092,7 @@ export default function SettingsPage() {
     <div
       className={cn(
         "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm",
-        className
+        className,
       )}
     >
       {children}
@@ -1188,9 +1122,7 @@ export default function SettingsPage() {
 
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-black text-slate-900">
-              {title}
-            </h2>
+            <h2 className="text-xl font-black text-slate-900">{title}</h2>
 
             {badge && (
               <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700">
@@ -1240,9 +1172,7 @@ export default function SettingsPage() {
         <div
           className={cn(
             "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-            danger
-              ? "bg-red-50 text-red-600"
-              : "bg-slate-100 text-slate-600"
+            danger ? "bg-red-50 text-red-600" : "bg-slate-100 text-slate-600",
           )}
         >
           <Icon size={17} />
@@ -1252,7 +1182,7 @@ export default function SettingsPage() {
           <p
             className={cn(
               "text-sm font-black",
-              danger ? "text-red-800" : "text-slate-800"
+              danger ? "text-red-800" : "text-slate-800",
             )}
           >
             {title}
@@ -1264,11 +1194,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <Toggle
-        enabled={enabled}
-        onChange={onChange}
-        label={title}
-      />
+      <Toggle enabled={enabled} onChange={onChange} label={title} />
     </div>
   );
 
@@ -1281,10 +1207,7 @@ export default function SettingsPage() {
       <div className="flex items-center gap-2">
         {saved ? (
           <>
-            <CheckCircle2
-              size={18}
-              className="text-emerald-500"
-            />
+            <CheckCircle2 size={18} className="text-emerald-500" />
             <div>
               <p className="text-sm font-bold text-slate-700">
                 All changes saved
@@ -1296,10 +1219,7 @@ export default function SettingsPage() {
           </>
         ) : (
           <>
-            <AlertTriangle
-              size={18}
-              className="text-amber-500"
-            />
+            <AlertTriangle size={18} className="text-amber-500" />
             <div>
               <p className="text-sm font-bold text-amber-700">
                 Unsaved changes
@@ -1531,12 +1451,9 @@ export default function SettingsPage() {
       },
     };
 
-    const blob = new Blob(
-      [JSON.stringify(backup, null, 2)],
-      {
-        type: "application/json",
-      }
-    );
+    const blob = new Blob([JSON.stringify(backup, null, 2)], {
+      type: "application/json",
+    });
 
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -1547,10 +1464,7 @@ export default function SettingsPage() {
 
     URL.revokeObjectURL(url);
 
-    addAudit(
-      "Exported system settings backup",
-      "Data & Backup"
-    );
+    addAudit("Exported system settings backup", "Data & Backup");
 
     showToast("Settings backup exported");
   };
@@ -1571,14 +1485,10 @@ export default function SettingsPage() {
         setImporting(false);
         markChanged();
 
-        addAudit(
-          "Imported settings configuration",
-          "Data & Backup",
-          "warning"
-        );
+        addAudit("Imported settings configuration", "Data & Backup", "warning");
 
         showToast(
-          "Backup validated. Full backend restore will be connected later."
+          "Backup validated. Full backend restore will be connected later.",
         );
       } catch {
         setImporting(false);
@@ -1605,9 +1515,7 @@ export default function SettingsPage() {
     }
 
     if (newPassword.length < 8) {
-      showToast(
-        "New password must contain at least 8 characters"
-      );
+      showToast("New password must contain at least 8 characters");
       return;
     }
 
@@ -1621,10 +1529,7 @@ export default function SettingsPage() {
     setConfirmPassword("");
     setShowPasswordModal(false);
 
-    addAudit(
-      "Changed administrator password",
-      "Security"
-    );
+    addAudit("Changed administrator password", "Security");
 
     showToast("Password changed successfully");
   };
@@ -1662,14 +1567,11 @@ export default function SettingsPage() {
                 name: roleName.trim(),
                 description: roleDescription.trim(),
               }
-            : role
-        )
+            : role,
+        ),
       );
 
-      addAudit(
-        `Updated role ${roleName.trim()}`,
-        "Roles"
-      );
+      addAudit(`Updated role ${roleName.trim()}`, "Roles");
 
       showToast("Role updated successfully");
     } else {
@@ -1684,10 +1586,7 @@ export default function SettingsPage() {
       setRoles((current) => [...current, newRole]);
       setSelectedRoleId(newRole.id);
 
-      addAudit(
-        `Created role ${newRole.name}`,
-        "Roles"
-      );
+      addAudit(`Created role ${newRole.name}`, "Roles");
 
       showToast("Role created successfully");
     }
@@ -1704,28 +1603,18 @@ export default function SettingsPage() {
 
     if (role.users > 0) {
       showToast(
-        "This role has assigned users. Reassign users before deleting it."
+        "This role has assigned users. Reassign users before deleting it.",
       );
       return;
     }
 
-    if (
-      !window.confirm(
-        `Delete the ${role.name} role?`
-      )
-    ) {
+    if (!window.confirm(`Delete the ${role.name} role?`)) {
       return;
     }
 
-    setRoles((current) =>
-      current.filter((item) => item.id !== role.id)
-    );
+    setRoles((current) => current.filter((item) => item.id !== role.id));
 
-    addAudit(
-      `Deleted role ${role.name}`,
-      "Roles",
-      "warning"
-    );
+    addAudit(`Deleted role ${role.name}`, "Roles", "warning");
 
     showToast("Role deleted");
     markChanged();
@@ -1748,28 +1637,22 @@ export default function SettingsPage() {
               ...integration,
               connected: !integration.connected,
             }
-          : integration
-      )
+          : integration,
+      ),
     );
 
-    const integration = integrations.find(
-      (item) => item.name === name
-    );
+    const integration = integrations.find((item) => item.name === name);
 
     const nextState = !integration?.connected;
 
     addAudit(
       `${nextState ? "Connected" : "Disconnected"} ${name}`,
-      "Integrations"
+      "Integrations",
     );
 
     markChanged();
 
-    showToast(
-      nextState
-        ? `${name} connected`
-        : `${name} disconnected`
-    );
+    showToast(nextState ? `${name} connected` : `${name} disconnected`);
   };
 
   /* ==========================================================================
@@ -1784,10 +1667,7 @@ export default function SettingsPage() {
   const runTest = () => {
     setShowTestModal(false);
 
-    addAudit(
-      `Ran ${testType} connection test`,
-      "Integrations"
-    );
+    addAudit(`Ran ${testType} connection test`, "Integrations");
 
     showToast(`${testType} test completed successfully`);
   };
@@ -1805,40 +1685,24 @@ export default function SettingsPage() {
     setShowDangerModal(false);
 
     if (dangerAction === "cache") {
-      addAudit(
-        "Cleared application cache",
-        "System",
-        "warning"
-      );
+      addAudit("Cleared application cache", "System", "warning");
 
       showToast("Application cache cleared");
       return;
     }
 
     if (dangerAction === "demo") {
-      addAudit(
-        "Requested demo-data reset",
-        "System",
-        "warning"
-      );
+      addAudit("Requested demo-data reset", "System", "warning");
 
-      showToast(
-        "Demo reset requires backend authorization"
-      );
+      showToast("Demo reset requires backend authorization");
 
       return;
     }
 
     if (dangerAction === "account") {
-      addAudit(
-        "Requested institute account deletion",
-        "System",
-        "warning"
-      );
+      addAudit("Requested institute account deletion", "System", "warning");
 
-      showToast(
-        "Account deletion requires secure backend confirmation"
-      );
+      showToast("Account deletion requires secure backend confirmation");
     }
   };
 
@@ -1875,8 +1739,7 @@ export default function SettingsPage() {
           title: "Attendance Optimization",
           summary:
             "Your attendance stack already supports multiple capture methods. Automation can make it more proactive.",
-          score:
-            faceScan && rfid && fingerprint ? 94 : 76,
+          score: faceScan && rfid && fingerprint ? 94 : 76,
           items: [
             "Keep multiple attendance methods available for fallback.",
             lowAttendanceAlert
@@ -1894,8 +1757,7 @@ export default function SettingsPage() {
           title: "Fee Collection Optimization",
           summary:
             "The configuration supports online and automated fee collection. Reminder automation is the biggest opportunity.",
-          score:
-            onlinePayments && autoReceipt ? 91 : 70,
+          score: onlinePayments && autoReceipt ? 91 : 70,
           items: [
             onlinePayments
               ? "Online payments are enabled."
@@ -1916,10 +1778,7 @@ export default function SettingsPage() {
           summary:
             "Your notification system is ready for event-driven automation.",
           score:
-            pushNotifications &&
-            (whatsappEnabled || emailEnabled)
-              ? 88
-              : 69,
+            pushNotifications && (whatsappEnabled || emailEnabled) ? 88 : 69,
           items: [
             pushNotifications
               ? "Push notifications are enabled."
@@ -1993,9 +1852,7 @@ export default function SettingsPage() {
     backupEncryption,
   ]);
 
-  const applyAIRecommendation = (
-    recommendation: Recommendation
-  ) => {
+  const applyAIRecommendation = (recommendation: Recommendation) => {
     if (recommendation.action === "security") {
       setTwoFactor(true);
       setForceStrongPasswords(true);
@@ -2024,23 +1881,19 @@ export default function SettingsPage() {
       setPushNotifications(true);
       setCriticalOverride(true);
       markChanged();
-      showToast(
-        "Communication recommendations applied"
-      );
+      showToast("Communication recommendations applied");
     }
 
     if (recommendation.action === "performance") {
       setAutoBackup(true);
       setBackupEncryption(true);
       markChanged();
-      showToast(
-        "System optimization recommendations applied"
-      );
+      showToast("System optimization recommendations applied");
     }
 
     addAudit(
       `Applied AI recommendation: ${recommendation.title}`,
-      "AI Assistant"
+      "AI Assistant",
     );
   };
 
@@ -2065,9 +1918,7 @@ export default function SettingsPage() {
                 Institute Workspace
               </p>
 
-              <h3 className="mt-2 text-2xl font-black">
-                {instituteName}
-              </h3>
+              <h3 className="mt-2 text-2xl font-black">{instituteName}</h3>
 
               <p className="mt-1 text-sm text-blue-100">
                 {instituteCode} · {timezone}
@@ -2075,9 +1926,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="rounded-2xl bg-white/15 px-4 py-3 backdrop-blur">
-              <p className="text-xs font-bold text-blue-100">
-                System Status
-              </p>
+              <p className="text-xs font-bold text-blue-100">System Status</p>
               <p className="mt-1 flex items-center gap-2 text-sm font-black">
                 <span className="h-2 w-2 rounded-full bg-emerald-300" />
                 Operational
@@ -2153,21 +2002,11 @@ export default function SettingsPage() {
               }}
               className={selectClasses}
             >
-              <option value="Asia/Kolkata">
-                Asia/Kolkata (IST)
-              </option>
-              <option value="Asia/Dubai">
-                Asia/Dubai
-              </option>
-              <option value="Asia/Singapore">
-                Asia/Singapore
-              </option>
-              <option value="Europe/London">
-                Europe/London
-              </option>
-              <option value="America/New_York">
-                America/New_York
-              </option>
+              <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+              <option value="Asia/Dubai">Asia/Dubai</option>
+              <option value="Asia/Singapore">Asia/Singapore</option>
+              <option value="Europe/London">Europe/London</option>
+              <option value="America/New_York">America/New_York</option>
             </select>
           </Field>
 
@@ -2180,16 +2019,10 @@ export default function SettingsPage() {
               }}
               className={selectClasses}
             >
-              <option value="INR">
-                INR — Indian Rupee
-              </option>
-              <option value="USD">
-                USD — US Dollar
-              </option>
+              <option value="INR">INR — Indian Rupee</option>
+              <option value="USD">USD — US Dollar</option>
               <option value="EUR">EUR — Euro</option>
-              <option value="GBP">
-                GBP — British Pound
-              </option>
+              <option value="GBP">GBP — British Pound</option>
             </select>
           </Field>
 
@@ -2291,20 +2124,14 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <h3 className="text-xl font-black text-slate-900">
-                {adminName}
-              </h3>
+              <h3 className="text-xl font-black text-slate-900">{adminName}</h3>
 
-              <p className="mt-1 text-sm text-slate-500">
-                {jobTitle}
-              </p>
+              <p className="mt-1 text-sm text-slate-500">{jobTitle}</p>
 
               <button
                 type="button"
                 onClick={() =>
-                  showToast(
-                    "Profile photo upload will be connected later"
-                  )
+                  showToast("Profile photo upload will be connected later")
                 }
                 className="mt-3 flex items-center gap-2 text-sm font-bold text-blue-600"
               >
@@ -2315,9 +2142,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
-            <p className="text-xs font-bold text-emerald-700">
-              Account Status
-            </p>
+            <p className="text-xs font-bold text-emerald-700">Account Status</p>
             <p className="mt-1 text-sm font-black text-emerald-900">
               Active Administrator
             </p>
@@ -2396,21 +2221,15 @@ export default function SettingsPage() {
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold text-slate-400">
-              Last Login
-            </p>
+            <p className="text-xs font-bold text-slate-400">Last Login</p>
             <p className="mt-2 text-sm font-black text-slate-800">
               Today, 09:12 AM
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold text-slate-400">
-              Active Sessions
-            </p>
-            <p className="mt-2 text-sm font-black text-slate-800">
-              2 devices
-            </p>
+            <p className="text-xs font-bold text-slate-400">Active Sessions</p>
+            <p className="mt-2 text-sm font-black text-slate-800">2 devices</p>
           </div>
 
           <button
@@ -2418,9 +2237,7 @@ export default function SettingsPage() {
             onClick={() => setShowSessionModal(true)}
             className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-left transition hover:bg-blue-100"
           >
-            <p className="text-xs font-bold text-blue-500">
-              Security
-            </p>
+            <p className="text-xs font-bold text-blue-500">Security</p>
             <p className="mt-2 text-sm font-black text-blue-800">
               Manage Sessions →
             </p>
@@ -2445,9 +2262,7 @@ export default function SettingsPage() {
       />
 
       <Card>
-        <h3 className="text-sm font-black text-slate-800">
-          Theme
-        </h3>
+        <h3 className="text-sm font-black text-slate-800">Theme</h3>
 
         <p className="mt-1 text-xs text-slate-500">
           Choose how the administration console should appear.
@@ -2489,7 +2304,7 @@ export default function SettingsPage() {
                   "relative rounded-2xl border p-5 text-left transition",
                   active
                     ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500/10"
-                    : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    : "border-slate-200 hover:border-slate-300 hover:bg-slate-50",
                 )}
               >
                 {active && (
@@ -2503,7 +2318,7 @@ export default function SettingsPage() {
                     "flex h-11 w-11 items-center justify-center rounded-xl",
                     active
                       ? "bg-blue-600 text-white"
-                      : "bg-slate-100 text-slate-600"
+                      : "bg-slate-100 text-slate-600",
                   )}
                 >
                   <Icon size={20} />
@@ -2522,9 +2337,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="mt-8 border-t border-slate-100 pt-7">
-          <h3 className="text-sm font-black text-slate-800">
-            Accent Color
-          </h3>
+          <h3 className="text-sm font-black text-slate-800">Accent Color</h3>
 
           <div className="mt-4 flex flex-wrap gap-3">
             {[
@@ -2545,13 +2358,11 @@ export default function SettingsPage() {
                 className={cn(
                   "flex h-11 w-11 items-center justify-center rounded-full ring-offset-2 transition",
                   color,
-                  accent === id && "ring-2 ring-slate-900"
+                  accent === id && "ring-2 ring-slate-900",
                 )}
                 aria-label={`${id} accent`}
               >
-                {accent === id && (
-                  <Check size={18} className="text-white" />
-                )}
+                {accent === id && <Check size={18} className="text-white" />}
               </button>
             ))}
           </div>
@@ -2567,9 +2378,7 @@ export default function SettingsPage() {
               }}
               className={selectClasses}
             >
-              <option value="comfortable">
-                Comfortable
-              </option>
+              <option value="comfortable">Comfortable</option>
               <option value="compact">Compact</option>
               <option value="spacious">Spacious</option>
             </select>
@@ -2863,10 +2672,7 @@ export default function SettingsPage() {
 
       <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-5">
         <div className="flex items-start gap-3">
-          <Sparkles
-            size={20}
-            className="mt-0.5 shrink-0 text-blue-600"
-          />
+          <Sparkles size={20} className="mt-0.5 shrink-0 text-blue-600" />
 
           <div>
             <h3 className="font-black text-blue-900">
@@ -2874,10 +2680,9 @@ export default function SettingsPage() {
             </h3>
 
             <p className="mt-1 text-sm leading-6 text-blue-800">
-              Your system supports multiple attendance methods.
-              A future AI layer can detect unusual attendance
-              patterns, identify at-risk students and recommend
-              parent follow-up.
+              Your system supports multiple attendance methods. A future AI
+              layer can detect unusual attendance patterns, identify at-risk
+              students and recommend parent follow-up.
             </p>
 
             <button
@@ -3035,27 +2840,17 @@ export default function SettingsPage() {
 
       <div className="mt-6 grid gap-5 md:grid-cols-3">
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
-          <p className="text-xs font-bold text-emerald-600">
-            Collection
-          </p>
-          <p className="mt-2 text-2xl font-black text-emerald-900">
-            87.4%
-          </p>
+          <p className="text-xs font-bold text-emerald-600">Collection</p>
+          <p className="mt-2 text-2xl font-black text-emerald-900">87.4%</p>
           <p className="mt-1 text-xs text-emerald-700">
             Demo collection efficiency
           </p>
         </div>
 
         <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
-          <p className="text-xs font-bold text-amber-600">
-            Pending
-          </p>
-          <p className="mt-2 text-2xl font-black text-amber-900">
-            ₹4.82L
-          </p>
-          <p className="mt-1 text-xs text-amber-700">
-            Demo outstanding amount
-          </p>
+          <p className="text-xs font-bold text-amber-600">Pending</p>
+          <p className="mt-2 text-2xl font-black text-amber-900">₹4.82L</p>
+          <p className="mt-1 text-xs text-amber-700">Demo outstanding amount</p>
         </div>
 
         <button
@@ -3063,10 +2858,7 @@ export default function SettingsPage() {
           onClick={() => openAI("fees")}
           className="rounded-2xl border border-violet-100 bg-violet-50 p-5 text-left transition hover:bg-violet-100"
         >
-          <Sparkles
-            size={18}
-            className="text-violet-600"
-          />
+          <Sparkles size={18} className="text-violet-600" />
           <p className="mt-3 text-sm font-black text-violet-900">
             AI Fee Optimization
           </p>
@@ -3207,9 +2999,7 @@ export default function SettingsPage() {
               key={String(label)}
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
             >
-              <p className="text-xs font-bold text-slate-400">
-                {label}
-              </p>
+              <p className="text-xs font-bold text-slate-400">{label}</p>
 
               <p className="mt-2 text-sm font-black text-slate-800">
                 {value ? "Enabled" : "Disabled"}
@@ -3357,9 +3147,9 @@ export default function SettingsPage() {
             </h3>
 
             <p className="mt-1 text-sm leading-6 text-violet-800">
-              AI can later analyze delivery behavior, recommend
-              channels and suggest the best time to send
-              attendance, fee and exam notifications.
+              AI can later analyze delivery behavior, recommend channels and
+              suggest the best time to send attendance, fee and exam
+              notifications.
             </p>
 
             <button
@@ -3394,18 +3184,14 @@ export default function SettingsPage() {
         <div
           className={cn(
             "mb-7 flex flex-wrap items-center justify-between gap-4 rounded-2xl p-5",
-            whatsappEnabled
-              ? "bg-emerald-50"
-              : "bg-amber-50"
+            whatsappEnabled ? "bg-emerald-50" : "bg-amber-50",
           )}
         >
           <div className="flex items-center gap-4">
             <div
               className={cn(
                 "flex h-12 w-12 items-center justify-center rounded-full text-white",
-                whatsappEnabled
-                  ? "bg-emerald-500"
-                  : "bg-amber-500"
+                whatsappEnabled ? "bg-emerald-500" : "bg-amber-500",
               )}
             >
               <MessageCircle size={21} />
@@ -3415,9 +3201,7 @@ export default function SettingsPage() {
               <p
                 className={cn(
                   "text-sm font-black",
-                  whatsappEnabled
-                    ? "text-emerald-900"
-                    : "text-amber-900"
+                  whatsappEnabled ? "text-emerald-900" : "text-amber-900",
                 )}
               >
                 WhatsApp Business Communication
@@ -3426,9 +3210,7 @@ export default function SettingsPage() {
               <p
                 className={cn(
                   "mt-1 text-xs",
-                  whatsappEnabled
-                    ? "text-emerald-700"
-                    : "text-amber-700"
+                  whatsappEnabled ? "text-emerald-700" : "text-amber-700",
                 )}
               >
                 {whatsappEnabled
@@ -3560,9 +3342,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={() =>
-              showToast(
-                "WhatsApp template manager will be connected later"
-              )
+              showToast("WhatsApp template manager will be connected later")
             }
             className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
           >
@@ -3591,9 +3371,7 @@ export default function SettingsPage() {
       <Card>
         <div className="mb-7 flex items-center justify-between rounded-2xl bg-blue-50 p-5">
           <div>
-            <p className="text-sm font-black text-blue-900">
-              Email Delivery
-            </p>
+            <p className="text-sm font-black text-blue-900">Email Delivery</p>
 
             <p className="mt-1 text-xs text-blue-700">
               Configure SMTP or a supported email provider.
@@ -3756,9 +3534,7 @@ export default function SettingsPage() {
       <Card className="mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 className="font-black text-slate-900">
-              System Roles
-            </h3>
+            <h3 className="font-black text-slate-900">System Roles</h3>
 
             <p className="mt-1 text-sm text-slate-500">
               Create custom access roles for your organization.
@@ -3785,7 +3561,7 @@ export default function SettingsPage() {
                 "rounded-2xl border p-4 text-left transition",
                 selectedRoleId === role.id
                   ? "border-blue-500 bg-blue-50"
-                  : "border-slate-200 hover:bg-slate-50"
+                  : "border-slate-200 hover:bg-slate-50",
               )}
             >
               <div className="flex items-center justify-between gap-3">
@@ -3799,17 +3575,12 @@ export default function SettingsPage() {
                       {role.name}
                     </p>
 
-                    <p className="text-xs text-slate-400">
-                      {role.users} users
-                    </p>
+                    <p className="text-xs text-slate-400">{role.users} users</p>
                   </div>
                 </div>
 
                 {selectedRoleId === role.id && (
-                  <CheckCircle2
-                    size={18}
-                    className="text-blue-600"
-                  />
+                  <CheckCircle2 size={18} className="text-blue-600" />
                 )}
               </div>
 
@@ -3823,9 +3594,7 @@ export default function SettingsPage() {
         <div className="mt-5 flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={() =>
-              currentRole && openEditRole(currentRole)
-            }
+            onClick={() => currentRole && openEditRole(currentRole)}
             className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
           >
             <Edit3 size={16} />
@@ -3848,9 +3617,7 @@ export default function SettingsPage() {
       <Card>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 className="font-black text-slate-900">
-              Permission Matrix
-            </h3>
+            <h3 className="font-black text-slate-900">Permission Matrix</h3>
 
             <p className="mt-1 text-sm text-slate-500">
               Editing permissions for{" "}
@@ -3862,8 +3629,8 @@ export default function SettingsPage() {
           </div>
 
           <span className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-black text-blue-700">
-            {Object.values(permissionState).filter(Boolean).length}{" "}
-            permissions enabled
+            {Object.values(permissionState).filter(Boolean).length} permissions
+            enabled
           </span>
         </div>
 
@@ -3895,15 +3662,11 @@ export default function SettingsPage() {
 
                     <input
                       type="checkbox"
-                      checked={
-                        permissionState[permission] ??
-                        false
-                      }
+                      checked={permissionState[permission] ?? false}
                       onChange={(e) => {
                         setPermissionState((current) => ({
                           ...current,
-                          [permission]:
-                            e.target.checked,
+                          [permission]: e.target.checked,
                         }));
 
                         markChanged();
@@ -3937,19 +3700,14 @@ export default function SettingsPage() {
 
       <div className="mb-6 grid gap-5 md:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold text-slate-400">
-            Security Score
-          </p>
+          <p className="text-xs font-bold text-slate-400">Security Score</p>
 
           <div className="mt-3 flex items-end justify-between">
             <p className="text-3xl font-black text-slate-900">
               {securityScore}%
             </p>
 
-            <Shield
-              size={25}
-              className="text-blue-600"
-            />
+            <Shield size={25} className="text-blue-600" />
           </div>
 
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
@@ -3961,14 +3719,10 @@ export default function SettingsPage() {
         </div>
 
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
-          <p className="text-xs font-bold text-emerald-600">
-            Protection
-          </p>
+          <p className="text-xs font-bold text-emerald-600">Protection</p>
 
           <p className="mt-3 text-lg font-black text-emerald-900">
-            {dataEncryption
-              ? "Encryption enabled"
-              : "Review encryption"}
+            {dataEncryption ? "Encryption enabled" : "Review encryption"}
           </p>
 
           <p className="mt-1 text-xs text-emerald-700">
@@ -3981,10 +3735,7 @@ export default function SettingsPage() {
           onClick={() => openAI("security")}
           className="rounded-2xl border border-violet-100 bg-violet-50 p-5 text-left transition hover:bg-violet-100"
         >
-          <Sparkles
-            size={20}
-            className="text-violet-600"
-          />
+          <Sparkles size={20} className="text-violet-600" />
 
           <p className="mt-3 text-sm font-black text-violet-900">
             AI Security Review
@@ -4086,10 +3837,7 @@ export default function SettingsPage() {
 
       <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
         <div className="flex items-start gap-3">
-          <AlertTriangle
-            size={19}
-            className="mt-0.5 shrink-0 text-amber-600"
-          />
+          <AlertTriangle size={19} className="mt-0.5 shrink-0 text-amber-600" />
 
           <div>
             <h3 className="font-black text-amber-900">
@@ -4097,10 +3845,9 @@ export default function SettingsPage() {
             </h3>
 
             <p className="mt-1 text-sm leading-6 text-amber-800">
-              These controls are currently frontend configuration
-              UI. Real authentication, authorization, encryption,
-              rate limiting, session invalidation and API protection
-              will be enforced by the backend.
+              These controls are currently frontend configuration UI. Real
+              authentication, authorization, encryption, rate limiting, session
+              invalidation and API protection will be enforced by the backend.
             </p>
           </div>
         </div>
@@ -4261,13 +4008,9 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <p className="text-xl font-black text-slate-900">
-                  {brandName}
-                </p>
+                <p className="text-xl font-black text-slate-900">{brandName}</p>
 
-                <p className="mt-1 text-sm text-slate-500">
-                  {loginMessage}
-                </p>
+                <p className="mt-1 text-sm text-slate-500">{loginMessage}</p>
               </div>
             </div>
 
@@ -4377,10 +4120,7 @@ export default function SettingsPage() {
       {maintenanceMode && (
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <div className="flex items-start gap-3">
-            <AlertTriangle
-              size={19}
-              className="text-amber-600"
-            />
+            <AlertTriangle size={19} className="text-amber-600" />
 
             <div>
               <p className="font-black text-amber-900">
@@ -4388,9 +4128,8 @@ export default function SettingsPage() {
               </p>
 
               <p className="mt-1 text-sm text-amber-800">
-                In production, this will be enforced by the
-                backend and can display a maintenance page to
-                students, parents and staff.
+                In production, this will be enforced by the backend and can
+                display a maintenance page to students, parents and staff.
               </p>
             </div>
           </div>
@@ -4448,21 +4187,17 @@ export default function SettingsPage() {
                     "rounded-full px-3 py-1 text-xs font-black",
                     integration.connected
                       ? "bg-emerald-50 text-emerald-700"
-                      : "bg-slate-100 text-slate-500"
+                      : "bg-slate-100 text-slate-500",
                   )}
                 >
-                  {integration.connected
-                    ? "Connected"
-                    : "Not Connected"}
+                  {integration.connected ? "Connected" : "Not Connected"}
                 </span>
               </div>
 
               <div className="mt-6 flex gap-3">
                 <button
                   type="button"
-                  onClick={() =>
-                    openIntegration(integration)
-                  }
+                  onClick={() => openIntegration(integration)}
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-black text-slate-700 hover:bg-slate-50"
                 >
                   <SettingsIcon size={16} />
@@ -4471,19 +4206,15 @@ export default function SettingsPage() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    toggleIntegration(integration.name)
-                  }
+                  onClick={() => toggleIntegration(integration.name)}
                   className={cn(
                     "rounded-xl px-4 py-2.5 text-sm font-black",
                     integration.connected
                       ? "bg-red-50 text-red-600 hover:bg-red-100"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-blue-600 text-white hover:bg-blue-700",
                   )}
                 >
-                  {integration.connected
-                    ? "Disconnect"
-                    : "Connect"}
+                  {integration.connected ? "Disconnect" : "Connect"}
                 </button>
               </div>
             </Card>
@@ -4493,15 +4224,12 @@ export default function SettingsPage() {
 
       <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-5">
         <div className="flex items-start gap-3">
-          <Shield
-            size={19}
-            className="mt-0.5 text-blue-600"
-          />
+          <Shield size={19} className="mt-0.5 text-blue-600" />
 
           <p className="text-sm leading-6 text-blue-800">
-            Production API keys, OAuth secrets, payment credentials
-            and webhook secrets should be stored on the backend or
-            secret manager, not inside this frontend page.
+            Production API keys, OAuth secrets, payment credentials and webhook
+            secrets should be stored on the backend or secret manager, not
+            inside this frontend page.
           </p>
         </div>
       </div>
@@ -4524,9 +4252,7 @@ export default function SettingsPage() {
 
       <div className="mb-6 grid gap-5 md:grid-cols-3">
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
-          <p className="text-xs font-bold text-emerald-600">
-            Backup Status
-          </p>
+          <p className="text-xs font-bold text-emerald-600">Backup Status</p>
 
           <p className="mt-2 text-xl font-black text-emerald-900">
             {autoBackup ? "Protected" : "Review Needed"}
@@ -4538,9 +4264,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs font-bold text-slate-400">
-            Frequency
-          </p>
+          <p className="text-xs font-bold text-slate-400">Frequency</p>
 
           <p className="mt-2 text-xl font-black text-slate-900">
             {backupFrequency}
@@ -4552,9 +4276,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-          <p className="text-xs font-bold text-blue-600">
-            Retention
-          </p>
+          <p className="text-xs font-bold text-blue-600">Retention</p>
 
           <p className="mt-2 text-xl font-black text-blue-900">
             {backupRetention} days
@@ -4633,9 +4355,7 @@ export default function SettingsPage() {
       </Card>
 
       <Card className="mt-6">
-        <h3 className="font-black text-slate-900">
-          Configuration Backup
-        </h3>
+        <h3 className="font-black text-slate-900">Configuration Backup</h3>
 
         <p className="mt-1 text-sm text-slate-500">
           Export or import your current frontend configuration.
@@ -4653,16 +4373,12 @@ export default function SettingsPage() {
 
           <button
             type="button"
-            onClick={() =>
-              importInputRef.current?.click()
-            }
+            onClick={() => importInputRef.current?.click()}
             disabled={importing}
             className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50"
           >
             <ArrowUpFromLine size={16} />
-            {importing
-              ? "Validating..."
-              : "Import Backup"}
+            {importing ? "Validating..." : "Import Backup"}
           </button>
 
           <input
@@ -4702,9 +4418,7 @@ export default function SettingsPage() {
       <Card>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 className="font-black text-slate-900">
-              Activity Timeline
-            </h3>
+            <h3 className="font-black text-slate-900">Activity Timeline</h3>
 
             <p className="mt-1 text-sm text-slate-500">
               Recent system and administrator activity.
@@ -4738,10 +4452,7 @@ export default function SettingsPage() {
         <div className="space-y-4">
           {auditLogs.length === 0 && (
             <div className="rounded-2xl border border-dashed border-slate-200 p-10 text-center">
-              <Activity
-                size={30}
-                className="mx-auto text-slate-300"
-              />
+              <Activity size={30} className="mx-auto text-slate-300" />
               <p className="mt-3 text-sm font-bold text-slate-500">
                 No visible audit records
               </p>
@@ -4756,25 +4467,16 @@ export default function SettingsPage() {
               <div
                 className={cn(
                   "mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-                  log.type === "success" &&
-                    "bg-emerald-50 text-emerald-600",
-                  log.type === "warning" &&
-                    "bg-amber-50 text-amber-600",
-                  log.type === "info" &&
-                    "bg-blue-50 text-blue-600"
+                  log.type === "success" && "bg-emerald-50 text-emerald-600",
+                  log.type === "warning" && "bg-amber-50 text-amber-600",
+                  log.type === "info" && "bg-blue-50 text-blue-600",
                 )}
               >
-                {log.type === "success" && (
-                  <Check size={16} />
-                )}
+                {log.type === "success" && <Check size={16} />}
 
-                {log.type === "warning" && (
-                  <AlertTriangle size={16} />
-                )}
+                {log.type === "warning" && <AlertTriangle size={16} />}
 
-                {log.type === "info" && (
-                  <Activity size={16} />
-                )}
+                {log.type === "info" && <Activity size={16} />}
               </div>
 
               <div className="min-w-0 flex-1">
@@ -4783,9 +4485,7 @@ export default function SettingsPage() {
                     {log.action}
                   </p>
 
-                  <span className="text-xs text-slate-400">
-                    {log.time}
-                  </span>
+                  <span className="text-xs text-slate-400">{log.time}</span>
                 </div>
 
                 <div className="mt-1 flex flex-wrap gap-2 text-xs text-slate-500">
@@ -4882,21 +4582,15 @@ export default function SettingsPage() {
 
       <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-5">
         <div className="flex items-start gap-3">
-          <CircleHelp
-            size={20}
-            className="mt-0.5 text-blue-600"
-          />
+          <CircleHelp size={20} className="mt-0.5 text-blue-600" />
 
           <div>
-            <h3 className="font-black text-blue-900">
-              Privacy architecture
-            </h3>
+            <h3 className="font-black text-blue-900">Privacy architecture</h3>
 
             <p className="mt-2 text-sm leading-6 text-blue-800">
-              Final privacy enforcement will be implemented across
-              the backend, database, API, authentication and
-              storage layers. These controls define intended
-              product behavior.
+              Final privacy enforcement will be implemented across the backend,
+              database, API, authentication and storage layers. These controls
+              define intended product behavior.
             </p>
           </div>
         </div>
@@ -4925,13 +4619,11 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <h3 className="font-black text-red-900">
-              Destructive Actions
-            </h3>
+            <h3 className="font-black text-red-900">Destructive Actions</h3>
 
             <p className="mt-1 text-sm leading-6 text-red-700">
-              Real destructive operations will require backend
-              authorization, audit logging and explicit confirmation.
+              Real destructive operations will require backend authorization,
+              audit logging and explicit confirmation.
             </p>
           </div>
         </div>
@@ -4939,9 +4631,7 @@ export default function SettingsPage() {
         <div className="mt-6 space-y-3">
           <button
             type="button"
-            onClick={() =>
-              requestDangerAction("cache")
-            }
+            onClick={() => requestDangerAction("cache")}
             className="flex w-full items-center justify-between rounded-xl border border-red-200 bg-white px-5 py-4 text-left transition hover:bg-red-50"
           >
             <div>
@@ -4954,40 +4644,28 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <RefreshCw
-              size={18}
-              className="text-red-500"
-            />
+            <RefreshCw size={18} className="text-red-500" />
           </button>
 
           <button
             type="button"
-            onClick={() =>
-              requestDangerAction("demo")
-            }
+            onClick={() => requestDangerAction("demo")}
             className="flex w-full items-center justify-between rounded-xl border border-red-200 bg-white px-5 py-4 text-left transition hover:bg-red-50"
           >
             <div>
-              <p className="text-sm font-black text-red-800">
-                Reset Demo Data
-              </p>
+              <p className="text-sm font-black text-red-800">Reset Demo Data</p>
 
               <p className="mt-1 text-xs text-red-600">
                 Reset sample frontend data after authorization.
               </p>
             </div>
 
-            <Database
-              size={18}
-              className="text-red-500"
-            />
+            <Database size={18} className="text-red-500" />
           </button>
 
           <button
             type="button"
-            onClick={() =>
-              requestDangerAction("account")
-            }
+            onClick={() => requestDangerAction("account")}
             className="flex w-full items-center justify-between rounded-xl border border-red-300 bg-red-600 px-5 py-4 text-left transition hover:bg-red-700"
           >
             <div>
@@ -5000,10 +4678,7 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <Trash2
-              size={18}
-              className="text-white"
-            />
+            <Trash2 size={18} className="text-white" />
           </button>
         </div>
       </div>
@@ -5091,45 +4766,25 @@ export default function SettingsPage() {
             HEADER
         ------------------------------------------------------------------ */}
 
-        <div className="mb-8">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-black tracking-tight text-slate-900">
-                  Settings
-                </h1>
-
-                <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
-                  {APP_VERSION}
-                </span>
-
-                <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  System operational
-                </span>
-              </div>
-
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                Your central command center for Coaching OS
-                configuration, security, communication, automation
-                and platform behavior.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
+        <PageHeader
+          title="Settings"
+          description="Your central command center for Coaching OS configuration, security, communication, automation and platform behavior."
+          icon={<SettingsIcon size={20} />}
+          actions={
+            <>
               <button
                 type="button"
                 onClick={() => openAI("overview")}
-                className="flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-100"
+                className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-semibold text-violet-700 shadow-sm transition hover:bg-violet-100"
               >
-                <Sparkles size={17} />
+                <Sparkles size={16} />
                 AI Assistant
               </button>
 
               <button
                 type="button"
                 onClick={exportSettings}
-                className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 shadow-sm hover:bg-slate-50 md:flex"
+                className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 md:flex"
               >
                 <Download size={16} />
                 Export
@@ -5137,18 +4792,15 @@ export default function SettingsPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setMobileMenuOpen(true)
-                }
-                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 shadow-sm lg:hidden"
+                onClick={() => setMobileMenuOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 lg:hidden"
               >
-                <Menu size={17} />
+                <Menu size={16} />
                 Sections
               </button>
-            </div>
-          </div>
-        </div>
-
+            </>
+          }
+        />
         {/* ------------------------------------------------------------------
             COMMAND CENTER
         ------------------------------------------------------------------ */}
@@ -5164,10 +4816,7 @@ export default function SettingsPage() {
                 <Sparkles size={18} />
               </span>
 
-              <ChevronRight
-                size={17}
-                className="text-violet-400"
-              />
+              <ChevronRight size={17} className="text-violet-400" />
             </div>
 
             <p className="mt-4 text-xs font-bold uppercase tracking-wide text-violet-500">
@@ -5178,9 +4827,7 @@ export default function SettingsPage() {
               {systemScore}%
             </p>
 
-            <p className="mt-1 text-xs text-violet-700">
-              Configuration health
-            </p>
+            <p className="mt-1 text-xs text-violet-700">Configuration health</p>
           </button>
 
           <button
@@ -5193,10 +4840,7 @@ export default function SettingsPage() {
                 <Shield size={18} />
               </span>
 
-              <ChevronRight
-                size={17}
-                className="text-slate-300"
-              />
+              <ChevronRight size={17} className="text-slate-300" />
             </div>
 
             <p className="mt-4 text-xs font-bold uppercase tracking-wide text-slate-400">
@@ -5207,16 +4851,12 @@ export default function SettingsPage() {
               {securityScore}%
             </p>
 
-            <p className="mt-1 text-xs text-slate-500">
-              Protection score
-            </p>
+            <p className="mt-1 text-xs text-slate-500">Protection score</p>
           </button>
 
           <button
             type="button"
-            onClick={() =>
-              selectSection("integrations")
-            }
+            onClick={() => selectSection("integrations")}
             className="rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-center justify-between">
@@ -5224,10 +4864,7 @@ export default function SettingsPage() {
                 <Zap size={18} />
               </span>
 
-              <ChevronRight
-                size={17}
-                className="text-slate-300"
-              />
+              <ChevronRight size={17} className="text-slate-300" />
             </div>
 
             <p className="mt-4 text-xs font-bold uppercase tracking-wide text-slate-400">
@@ -5241,9 +4878,7 @@ export default function SettingsPage() {
               </span>
             </p>
 
-            <p className="mt-1 text-xs text-slate-500">
-              Services connected
-            </p>
+            <p className="mt-1 text-xs text-slate-500">Services connected</p>
           </button>
 
           <button
@@ -5256,10 +4891,7 @@ export default function SettingsPage() {
                 <Database size={18} />
               </span>
 
-              <ChevronRight
-                size={17}
-                className="text-slate-300"
-              />
+              <ChevronRight size={17} className="text-slate-300" />
             </div>
 
             <p className="mt-4 text-xs font-bold uppercase tracking-wide text-slate-400">
@@ -5326,30 +4958,24 @@ export default function SettingsPage() {
                   </p>
                 </div>
 
-                <SettingsIcon
-                  size={18}
-                  className="text-slate-300"
-                />
+                <SettingsIcon size={18} className="text-slate-300" />
               </div>
 
               <div className="max-h-[calc(100vh-260px)] space-y-1 overflow-y-auto pr-1">
                 {filteredMenu.map((item) => {
                   const Icon = item.icon;
-                  const active =
-                    activeSection === item.id;
+                  const active = activeSection === item.id;
 
                   return (
                     <button
                       key={item.id}
                       type="button"
-                      onClick={() =>
-                        selectSection(item.id)
-                      }
+                      onClick={() => selectSection(item.id)}
                       className={cn(
                         "group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition",
                         active
                           ? "bg-blue-600 text-white shadow-md"
-                          : "text-slate-600 hover:bg-slate-50"
+                          : "text-slate-600 hover:bg-slate-50",
                       )}
                     >
                       <div
@@ -5357,7 +4983,7 @@ export default function SettingsPage() {
                           "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
                           active
                             ? "bg-white/15 text-white"
-                            : "bg-slate-100 text-slate-500 group-hover:text-slate-700"
+                            : "bg-slate-100 text-slate-500 group-hover:text-slate-700",
                         )}
                       >
                         <Icon size={17} />
@@ -5367,9 +4993,7 @@ export default function SettingsPage() {
                         <p
                           className={cn(
                             "truncate text-sm font-black",
-                            active
-                              ? "text-white"
-                              : "text-slate-700"
+                            active ? "text-white" : "text-slate-700",
                           )}
                         >
                           {item.label}
@@ -5378,9 +5002,7 @@ export default function SettingsPage() {
                         <p
                           className={cn(
                             "mt-0.5 truncate text-[11px]",
-                            active
-                              ? "text-blue-100"
-                              : "text-slate-400"
+                            active ? "text-blue-100" : "text-slate-400",
                           )}
                         >
                           {item.description}
@@ -5389,11 +5011,7 @@ export default function SettingsPage() {
 
                       <ChevronRight
                         size={15}
-                        className={
-                          active
-                            ? "text-white"
-                            : "text-slate-300"
-                        }
+                        className={active ? "text-white" : "text-slate-300"}
                       />
                     </button>
                   );
@@ -5401,10 +5019,7 @@ export default function SettingsPage() {
 
                 {filteredMenu.length === 0 && (
                   <div className="px-3 py-10 text-center">
-                    <Search
-                      size={24}
-                      className="mx-auto text-slate-300"
-                    />
+                    <Search size={24} className="mx-auto text-slate-300" />
 
                     <p className="mt-3 text-sm font-black text-slate-500">
                       No settings found
@@ -5443,9 +5058,7 @@ export default function SettingsPage() {
 
           {/* Content */}
 
-          <section className="min-w-0">
-            {renderSection()}
-          </section>
+          <section className="min-w-0">{renderSection()}</section>
         </div>
       </main>
 
@@ -5457,28 +5070,20 @@ export default function SettingsPage() {
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
             className="absolute inset-0 bg-slate-900/50"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
+            onClick={() => setMobileMenuOpen(false)}
           />
 
           <div className="absolute inset-y-0 left-0 w-[90%] max-w-sm overflow-y-auto bg-white p-4 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <p className="text-lg font-black text-slate-900">
-                  Settings
-                </p>
+                <p className="text-lg font-black text-slate-900">Settings</p>
 
-                <p className="text-xs text-slate-400">
-                  Admin Control Center
-                </p>
+                <p className="text-xs text-slate-400">Admin Control Center</p>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setMobileMenuOpen(false)
-                }
+                onClick={() => setMobileMenuOpen(false)}
                 className="rounded-xl p-2 text-slate-500 hover:bg-slate-100"
               >
                 <X size={20} />
@@ -5494,9 +5099,7 @@ export default function SettingsPage() {
 
                 <input
                   value={search}
-                  onChange={(e) =>
-                    setSearch(e.target.value)
-                  }
+                  onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search settings..."
                   className={`${inputClasses} py-2.5 pl-9`}
                 />
@@ -5506,36 +5109,29 @@ export default function SettingsPage() {
             <div className="space-y-1">
               {filteredMenu.map((item) => {
                 const Icon = item.icon;
-                const active =
-                  activeSection === item.id;
+                const active = activeSection === item.id;
 
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() =>
-                      selectSection(item.id)
-                    }
+                    onClick={() => selectSection(item.id)}
                     className={cn(
                       "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left",
                       active
                         ? "bg-blue-600 text-white"
-                        : "text-slate-600 hover:bg-slate-50"
+                        : "text-slate-600 hover:bg-slate-50",
                     )}
                   >
                     <Icon size={18} />
 
                     <div>
-                      <p className="text-sm font-black">
-                        {item.label}
-                      </p>
+                      <p className="text-sm font-black">{item.label}</p>
 
                       <p
                         className={cn(
                           "text-[11px]",
-                          active
-                            ? "text-blue-100"
-                            : "text-slate-400"
+                          active ? "text-blue-100" : "text-slate-400",
                         )}
                       >
                         {item.description}
@@ -5600,14 +5196,12 @@ export default function SettingsPage() {
                   <button
                     key={action}
                     type="button"
-                    onClick={() =>
-                      setAIAction(action as AIAction)
-                    }
+                    onClick={() => setAIAction(action as AIAction)}
                     className={cn(
                       "rounded-xl border px-3 py-2.5 text-xs font-black transition",
                       aiAction === action
                         ? "border-violet-500 bg-violet-50 text-violet-700"
-                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50",
                     )}
                   >
                     {label}
@@ -5659,19 +5253,16 @@ export default function SettingsPage() {
                       className="mt-0.5 shrink-0 text-emerald-500"
                     />
 
-                    <p className="text-sm leading-6 text-slate-700">
-                      {item}
-                    </p>
+                    <p className="text-sm leading-6 text-slate-700">{item}</p>
                   </div>
                 ))}
               </div>
 
               <div className="mt-6 rounded-xl border border-amber-100 bg-amber-50 p-4">
                 <p className="text-xs leading-5 text-amber-800">
-                  <strong>AI demo:</strong> These recommendations
-                  are currently generated from local configuration
-                  rules. Later we can connect the page to a real AI
-                  service through the Coaching OS backend.
+                  <strong>AI demo:</strong> These recommendations are currently
+                  generated from local configuration rules. Later we can connect
+                  the page to a real AI service through the Coaching OS backend.
                 </p>
               </div>
 
@@ -5715,9 +5306,7 @@ export default function SettingsPage() {
                     }
 
                     markChanged();
-                    showToast(
-                      "AI recommendations applied"
-                    );
+                    showToast("AI recommendations applied");
                   }}
                   className="flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-black text-white hover:bg-violet-700"
                 >
@@ -5750,9 +5339,7 @@ export default function SettingsPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowPasswordModal(false)
-                }
+                onClick={() => setShowPasswordModal(false)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
               >
                 <X size={18} />
@@ -5762,49 +5349,27 @@ export default function SettingsPage() {
             <div className="mt-6 space-y-4">
               <Field label="Current Password">
                 <input
-                  type={
-                    showPasswords
-                      ? "text"
-                      : "password"
-                  }
+                  type={showPasswords ? "text" : "password"}
                   value={currentPassword}
-                  onChange={(e) =>
-                    setCurrentPassword(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setCurrentPassword(e.target.value)}
                   className={inputClasses}
                 />
               </Field>
 
               <Field label="New Password">
                 <input
-                  type={
-                    showPasswords
-                      ? "text"
-                      : "password"
-                  }
+                  type={showPasswords ? "text" : "password"}
                   value={newPassword}
-                  onChange={(e) =>
-                    setNewPassword(e.target.value)
-                  }
+                  onChange={(e) => setNewPassword(e.target.value)}
                   className={inputClasses}
                 />
               </Field>
 
               <Field label="Confirm New Password">
                 <input
-                  type={
-                    showPasswords
-                      ? "text"
-                      : "password"
-                  }
+                  type={showPasswords ? "text" : "password"}
                   value={confirmPassword}
-                  onChange={(e) =>
-                    setConfirmPassword(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className={inputClasses}
                 />
               </Field>
@@ -5813,11 +5378,7 @@ export default function SettingsPage() {
                 <input
                   type="checkbox"
                   checked={showPasswords}
-                  onChange={(e) =>
-                    setShowPasswords(
-                      e.target.checked
-                    )
-                  }
+                  onChange={(e) => setShowPasswords(e.target.checked)}
                   className="h-4 w-4 rounded border-slate-300 text-blue-600"
                 />
                 Show passwords
@@ -5827,9 +5388,7 @@ export default function SettingsPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowPasswordModal(false)
-                }
+                onClick={() => setShowPasswordModal(false)}
                 className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
@@ -5857,9 +5416,7 @@ export default function SettingsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-black text-slate-900">
-                  {editingRole
-                    ? "Edit Role"
-                    : "Create Role"}
+                  {editingRole ? "Edit Role" : "Create Role"}
                 </h2>
 
                 <p className="mt-1 text-sm text-slate-500">
@@ -5869,9 +5426,7 @@ export default function SettingsPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowRoleModal(false)
-                }
+                onClick={() => setShowRoleModal(false)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
               >
                 <X size={18} />
@@ -5882,9 +5437,7 @@ export default function SettingsPage() {
               <Field label="Role Name">
                 <input
                   value={roleName}
-                  onChange={(e) =>
-                    setRoleName(e.target.value)
-                  }
+                  onChange={(e) => setRoleName(e.target.value)}
                   className={inputClasses}
                   placeholder="e.g. Branch Manager"
                 />
@@ -5893,11 +5446,7 @@ export default function SettingsPage() {
               <Field label="Description">
                 <textarea
                   value={roleDescription}
-                  onChange={(e) =>
-                    setRoleDescription(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setRoleDescription(e.target.value)}
                   rows={4}
                   className={inputClasses}
                   placeholder="Describe what this role is responsible for..."
@@ -5908,9 +5457,7 @@ export default function SettingsPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowRoleModal(false)
-                }
+                onClick={() => setShowRoleModal(false)}
                 className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
@@ -5921,9 +5468,7 @@ export default function SettingsPage() {
                 onClick={saveRole}
                 className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white hover:bg-blue-700"
               >
-                {editingRole
-                  ? "Save Role"
-                  : "Create Role"}
+                {editingRole ? "Save Role" : "Create Role"}
               </button>
             </div>
           </div>
@@ -5934,137 +5479,116 @@ export default function SettingsPage() {
           INTEGRATION MODAL
       ========================================================================= */}
 
-      {showIntegrationModal &&
-        selectedIntegration && (
-          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-4">
-            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-xl font-black text-slate-900">
-                    Configure{" "}
-                    {selectedIntegration.name}
-                  </h2>
+      {showIntegrationModal && selectedIntegration && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-black text-slate-900">
+                  Configure {selectedIntegration.name}
+                </h2>
 
-                  <p className="mt-1 text-sm leading-5 text-slate-500">
-                    Configure the integration before connecting
-                    it to the production backend.
-                  </p>
-                </div>
+                <p className="mt-1 text-sm leading-5 text-slate-500">
+                  Configure the integration before connecting it to the
+                  production backend.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowIntegrationModal(false)}
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="mt-6 rounded-xl bg-amber-50 p-4">
+              <div className="flex gap-3">
+                <AlertTriangle size={19} className="shrink-0 text-amber-600" />
+
+                <p className="text-sm leading-6 text-amber-800">
+                  Never place real API keys, payment secrets or private
+                  credentials directly in this frontend component. Production
+                  secrets belong on the backend.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <Field label="Integration">
+                <input
+                  value={selectedIntegration.name}
+                  readOnly
+                  className={`${inputClasses} bg-slate-50`}
+                />
+              </Field>
+
+              <Field label="Environment">
+                <select className={selectClasses} defaultValue="Sandbox">
+                  <option>Sandbox</option>
+                  <option>Production</option>
+                </select>
+              </Field>
+
+              <Field label="Connection Status">
+                <select
+                  className={selectClasses}
+                  defaultValue={
+                    selectedIntegration.connected
+                      ? "Connected"
+                      : "Ready to Connect"
+                  }
+                >
+                  <option>Ready to Connect</option>
+                  <option>Connected</option>
+                  <option>Disabled</option>
+                </select>
+              </Field>
+
+              <Field label="Webhook Endpoint">
+                <input
+                  className={inputClasses}
+                  placeholder="Backend endpoint will be generated later"
+                />
+              </Field>
+            </div>
+
+            <div className="mt-7 flex justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => openTest(selectedIntegration.name)}
+                className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+              >
+                <RefreshCw size={15} />
+                Test
+              </button>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowIntegrationModal(false)}
+                  className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowIntegrationModal(false)
-                  }
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+                  onClick={() => {
+                    toggleIntegration(selectedIntegration.name);
+                    setShowIntegrationModal(false);
+                  }}
+                  className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white hover:bg-blue-700"
                 >
-                  <X size={18} />
+                  <Save size={16} />
+                  Save Configuration
                 </button>
-              </div>
-
-              <div className="mt-6 rounded-xl bg-amber-50 p-4">
-                <div className="flex gap-3">
-                  <AlertTriangle
-                    size={19}
-                    className="shrink-0 text-amber-600"
-                  />
-
-                  <p className="text-sm leading-6 text-amber-800">
-                    Never place real API keys, payment secrets or
-                    private credentials directly in this frontend
-                    component. Production secrets belong on the
-                    backend.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-5 space-y-4">
-                <Field label="Integration">
-                  <input
-                    value={selectedIntegration.name}
-                    readOnly
-                    className={`${inputClasses} bg-slate-50`}
-                  />
-                </Field>
-
-                <Field label="Environment">
-                  <select
-                    className={selectClasses}
-                    defaultValue="Sandbox"
-                  >
-                    <option>Sandbox</option>
-                    <option>Production</option>
-                  </select>
-                </Field>
-
-                <Field label="Connection Status">
-                  <select
-                    className={selectClasses}
-                    defaultValue={
-                      selectedIntegration.connected
-                        ? "Connected"
-                        : "Ready to Connect"
-                    }
-                  >
-                    <option>
-                      Ready to Connect
-                    </option>
-                    <option>Connected</option>
-                    <option>Disabled</option>
-                  </select>
-                </Field>
-
-                <Field label="Webhook Endpoint">
-                  <input
-                    className={inputClasses}
-                    placeholder="Backend endpoint will be generated later"
-                  />
-                </Field>
-              </div>
-
-              <div className="mt-7 flex justify-between gap-3">
-                <button
-                  type="button"
-                  onClick={() =>
-                    openTest(
-                      selectedIntegration.name
-                    )
-                  }
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
-                >
-                  <RefreshCw size={15} />
-                  Test
-                </button>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowIntegrationModal(false)
-                    }
-                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      toggleIntegration(
-                        selectedIntegration.name
-                      );
-                      setShowIntegrationModal(false);
-                    }}
-                    className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white hover:bg-blue-700"
-                  >
-                    <Save size={16} />
-                    Save Configuration
-                  </button>
-                </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
       {/* =========================================================================
           DANGER CONFIRMATION
@@ -6086,28 +5610,23 @@ export default function SettingsPage() {
             </p>
 
             <p className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-black text-red-700">
-              {dangerAction === "cache" &&
-                "Clear Application Cache"}
+              {dangerAction === "cache" && "Clear Application Cache"}
 
-              {dangerAction === "demo" &&
-                "Reset Demo Data"}
+              {dangerAction === "demo" && "Reset Demo Data"}
 
-              {dangerAction === "account" &&
-                "Delete Institute Account"}
+              {dangerAction === "account" && "Delete Institute Account"}
             </p>
 
             <p className="mt-4 text-xs leading-5 text-slate-400">
-              This frontend build does not perform real destructive
-              database operations. Production actions will require
-              backend authorization and confirmation.
+              This frontend build does not perform real destructive database
+              operations. Production actions will require backend authorization
+              and confirmation.
             </p>
 
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowDangerModal(false)
-                }
+                onClick={() => setShowDangerModal(false)}
                 className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
@@ -6145,9 +5664,7 @@ export default function SettingsPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowSessionModal(false)
-                }
+                onClick={() => setShowSessionModal(false)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
               >
                 <X size={18} />
@@ -6161,11 +5678,7 @@ export default function SettingsPage() {
                   "Chrome · Current session",
                   "Indore, India",
                 ],
-                [
-                  "Android Device",
-                  "Coaching OS App",
-                  "India",
-                ],
+                ["Android Device", "Coaching OS App", "India"],
               ].map((session, index) => (
                 <div
                   key={index}
@@ -6184,9 +5697,7 @@ export default function SettingsPage() {
                       {session[0]}
                     </p>
 
-                    <p className="mt-1 text-xs text-slate-500">
-                      {session[1]}
-                    </p>
+                    <p className="mt-1 text-xs text-slate-500">{session[1]}</p>
 
                     <p className="mt-1 text-[11px] text-slate-400">
                       {session[2]}
@@ -6202,7 +5713,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={() =>
                         showToast(
-                          "Session revocation will be connected to the backend"
+                          "Session revocation will be connected to the backend",
                         )
                       }
                       className="rounded-lg bg-red-50 px-3 py-2 text-xs font-black text-red-600"
@@ -6233,17 +5744,13 @@ export default function SettingsPage() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              This demo will simulate a connection test. Real
-              connectivity will be performed by the backend integration
-              service.
+              This demo will simulate a connection test. Real connectivity will
+              be performed by the backend integration service.
             </p>
 
             <div className="mt-6 rounded-xl bg-slate-50 p-4">
               <div className="flex items-center gap-3">
-                <CheckCircle2
-                  size={19}
-                  className="text-emerald-500"
-                />
+                <CheckCircle2 size={19} className="text-emerald-500" />
 
                 <div>
                   <p className="text-sm font-black text-slate-800">
@@ -6260,9 +5767,7 @@ export default function SettingsPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowTestModal(false)
-                }
+                onClick={() => setShowTestModal(false)}
                 className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
@@ -6298,10 +5803,7 @@ export default function SettingsPage() {
             <p className="mt-2 text-sm leading-6 text-slate-500">
               Save the current configuration for the{" "}
               <strong>
-                {settingsMenu.find(
-                  (item) =>
-                    item.id === activeSection
-                )?.label}
+                {settingsMenu.find((item) => item.id === activeSection)?.label}
               </strong>{" "}
               section.
             </p>
@@ -6309,9 +5811,7 @@ export default function SettingsPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowSaveConfirm(false)
-                }
+                onClick={() => setShowSaveConfirm(false)}
                 className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
               >
                 Cancel

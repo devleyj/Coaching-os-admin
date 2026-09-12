@@ -141,18 +141,21 @@ export default function Slidebar() {
 
   return (
     <>
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-slate-200/80 bg-white lg:flex lg:flex-col">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[272px] flex-col border-r border-slate-200/80 bg-white lg:flex">
         {/* ========================================================= */}
-        {/* BRAND HEADER */}
+        {/* BRAND */}
         {/* ========================================================= */}
 
-        <div className="relative border-b border-slate-100 px-5 py-5">
-          <Link href="/" className="group flex items-center">
+        <div className="border-b border-slate-100 px-5 py-5">
+          <Link
+            href="/"
+            className="group flex items-center rounded-2xl transition-colors hover:bg-slate-50"
+          >
             {/* Logo */}
-            <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 transition-transform duration-200 group-hover:scale-105">
+            <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 transition-all duration-200 group-hover:scale-105 group-hover:shadow-blue-500/30">
               <GraduationCap size={23} strokeWidth={2.2} />
 
-              <div className="absolute -right-2 -top-2 h-6 w-6 rounded-full bg-white/10" />
+              <div className="absolute -right-2 -top-2 h-7 w-7 rounded-full bg-white/10" />
             </div>
 
             {/* Brand */}
@@ -175,30 +178,40 @@ export default function Slidebar() {
         </div>
 
         {/* ========================================================= */}
-        {/* QUICK AI BUTTON */}
+        {/* AI ASSISTANT */}
         {/* ========================================================= */}
 
         <div className="px-4 pt-4">
           <button
             type="button"
-            className="group flex w-full items-center rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2.5 text-left transition-all duration-200 hover:border-blue-200 hover:shadow-sm"
+            className="group relative flex w-full items-center overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 via-indigo-50 to-violet-50 px-3 py-3 text-left transition-all duration-200 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/10"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-blue-600 shadow-sm">
-              <Sparkles size={16} />
+            {/* Decorative glow */}
+            <div className="absolute -right-5 -top-5 h-16 w-16 rounded-full bg-blue-200/20 blur-xl transition-opacity group-hover:opacity-100" />
+
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+              <Sparkles size={16} strokeWidth={2.2} />
             </div>
 
-            <div className="ml-2.5 flex-1">
-              <p className="text-xs font-semibold text-slate-800">
-                AI Assistant
-              </p>
-              <p className="text-[9px] text-slate-400">
+            <div className="relative ml-2.5 min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-bold text-slate-800">
+                  AI Assistant
+                </p>
+
+                <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-wide text-blue-600">
+                  AI
+                </span>
+              </div>
+
+              <p className="mt-0.5 truncate text-[9px] text-slate-400">
                 Ask anything about your institute
               </p>
             </div>
 
             <ChevronRight
               size={14}
-              className="text-slate-300 transition-transform group-hover:translate-x-0.5"
+              className="relative text-slate-300 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-500"
             />
           </button>
         </div>
@@ -207,18 +220,21 @@ export default function Slidebar() {
         {/* SEARCH */}
         {/* ========================================================= */}
 
-        <div className="px-4 pt-4">
+        <div className="px-4 pt-3">
           <button
             type="button"
-            className="flex w-full items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-left transition-colors hover:border-slate-300 hover:bg-white"
+            className="group flex w-full items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-left transition-all duration-200 hover:border-slate-300 hover:bg-white hover:shadow-sm"
           >
-            <Search size={15} className="text-slate-400" />
+            <Search
+              size={15}
+              className="text-slate-400 transition-colors group-hover:text-blue-500"
+            />
 
-            <span className="ml-2.5 flex-1 text-xs text-slate-400">
+            <span className="ml-2.5 flex-1 text-xs font-medium text-slate-400 group-hover:text-slate-500">
               Search menu...
             </span>
 
-            <kbd className="rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[9px] font-medium text-slate-400">
+            <kbd className="rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[9px] font-semibold text-slate-400 shadow-sm">
               /
             </kbd>
           </button>
@@ -231,12 +247,14 @@ export default function Slidebar() {
         <nav className="sidebar-scrollbar flex-1 overflow-y-auto px-3 py-5">
           {menuGroups.map((group) => (
             <div key={group.title} className="mb-5 last:mb-0">
+              {/* Group title */}
               <div className="mb-2 px-3">
-                <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
                   {group.title}
                 </p>
               </div>
 
+              {/* Group items */}
               <div className="space-y-1">
                 {group.items.map((item) => {
                   const Icon = item.icon;
@@ -246,36 +264,43 @@ export default function Slidebar() {
                     <Link
                       key={item.label}
                       href={item.href}
+                      aria-current={active ? "page" : undefined}
                       className={`group relative flex w-full items-center rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
                         active
-                          ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                          ? "bg-blue-50 text-blue-700 shadow-sm"
                           : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
                       {/* Active indicator */}
                       {active && (
-                        <span className="absolute -left-3 h-7 w-1 rounded-r-full bg-blue-600" />
+                        <span className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-blue-600 shadow-sm shadow-blue-500/30" />
                       )}
 
+                      {/* Icon */}
                       <div
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200 ${
                           active
-                            ? "bg-white/15 text-white"
-                            : "text-slate-500 group-hover:bg-white group-hover:text-blue-600"
+                            ? "bg-blue-600 text-white shadow-sm shadow-blue-500/20"
+                            : "text-slate-500 group-hover:bg-white group-hover:text-blue-600 group-hover:shadow-sm"
                         }`}
                       >
-                        <Icon size={17} strokeWidth={active ? 2.3 : 2} />
+                        <Icon
+                          size={17}
+                          strokeWidth={active ? 2.3 : 2}
+                        />
                       </div>
 
+                      {/* Label */}
                       <span className="ml-2.5 flex-1 truncate">
                         {item.label}
                       </span>
 
+                      {/* Badge */}
                       {item.badge && (
                         <span
-                          className={`mr-0.5 min-w-[20px] rounded-full px-1.5 py-0.5 text-center text-[9px] font-bold ${
+                          className={`mr-0.5 min-w-[21px] rounded-full px-1.5 py-0.5 text-center text-[9px] font-bold ${
                             active
-                              ? "bg-white/20 text-white"
+                              ? "bg-blue-600 text-white"
                               : "bg-blue-50 text-blue-600"
                           }`}
                         >
@@ -283,8 +308,12 @@ export default function Slidebar() {
                         </span>
                       )}
 
+                      {/* Arrow */}
                       {!item.badge && active && (
-                        <ChevronRight size={14} className="text-white/70" />
+                        <ChevronRight
+                          size={14}
+                          className="text-blue-400"
+                        />
                       )}
                     </Link>
                   );
@@ -293,64 +322,82 @@ export default function Slidebar() {
             </div>
           ))}
 
-          {/* System */}
-          <div className="mb-2 px-3">
-            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
-              System
-            </p>
-          </div>
+          {/* ======================================================= */}
+          {/* SYSTEM */}
+          {/* ======================================================= */}
 
-          <Link
-            href="/settings"
-            className={`group flex w-full items-center rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
-              isItemActive("/settings")
-                ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-            }`}
-          >
-            <div
-              className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                isItemActive("/settings")
-                  ? "bg-white/15 text-white"
-                  : "text-slate-500 group-hover:text-blue-600"
-              }`}
-            >
-              <Settings
-                size={17}
-                strokeWidth={isItemActive("/settings") ? 2.3 : 2}
-              />
+          <div className="mt-1">
+            <div className="mb-2 px-3">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                System
+              </p>
             </div>
 
-            <span className="ml-2.5 flex-1">Settings</span>
+            <Link
+              href="/settings"
+              aria-current={
+                isItemActive("/settings") ? "page" : undefined
+              }
+              className={`group relative flex w-full items-center rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
+                isItemActive("/settings")
+                  ? "bg-blue-50 text-blue-700 shadow-sm"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+            >
+              {isItemActive("/settings") && (
+                <span className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-blue-600 shadow-sm shadow-blue-500/30" />
+              )}
 
-            {isItemActive("/settings") && (
-              <ChevronRight size={14} className="text-white/70" />
-            )}
-          </Link>
+              <div
+                className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 ${
+                  isItemActive("/settings")
+                    ? "bg-blue-600 text-white shadow-sm shadow-blue-500/20"
+                    : "text-slate-500 group-hover:bg-white group-hover:text-blue-600 group-hover:shadow-sm"
+                }`}
+              >
+                <Settings
+                  size={17}
+                  strokeWidth={
+                    isItemActive("/settings") ? 2.3 : 2
+                  }
+                />
+              </div>
+
+              <span className="ml-2.5 flex-1">Settings</span>
+
+              {isItemActive("/settings") && (
+                <ChevronRight
+                  size={14}
+                  className="text-blue-400"
+                />
+              )}
+            </Link>
+          </div>
         </nav>
 
         {/* ========================================================= */}
         {/* BOTTOM AREA */}
         {/* ========================================================= */}
 
-        <div className="border-t border-slate-100 bg-white p-3">
+        <div className="border-t border-slate-100 bg-white p-3.5">
           {/* Admin profile */}
-          <div className="mb-3 flex items-center rounded-xl bg-slate-50 px-3 py-2.5">
+          <div className="mb-3 flex items-center rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2.5 transition-colors hover:bg-slate-100/70">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white shadow-sm">
               AD
             </div>
 
             <div className="ml-2.5 min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-slate-800">
+              <p className="truncate text-xs font-bold text-slate-800">
                 Admin
               </p>
-              <p className="truncate text-[9px] text-slate-400">
+
+              <p className="truncate text-[9px] font-medium text-slate-400">
                 Super Administrator
               </p>
             </div>
 
             <div
-              className="h-2 w-2 rounded-full bg-emerald-500"
+              className="h-2 w-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/40"
               title="Online"
             />
           </div>
@@ -359,13 +406,15 @@ export default function Slidebar() {
           <button
             type="button"
             onClick={() => setShowSupport(true)}
-            className="group flex w-full items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900"
+            className="group flex w-full items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:text-slate-900"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors group-hover:text-blue-600">
               <HelpCircle size={17} />
             </div>
 
-            <span className="ml-2.5 flex-1 text-left">Support</span>
+            <span className="ml-2.5 flex-1 text-left">
+              Support
+            </span>
 
             <MessageCircle
               size={14}
@@ -377,23 +426,25 @@ export default function Slidebar() {
           <button
             type="button"
             onClick={() => setShowLogout(true)}
-            className="group mt-1 flex w-full items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-500 transition-all hover:bg-red-50 hover:text-red-600"
+            className="group mt-1 flex w-full items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors group-hover:text-red-600">
               <LogOut size={17} />
             </div>
 
-            <span className="ml-2.5 flex-1 text-left">Logout</span>
+            <span className="ml-2.5 flex-1 text-left">
+              Logout
+            </span>
           </button>
 
           {/* Version */}
-          <div className="mt-3 flex items-center justify-between px-2">
+          <div className="mt-3 flex items-center justify-between border-t border-slate-100 px-2 pt-3">
             <span className="text-[9px] font-medium text-slate-400">
               CoachingOS Admin
             </span>
 
             <span className="rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[8px] font-bold text-slate-400">
-              v0.1.20
+              v0.1.21
             </span>
           </div>
         </div>
@@ -422,8 +473,9 @@ export default function Slidebar() {
                   <h2 className="text-base font-bold text-slate-900">
                     CoachingOS Support
                   </h2>
+
                   <p className="mt-0.5 text-xs text-slate-400">
-                    We're here to help
+                    We&apos;re here to help
                   </p>
                 </div>
               </div>
@@ -431,7 +483,7 @@ export default function Slidebar() {
               <button
                 type="button"
                 onClick={() => setShowSupport(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
               >
                 <X size={17} />
               </button>
@@ -442,6 +494,7 @@ export default function Slidebar() {
                 <p className="text-xs font-semibold text-slate-800">
                   Help Center
                 </p>
+
                 <p className="mt-1 text-[11px] leading-5 text-slate-500">
                   Get help with students, fees, attendance, exams,
                   notifications and other CoachingOS modules.
@@ -457,9 +510,11 @@ export default function Slidebar() {
                     size={17}
                     className="text-blue-600"
                   />
+
                   <p className="mt-2 text-xs font-semibold text-slate-800">
                     Live Chat
                   </p>
+
                   <p className="mt-0.5 text-[10px] text-slate-400">
                     Talk to support
                   </p>
@@ -469,10 +524,15 @@ export default function Slidebar() {
                   type="button"
                   className="rounded-xl border border-slate-200 p-3 text-left transition-colors hover:border-blue-200 hover:bg-blue-50"
                 >
-                  <HelpCircle size={17} className="text-blue-600" />
+                  <HelpCircle
+                    size={17}
+                    className="text-blue-600"
+                  />
+
                   <p className="mt-2 text-xs font-semibold text-slate-800">
                     Documentation
                   </p>
+
                   <p className="mt-0.5 text-[10px] text-slate-400">
                     Browse guides
                   </p>
@@ -513,15 +573,16 @@ export default function Slidebar() {
             </h2>
 
             <p className="mt-1.5 text-sm leading-6 text-slate-500">
-              Authentication is not connected yet. The real logout action
-              will be connected when the authentication system is added.
+              Authentication is not connected yet. The real logout
+              action will be connected when the authentication system
+              is added.
             </p>
 
             <div className="mt-5 flex gap-3">
               <button
                 type="button"
                 onClick={() => setShowLogout(false)}
-                className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -529,7 +590,7 @@ export default function Slidebar() {
               <button
                 type="button"
                 onClick={() => setShowLogout(false)}
-                className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-red-600"
+                className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-red-600"
               >
                 Close
               </button>
@@ -539,7 +600,7 @@ export default function Slidebar() {
       )}
 
       {/* =========================================================== */}
-      {/* SCROLLBAR STYLE */}
+      {/* SIDEBAR SCROLLBAR */}
       {/* =========================================================== */}
 
       <style jsx global>{`
@@ -558,6 +619,11 @@ export default function Slidebar() {
 
         .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #cbd5e1;
+        }
+
+        .sidebar-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #e2e8f0 transparent;
         }
       `}</style>
     </>

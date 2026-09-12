@@ -1,6 +1,7 @@
 "use client";
 
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   AlertCircle,
   ArrowDownRight,
@@ -618,57 +619,41 @@ export default function FeesPage() {
         <main className="ml-64 min-h-screen p-8">
           <div className="mx-auto max-w-7xl">
             {/* HEADER */}
-            <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600">
-                    FINANCE
-                  </span>
+            <PageHeader
+              title="Fee Management"
+              description="Manage collections, student balances, receipts and payment activity from one place."
+              icon={<IndianRupee size={20} />}
+              actions={
+                <>
+                  <button
+                    type="button"
+                    onClick={exportPaymentsCSV}
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    <Download size={16} />
+                    Export
+                  </button>
 
-                  <span className="text-xs font-medium text-slate-400">
-                    EduManage v0.1.20
-                  </span>
-                </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAI(true)}
+                    className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:border-purple-300 hover:bg-purple-100"
+                  >
+                    <Sparkles size={16} />
+                    AI Insights
+                  </button>
 
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                  Fee Management
-                </h1>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Manage collections, student balances, receipts and payment
-                  activity from one place.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={exportPaymentsCSV}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-                >
-                  <Download size={17} />
-                  Export
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowAI(true)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-semibold text-violet-700 transition hover:bg-violet-100"
-                >
-                  <Sparkles size={17} />
-                  AI Insights
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleOpenPayment}
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-                >
-                  <IndianRupee size={17} />
-                  Record Payment
-                </button>
-              </div>
-            </div>
+                  <button
+                    type="button"
+                    onClick={handleOpenPayment}
+                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                  >
+                    <IndianRupee size={17} />
+                    Record Payment
+                  </button>
+                </>
+              }
+            />
 
             {/* KPI CARDS */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
+import PageHeader from "../components/PageHeader";
 import {
   AlertTriangle,
   ArrowDown,
@@ -768,48 +769,35 @@ export default function SchedulePage() {
         )}
 
         {/* Header */}
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-                <CalendarDays className="h-5 w-5" />
-              </div>
+        <PageHeader
+  title="Schedule"
+  description="Manage classes, timings, teachers, rooms and recurring sessions."
+  icon={<CalendarDays size={20} />}
+  actions={
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          setSelectedDate("2026-09-07");
+          showToast("Schedule view refreshed.");
+        }}
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+      >
+        <RefreshCw size={16} />
+        Refresh
+      </button>
 
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  Schedule
-                </h1>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Manage classes, timings, teachers, rooms and recurring sessions.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedDate("2026-09-07");
-                showToast("Schedule view refreshed.");
-              }}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </button>
-
-            <button
-              type="button"
-              onClick={openAddModal}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <Plus className="h-4 w-4" />
-              Add Schedule
-            </button>
-          </div>
-        </div>
+      <button
+        type="button"
+        onClick={openAddModal}
+        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+      >
+        <Plus size={17} />
+        Add Schedule
+      </button>
+    </>
+  }
+/>
 
         {/* KPI Cards */}
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
