@@ -1,84 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
 import { courses } from "../data/courses";
 import { batches as sharedBatches } from "../data/batches";
-import {
-  getCollection,
-  setCollection,
-  subscribeToStore,
-} from "../data/store";
-type StudentStatus = "Active" | "Inactive" | "Pending";
-
-type Student = {
-  name: string;
-  course: string;
-  id: string;
-  batch: string;
-  phone: string;
-  email: string;
-  totalFees: number;
-  paidFees: number;
-  pendingFees: number;
-  status: StudentStatus;
-  enrollmentDate: string;
-  parentName: string;
-  parentPhone: string;
-  attendance: number;
-  performance: number;
-  lastPayment: string;
-  notes: string;
-};
-
-const STUDENTS_STORAGE_KEY = "coaching-os-students";
-
-const initialStudents: Student[] = [
-  { name: "Aarav Mehta", course: "JEE Advanced", id: "STU-1001", batch: "JEE Advanced Morning", phone: "98XXXXXX21", email: "aarav@example.com", totalFees: 45000, paidFees: 30000, pendingFees: 15000, status: "Active", enrollmentDate: "2026-04-12", parentName: "Rajesh Mehta", parentPhone: "99XXXXXX11", attendance: 92, performance: 88, lastPayment: "2026-08-20", notes: "Strong mathematical ability." },
-  { name: "Riya Sharma", course: "NEET", id: "STU-1002", batch: "NEET Morning Batch", phone: "97XXXXXX45", email: "riya@example.com", totalFees: 52000, paidFees: 40000, pendingFees: 12000, status: "Active", enrollmentDate: "2026-03-18", parentName: "Suresh Sharma", parentPhone: "98XXXXXX34", attendance: 95, performance: 91, lastPayment: "2026-08-18", notes: "Consistent performer. Good biology scores." },
-  { name: "Kabir Patel", course: "JEE Main", id: "STU-1003", batch: "JEE Main Evening", phone: "96XXXXXX78", email: "kabir@example.com", totalFees: 38000, paidFees: 25000, pendingFees: 13000, status: "Active", enrollmentDate: "2026-05-05", parentName: "Amit Patel", parentPhone: "97XXXXXX55", attendance: 84, performance: 76, lastPayment: "2026-08-10", notes: "Attendance has dropped recently. Needs mentor follow-up." },
-  { name: "Ananya Singh", course: "NEET", id: "STU-1004", batch: "NEET Evening", phone: "95XXXXXX12", email: "ananya@example.com", totalFees: 10000, paidFees: 5000, pendingFees: 5000, status: "Pending", enrollmentDate: "2026-08-21", parentName: "Vikram Singh", parentPhone: "96XXXXXX67", attendance: 72, performance: 69, lastPayment: "2026-08-21", notes: "New admission. Initial academic assessment recommended." },
-  { name: "Dev Verma", course: "Foundation", id: "STU-1005", batch: "Foundation Weekend", phone: "94XXXXXX31", email: "dev@example.com", totalFees: 30000, paidFees: 30000, pendingFees: 0, status: "Active", enrollmentDate: "2026-02-10", parentName: "Manoj Verma", parentPhone: "93XXXXXX44", attendance: 97, performance: 94, lastPayment: "2026-07-28", notes: "Excellent attendance and academic progress." },
-  { name: "Ishita Rao", course: "JEE Advanced", id: "STU-1006", batch: "JEE Advanced Morning", phone: "93XXXXXX88", email: "ishita@example.com", totalFees: 45000, paidFees: 21000, pendingFees: 24000, status: "Active", enrollmentDate: "2026-06-02", parentName: "Nitin Rao", parentPhone: "92XXXXXX10", attendance: 81, performance: 73, lastPayment: "2026-07-12", notes: "Fee follow-up required. Academic performance is improving." },
-];
-
-function readLegacyStudents(): Student[] {
-  if (typeof window === "undefined") return initialStudents;
-
-  try {
-    const stored = window.localStorage.getItem(STUDENTS_STORAGE_KEY);
-    if (!stored) return initialStudents;
-
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? (parsed as Student[]) : initialStudents;
-  } catch {
-    return initialStudents;
-  }
-}
-
-function readSharedStudents(): Student[] {
-  const shared = getCollection<Student>("students");
-
-  if (shared.length > 0) {
-    return shared;
-  }
-
-  const legacy = readLegacyStudents();
-  setCollection("students", legacy);
-  return legacy;
-}
-
-function saveSharedStudents(students: Student[]) {
-  setCollection("students", students);
-
-  // Keep the previous key temporarily so the existing Fees page can continue
-  // reading the same student records during the migration.
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
-  }
-}
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
 
 import {
   Activity,
@@ -117,22 +44,226 @@ import {
   X,
 } from "lucide-react";
 
-const studentCourses = courses.filter((course) => course.status === "Active");
+type StudentStatus = "Active" | "Inactive" | "Pending";
 
-function getBatchesForCourse(courseName: string) {
-  const course = studentCourses.find((item) => item.name === courseName);
+type Student = {
+  name: string;
+  course: string;
+  courseId?: string;
+  id: string;
+  batch: string;
+  batchId?: string;
+  phone: string;
+  email: string;
+  totalFees: number;
+  paidFees: number;
+  pendingFees: number;
+  status: StudentStatus;
+  enrollmentDate: string;
+  parentName: string;
+  parentPhone: string;
+  attendance: number;
+  performance: number;
+  lastPayment: string;
+  notes: string;
+};
 
-  if (!course) {
-    return [];
-  }
+const initialStudents: Student[] = [
+  {
+    name: "Aarav Mehta",
+    course: "JEE Advanced",
+    id: "STU-1001",
+    batch: "JEE Advanced Morning",
+    phone: "98XXXXXX21",
+    email: "aarav@example.com",
+    totalFees: 45000,
+    paidFees: 30000,
+    pendingFees: 15000,
+    status: "Active",
+    enrollmentDate: "2026-04-12",
+    parentName: "Rajesh Mehta",
+    parentPhone: "99XXXXXX11",
+    attendance: 92,
+    performance: 88,
+    lastPayment: "2026-08-20",
+    notes: "Strong mathematics performance. Needs additional physics practice.",
+  },
+  {
+    name: "Riya Sharma",
+    course: "NEET",
+    id: "STU-1002",
+    batch: "NEET Morning Batch",
+    phone: "97XXXXXX45",
+    email: "riya@example.com",
+    totalFees: 52000,
+    paidFees: 40000,
+    pendingFees: 12000,
+    status: "Active",
+    enrollmentDate: "2026-03-18",
+    parentName: "Suresh Sharma",
+    parentPhone: "98XXXXXX34",
+    attendance: 95,
+    performance: 91,
+    lastPayment: "2026-08-18",
+    notes: "Consistent performer. Good biology scores.",
+  },
+  {
+    name: "Kabir Patel",
+    course: "JEE Main",
+    id: "STU-1003",
+    batch: "JEE Main Evening",
+    phone: "96XXXXXX78",
+    email: "kabir@example.com",
+    totalFees: 38000,
+    paidFees: 25000,
+    pendingFees: 13000,
+    status: "Active",
+    enrollmentDate: "2026-05-05",
+    parentName: "Amit Patel",
+    parentPhone: "97XXXXXX55",
+    attendance: 84,
+    performance: 76,
+    lastPayment: "2026-08-10",
+    notes: "Attendance has dropped recently. Needs mentor follow-up.",
+  },
+  {
+    name: "Ananya Singh",
+    course: "NEET",
+    id: "STU-1004",
+    batch: "NEET Evening",
+    phone: "95XXXXXX12",
+    email: "ananya@example.com",
+    totalFees: 10000,
+    paidFees: 5000,
+    pendingFees: 5000,
+    status: "Pending",
+    enrollmentDate: "2026-08-21",
+    parentName: "Vikram Singh",
+    parentPhone: "96XXXXXX67",
+    attendance: 72,
+    performance: 69,
+    lastPayment: "2026-08-21",
+    notes: "New admission. Initial academic assessment recommended.",
+  },
+  {
+    name: "Dev Verma",
+    course: "Foundation",
+    id: "STU-1005",
+    batch: "Foundation Weekend",
+    phone: "94XXXXXX31",
+    email: "dev@example.com",
+    totalFees: 30000,
+    paidFees: 30000,
+    pendingFees: 0,
+    status: "Active",
+    enrollmentDate: "2026-02-10",
+    parentName: "Manoj Verma",
+    parentPhone: "93XXXXXX44",
+    attendance: 97,
+    performance: 94,
+    lastPayment: "2026-07-28",
+    notes: "Excellent attendance and academic progress.",
+  },
+  {
+    name: "Ishita Rao",
+    course: "JEE Advanced",
+    id: "STU-1006",
+    batch: "JEE Advanced Morning",
+    phone: "93XXXXXX88",
+    email: "ishita@example.com",
+    totalFees: 45000,
+    paidFees: 21000,
+    pendingFees: 24000,
+    status: "Active",
+    enrollmentDate: "2026-06-02",
+    parentName: "Nitin Rao",
+    parentPhone: "92XXXXXX10",
+    attendance: 81,
+    performance: 73,
+    lastPayment: "2026-07-12",
+    notes: "Fee follow-up required. Academic performance is improving.",
+  },
+];
 
-  return sharedBatches.filter((batch) => batch.courseId === course.id);
+type StudentCourse = {
+  id: string;
+  name: string;
+  status?: string;
+};
+
+type StudentBatch = {
+  id: string;
+  name: string;
+  course?: string;
+  courseId?: string;
+  status?: string;
+};
+
+const fallbackStudentCourses: StudentCourse[] = courses.map((course) => ({
+  id: course.id,
+  name: course.name,
+  status: course.status,
+}));
+
+const fallbackStudentBatches: StudentBatch[] = sharedBatches.map((batch) => {
+  const course = fallbackStudentCourses.find(
+    (item) => item.name === batch.course,
+  );
+
+  return {
+    id: batch.id,
+    name: batch.name,
+    course: batch.course,
+    courseId: course?.id,
+    status: batch.status,
+  };
+});
+
+function getBatchesForCourse(
+  courseName: string,
+  courseOptions: StudentCourse[],
+  batchOptions: StudentBatch[],
+) {
+  const course = courseOptions.find((item) => item.name === courseName);
+
+  if (!course) return [];
+
+  return batchOptions.filter(
+    (batch) =>
+      batch.courseId === course.id ||
+      batch.course === course.name,
+  );
 }
 
-function isValidCourseBatch(courseName: string, batchName: string) {
-  return getBatchesForCourse(courseName).some(
-    (batch) => batch.name === batchName,
-  );
+function normalizeStudentRelationships(
+  students: Student[],
+  courseOptions: StudentCourse[],
+  batchOptions: StudentBatch[],
+): Student[] {
+  return students.map((student) => {
+    const course = courseOptions.find(
+      (item) =>
+        item.id === student.courseId ||
+        item.name === student.course,
+    );
+
+    const batch = batchOptions.find(
+      (item) =>
+        item.id === student.batchId ||
+        item.name === student.batch,
+    );
+
+    const resolvedCourse = course?.name ?? student.course;
+    const resolvedBatch = batch?.name ?? student.batch;
+
+    return {
+      ...student,
+      course: resolvedCourse,
+      courseId: course?.id ?? student.courseId,
+      batch: resolvedBatch,
+      batchId: batch?.id ?? student.batchId,
+    };
+  });
 }
 
 const statuses: StudentStatus[] = ["Active", "Inactive", "Pending"];
@@ -188,17 +319,82 @@ function getInitials(name: string) {
 }
 
 export default function StudentsPage() {
+  const [courseOptions, setCourseOptions] =
+    useState<StudentCourse[]>(fallbackStudentCourses);
+  const [batchOptions, setBatchOptions] =
+    useState<StudentBatch[]>(fallbackStudentBatches);
+
   const [studentList, setStudentList] = useState<Student[]>(initialStudents);
 
+  // Load courses, batches, and students from the shared app store.
+  // Legacy records are automatically enriched with courseId/batchId.
   useEffect(() => {
-    const students = readSharedStudents();
-    setStudentList(students);
+    const storedCourses = getCollection<StudentCourse>("courses");
+    const storedBatches = getCollection<StudentBatch>("batches");
+
+    const activeCourses =
+      storedCourses.length > 0
+        ? storedCourses.filter((course) => course.status !== "Inactive")
+        : fallbackStudentCourses.filter((course) => course.status !== "Inactive");
+
+    const activeBatches =
+      storedBatches.length > 0 ? storedBatches : fallbackStudentBatches;
+
+    setCourseOptions(activeCourses);
+    setBatchOptions(activeBatches);
+
+    const storedStudents = getCollection<Student>("students");
+    const sourceStudents = storedStudents.length > 0 ? storedStudents : initialStudents;
+    const normalizedStudents = normalizeStudentRelationships(
+      sourceStudents,
+      activeCourses,
+      activeBatches,
+    );
+
+    setStudentList(normalizedStudents);
+
+    if (storedStudents.length === 0) {
+      setCollection("students", normalizedStudents);
+    } else if (
+      JSON.stringify(sourceStudents) !== JSON.stringify(normalizedStudents)
+    ) {
+      setCollection("students", normalizedStudents);
+    }
 
     return subscribeToStore(() => {
-      const latestStudents = getCollection<Student>("students");
-      setStudentList(latestStudents);
+      const nextCourses = getCollection<StudentCourse>("courses");
+      const nextBatches = getCollection<StudentBatch>("batches");
+      const nextStudents = getCollection<Student>("students");
+
+      const resolvedCourses =
+        nextCourses.length > 0
+          ? nextCourses.filter((course) => course.status !== "Inactive")
+          : fallbackStudentCourses.filter((course) => course.status !== "Inactive");
+      const resolvedBatches =
+        nextBatches.length > 0 ? nextBatches : fallbackStudentBatches;
+
+      setCourseOptions(resolvedCourses);
+      setBatchOptions(resolvedBatches);
+
+      if (nextStudents.length > 0) {
+        const normalized = normalizeStudentRelationships(
+          nextStudents,
+          resolvedCourses,
+          resolvedBatches,
+        );
+        setStudentList((current) =>
+          JSON.stringify(current) === JSON.stringify(normalized)
+            ? current
+            : normalized,
+        );
+      }
     });
   }, []);
+
+  const persistStudents = (nextStudents: Student[]) => {
+    setStudentList(nextStudents);
+    setCollection("students", nextStudents);
+  };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
@@ -227,6 +423,20 @@ export default function StudentsPage() {
 
   const [toast, setToast] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!showAiPanel && !aiStudentId) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowAiPanel(false);
+        setAiStudentId(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showAiPanel, aiStudentId]);
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
     null,
   );
@@ -240,8 +450,8 @@ export default function StudentsPage() {
   const [studentBatch, setStudentBatch] = useState("");
 
   const availableStudentBatches = useMemo(
-    () => getBatchesForCourse(studentCourse),
-    [studentCourse],
+    () => getBatchesForCourse(studentCourse, courseOptions, batchOptions),
+    [studentCourse, courseOptions, batchOptions],
   );
 
   const [studentFees, setStudentFees] = useState("");
@@ -455,7 +665,19 @@ export default function StudentsPage() {
       return;
     }
 
-    const selectedCourseBatches = getBatchesForCourse(studentCourse);
+    const selectedCourse = courseOptions.find(
+      (course) => course.name === studentCourse,
+    );
+
+    const selectedBatch = availableStudentBatches.find(
+      (batch) => batch.name === studentBatch,
+    );
+
+    const selectedCourseBatches = getBatchesForCourse(
+      studentCourse,
+      courseOptions,
+      batchOptions,
+    );
     const selectedBatchExists = selectedCourseBatches.some(
       (batch) => batch.name === studentBatch,
     );
@@ -486,7 +708,9 @@ export default function StudentsPage() {
           phone: studentPhone.trim(),
           email: studentEmail.trim(),
           course: studentCourse,
+          courseId: selectedCourse?.id ?? student.courseId,
           batch: studentBatch,
+          batchId: selectedBatch?.id ?? student.batchId,
           totalFees: fees,
           pendingFees,
           parentName: studentParentName.trim(),
@@ -496,8 +720,8 @@ export default function StudentsPage() {
         };
       });
 
-      setStudentList(nextStudents);
-      saveSharedStudents(nextStudents);
+      persistStudents(nextStudents);
+
       showToast("Student updated successfully.");
     } else {
       const highestId = studentList.reduce((highest, student) => {
@@ -509,8 +733,10 @@ export default function StudentsPage() {
       const newStudent: Student = {
         name: studentName.trim(),
         course: studentCourse,
+        courseId: selectedCourse?.id,
         id: `STU-${highestId + 1}`,
         batch: studentBatch,
+        batchId: selectedBatch?.id,
         phone: studentPhone.trim(),
         email: studentEmail.trim(),
         totalFees: fees,
@@ -527,10 +753,7 @@ export default function StudentsPage() {
         notes: studentNotes.trim(),
       };
 
-      const nextStudents = [...studentList, newStudent];
-
-      setStudentList(nextStudents);
-      saveSharedStudents(nextStudents);
+      persistStudents([...studentList, newStudent]);
 
       showToast("Student added successfully.");
     }
@@ -540,12 +763,9 @@ export default function StudentsPage() {
   };
 
   const deleteStudent = (studentId: string) => {
-    const nextStudents = studentList.filter(
-      (student) => student.id !== studentId,
+    persistStudents(
+      studentList.filter((student) => student.id !== studentId),
     );
-
-    setStudentList(nextStudents);
-    saveSharedStudents(nextStudents);
 
     setSelectedStudents((current) => current.filter((id) => id !== studentId));
 
@@ -581,14 +801,13 @@ export default function StudentsPage() {
       return;
     }
 
-    const nextStudents = studentList.map((student) =>
-      selectedStudents.includes(student.id)
-        ? { ...student, status }
-        : student,
+    persistStudents(
+      studentList.map((student) =>
+        selectedStudents.includes(student.id)
+          ? { ...student, status }
+          : student,
+      ),
     );
-
-    setStudentList(nextStudents);
-    saveSharedStudents(nextStudents);
 
     showToast(`${selectedStudents.length} student(s) updated.`);
 
@@ -651,11 +870,9 @@ export default function StudentsPage() {
   };
 
   const refreshStudents = () => {
-    const latestStudents = getCollection<Student>("students");
-    setStudentList(
-      latestStudents.length > 0 ? latestStudents : readSharedStudents(),
-    );
-    showToast("Student data refreshed from shared data.");
+    const storedStudents = getCollection<Student>("students");
+    setStudentList(storedStudents.length > 0 ? storedStudents : initialStudents);
+    showToast("Student data refreshed.");
   };
 
   const selectedStudent = aiStudentId
@@ -702,7 +919,10 @@ export default function StudentsPage() {
 
               <button
                 type="button"
-                onClick={() => setShowAiPanel(true)}
+                onClick={() => {
+                setAiStudentId(null);
+                setShowAiPanel(true);
+              }}
                 className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-2.5 text-sm font-semibold text-purple-700 transition hover:bg-purple-100"
               >
                 <Sparkles size={16} />
@@ -720,31 +940,6 @@ export default function StudentsPage() {
             </>
           }
         />
-
-        {/* Connected Modules */}
-        <div className="mb-6 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Connected
-          </span>
-          <Link
-            href="/courses"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-          >
-            Courses
-          </Link>
-          <Link
-            href="/batches"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-          >
-            Batches
-          </Link>
-          <Link
-            href="/fees"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-          >
-            Fees
-          </Link>
-        </div>
 
         {/* KPI Cards */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -876,10 +1071,9 @@ export default function StudentsPage() {
                 </div>
 
                 <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-                  Course and batch assignments come from the shared course and
-                  batch data, while fee totals and payments stay synchronized
-                  through the shared student record. Real AI recommendations can
-                  be connected to the backend later.
+                  Identify attendance risk, academic risk and fee-risk patterns
+                  now. Real AI recommendations can be connected to the backend
+                  later.
                 </p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -900,7 +1094,10 @@ export default function StudentsPage() {
 
             <button
               type="button"
-              onClick={() => setShowAiPanel(true)}
+              onClick={() => {
+                setAiStudentId(null);
+                setShowAiPanel(true);
+              }}
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700"
             >
               <Brain size={16} />
@@ -946,7 +1143,7 @@ export default function StudentsPage() {
                 className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All Batches</option>
-                {sharedBatches.map((batch) => (
+                {batchOptions.map((batch) => (
                   <option key={batch.id} value={batch.name}>
                     {batch.name}
                   </option>
@@ -962,7 +1159,7 @@ export default function StudentsPage() {
                 className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="">All Courses</option>
-                {studentCourses.map((course) => (
+                {courseOptions.map((course) => (
                   <option key={course.id} value={course.name}>
                     {course.name}
                   </option>
@@ -1437,7 +1634,11 @@ export default function StudentsPage() {
 
                               <button
                                 type="button"
-                                onClick={() => setAiStudentId(student.id)}
+                                onClick={() => {
+                                    setShowAiPanel(false);
+                                    setOpenActionMenu(null);
+                                    setAiStudentId(student.id);
+                                  }}
                                 className="rounded-lg border border-purple-200 bg-purple-50 p-2 text-purple-600 transition hover:bg-purple-100"
                                 aria-label={`AI insights for ${student.name}`}
                               >
@@ -1483,7 +1684,11 @@ export default function StudentsPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() => setAiStudentId(student.id)}
+                                    onClick={() => {
+                                    setShowAiPanel(false);
+                                    setOpenActionMenu(null);
+                                    setAiStudentId(student.id);
+                                  }}
                                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-purple-700 hover:bg-purple-50"
                                   >
                                     <Sparkles size={14} />
@@ -1711,7 +1916,7 @@ export default function StudentsPage() {
                   >
                     <option value="">Select Course</option>
 
-                    {studentCourses.map((course) => (
+                    {courseOptions.map((course) => (
                       <option key={course.id} value={course.name}>
                         {course.name}
                       </option>
@@ -2111,6 +2316,7 @@ export default function StudentsPage() {
                 type="button"
                 onClick={() => {
                   setViewingStudentId(null);
+                  setShowAiPanel(false);
                   setAiStudentId(viewedStudent.id);
                 }}
                 className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700"
@@ -2348,17 +2554,17 @@ export default function StudentsPage() {
         </div>
       )}
 
-      {/* AI Overview Modal - centered in the viewport */}
+      {/* AI Overview Panel */}
       {showAiPanel && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-[2px] sm:p-6"
+          className="fixed inset-0 z-[55] flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               setShowAiPanel(false);
             }
           }}
         >
-          <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-purple-100 bg-white shadow-2xl">
+          <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-purple-100 bg-gradient-to-r from-purple-50 to-blue-50 px-6 py-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white">
@@ -2385,7 +2591,7 @@ export default function StudentsPage() {
               </button>
             </div>
 
-            <div className="space-y-5 p-6">
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-6">
               <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
                 <div className="flex items-center gap-2">
                   <ShieldAlert size={17} className="text-red-600" />
@@ -2411,7 +2617,11 @@ export default function StudentsPage() {
                       <button
                         key={student.id}
                         type="button"
-                        onClick={() => setAiStudentId(student.id)}
+                        onClick={() => {
+                                    setShowAiPanel(false);
+                                    setOpenActionMenu(null);
+                                    setAiStudentId(student.id);
+                                  }}
                         className="flex w-full items-center justify-between rounded-xl bg-white p-3 text-left transition hover:shadow-sm"
                       >
                         <div>

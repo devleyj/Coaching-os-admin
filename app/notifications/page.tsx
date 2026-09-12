@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import { getCollection, subscribeToStore } from "../data/store";
 import {
   Bell,
   Search,
@@ -522,12 +523,79 @@ const getChannelIcon = (channel: ChannelType) => {
 };
 
 /* =========================================================
+   SHARED STORE INTEGRATION
+========================================================= */
+
+type SharedAttendanceNotification = {
+  id: string;
+  type: "attendance";
+  title: string;
+  message: string;
+  studentId: string;
+  studentName: string;
+  batch: string;
+  date: string;
+  attendanceId: string;
+  status: "Present" | "Absent" | "Late" | "Leave";
+  read: boolean;
+  createdAt: string;
+};
+
+const mapAttendanceNotification = (
+  item: SharedAttendanceNotification,
+): Notification => ({
+  id: item.id,
+  title: item.title,
+  message: item.message,
+  type: "Attendance",
+  audience: "Specific Students",
+  target: item.studentName,
+  channels: ["In-App"],
+  status: "Sent",
+  scheduledDate: item.date,
+  scheduledTime: "",
+  sentDate: item.date,
+  sentTime: "",
+  recipients: 1,
+  deliveredCount: 1,
+  readCount: item.read ? 1 : 0,
+  failedCount: 0,
+  createdBy: "Attendance System",
+  createdAt: item.createdAt,
+  tone: item.status === "Absent" ? "Urgent" : "Concise",
+  recurrence: "None",
+});
+
+const mergeSharedNotifications = (current: Notification[]) => {
+  const shared = getCollection<SharedAttendanceNotification>("notifications");
+
+  const attendanceNotifications = shared
+    .filter((item) => item?.type === "attendance")
+    .map(mapAttendanceNotification);
+
+  const attendanceIds = new Set(attendanceNotifications.map((item) => item.id));
+
+  return [
+    ...attendanceNotifications,
+    ...current.filter((item) => !attendanceIds.has(item.id)),
+  ];
+};
+
+/* =========================================================
    PAGE
 ========================================================= */
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
+
+  useEffect(() => {
+    setNotifications((current) => mergeSharedNotifications(current));
+
+    return subscribeToStore(() => {
+      setNotifications((current) => mergeSharedNotifications(current));
+    });
+  }, []);
 
   const [templates] = useState<Template[]>(initialTemplates);
 

@@ -47,6 +47,11 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import {
+  getCollection,
+  setCollection,
+  subscribeToStore,
+} from "../data/store";
 
 type InquiryStatus = "New" | "Contacted" | "Follow-up" | "Converted" | "Lost";
 
@@ -69,6 +74,7 @@ type Inquiry = {
   expectedFee: number;
   lostReason: string;
   notes: string;
+  convertedStudentId?: string;
 };
 
 type FollowUp = {
@@ -545,6 +551,107 @@ export default function InquiriesPage() {
     setToast(message);
   };
 
+  const persistInquiries = (nextInquiries: Inquiry[]) => {
+    setInquiries(nextInquiries);
+    setCollection("inquiries", nextInquiries);
+  };
+
+  useEffect(() => {
+    const storedInquiries = getCollection<Inquiry>("inquiries");
+
+    if (storedInquiries.length > 0) {
+      setInquiries(storedInquiries);
+    } else {
+      setCollection("inquiries", initialInquiries);
+    }
+
+    return subscribeToStore(() => {
+      const nextInquiries = getCollection<Inquiry>("inquiries");
+
+      if (nextInquiries.length > 0) {
+        setInquiries((current) =>
+          JSON.stringify(current) === JSON.stringify(nextInquiries)
+            ? current
+            : nextInquiries,
+        );
+      }
+    });
+  }, []);
+
+  const convertInquiryToStudent = (inquiry: Inquiry) => {
+    if (inquiry.status === "Lost") {
+      showToast("Lost inquiries cannot be converted to students.");
+      return;
+    }
+
+    if (inquiry.convertedStudentId) {
+      showToast(
+        `Already converted to student ${inquiry.convertedStudentId}.`,
+      );
+      return;
+    }
+
+    const students = getCollection<Record<string, unknown>>("students");
+
+    const usedStudentIds = new Set(
+      students.map((student) => String(student.id ?? "")).filter(Boolean),
+    );
+
+    let nextStudentNumber =
+      students.reduce((highest, student) => {
+        const match = String(student.id ?? "").match(/^STU-(\d+)$/);
+        return match ? Math.max(highest, Number(match[1])) : highest;
+      }, 1000) + 1;
+
+    let studentId = `STU-${nextStudentNumber}`;
+
+    while (usedStudentIds.has(studentId)) {
+      nextStudentNumber += 1;
+      studentId = `STU-${nextStudentNumber}`;
+    }
+
+    const newStudent = {
+      name: inquiry.name,
+      course: inquiry.course,
+      id: studentId,
+      batch: inquiry.batch,
+      phone: inquiry.phone,
+      email: inquiry.email,
+      totalFees: inquiry.expectedFee,
+      paidFees: 0,
+      pendingFees: inquiry.expectedFee,
+      status: "Active",
+      enrollmentDate: getLocalDateString(),
+      parentName: "",
+      parentPhone: "",
+      attendance: 0,
+      performance: 0,
+      lastPayment: "",
+      notes: inquiry.notes,
+    };
+
+    setCollection("students", [...students, newStudent]);
+
+    const nextInquiries = inquiries.map((item) =>
+      item.id === inquiry.id
+        ? {
+            ...item,
+            status: "Converted" as InquiryStatus,
+            followUpDate: "",
+            convertedStudentId: studentId,
+          }
+        : item,
+    );
+
+    persistInquiries(nextInquiries);
+    setOpenActionMenu(null);
+    setViewingInquiryId(null);
+
+    showToast(
+      `${inquiry.name} converted successfully to ${studentId}.`,
+    );
+  };
+
   const filteredInquiries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
 
@@ -832,27 +939,27 @@ export default function InquiriesPage() {
     }
 
     if (editingInquiryId) {
-      setInquiries((current) =>
-        current.map((inquiry) =>
-          inquiry.id === editingInquiryId
-            ? {
-                ...inquiry,
-                name: inquiryName.trim(),
-                phone: cleanedPhone,
-                email: inquiryEmail.trim(),
-                course: inquiryCourse.trim(),
-                batch: inquiryBatch.trim(),
-                source: inquirySource,
-                followUpDate: inquiryFollowUpDate,
-                priority: inquiryPriority,
-                assignedTo: inquiryAssignedTo,
-                expectedFee: Number(inquiryExpectedFee),
-                lostReason: inquiryLostReason.trim(),
-                notes: inquiryNotes.trim(),
-              }
-            : inquiry,
-        ),
+      const nextInquiries = inquiries.map((inquiry) =>
+        inquiry.id === editingInquiryId
+          ? {
+              ...inquiry,
+              name: inquiryName.trim(),
+              phone: cleanedPhone,
+              email: inquiryEmail.trim(),
+              course: inquiryCourse.trim(),
+              batch: inquiryBatch.trim(),
+              source: inquirySource,
+              followUpDate: inquiryFollowUpDate,
+              priority: inquiryPriority,
+              assignedTo: inquiryAssignedTo,
+              expectedFee: Number(inquiryExpectedFee),
+              lostReason: inquiryLostReason.trim(),
+              notes: inquiryNotes.trim(),
+            }
+          : inquiry,
       );
+
+      persistInquiries(nextInquiries);
 
       showToast("Inquiry updated successfully.");
     } else {
@@ -884,7 +991,8 @@ export default function InquiriesPage() {
         notes: inquiryNotes.trim(),
       };
 
-      setInquiries((current) => [newInquiry, ...current]);
+      const nextInquiries = [newInquiry, ...inquiries];
+      persistInquiries(nextInquiries);
 
       showToast("New inquiry added successfully.");
     }
@@ -895,9 +1003,11 @@ export default function InquiriesPage() {
   };
 
   const handleDeleteInquiry = (inquiryId: string) => {
-    setInquiries((current) =>
-      current.filter((inquiry) => inquiry.id !== inquiryId),
+    const nextInquiries = inquiries.filter(
+      (inquiry) => inquiry.id !== inquiryId,
     );
+
+    persistInquiries(nextInquiries);
 
     setFollowUps((current) =>
       current.filter((followUp) => followUp.inquiryId !== inquiryId),
@@ -913,20 +1023,20 @@ export default function InquiriesPage() {
   const handleStatusChange = (inquiryId: string, nextStatus: InquiryStatus) => {
     setChangingStatusInquiryId(inquiryId);
 
-    setInquiries((current) =>
-      current.map((inquiry) =>
-        inquiry.id === inquiryId
-          ? {
-              ...inquiry,
-              status: nextStatus,
-              followUpDate:
-                nextStatus === "Converted" || nextStatus === "Lost"
-                  ? ""
-                  : inquiry.followUpDate,
-            }
-          : inquiry,
-      ),
+    const nextInquiries = inquiries.map((inquiry) =>
+      inquiry.id === inquiryId
+        ? {
+            ...inquiry,
+            status: nextStatus,
+            followUpDate:
+              nextStatus === "Converted" || nextStatus === "Lost"
+                ? ""
+                : inquiry.followUpDate,
+          }
+        : inquiry,
     );
+
+    persistInquiries(nextInquiries);
 
     setTimeout(() => {
       setChangingStatusInquiryId(null);
@@ -941,16 +1051,16 @@ export default function InquiriesPage() {
   ) => {
     setChangingPriorityInquiryId(inquiryId);
 
-    setInquiries((current) =>
-      current.map((inquiry) =>
-        inquiry.id === inquiryId
-          ? {
-              ...inquiry,
-              priority,
-            }
-          : inquiry,
-      ),
+    const nextInquiries = inquiries.map((inquiry) =>
+      inquiry.id === inquiryId
+        ? {
+            ...inquiry,
+            priority,
+          }
+        : inquiry,
     );
+
+    persistInquiries(nextInquiries);
 
     setTimeout(() => {
       setChangingPriorityInquiryId(null);
@@ -1014,30 +1124,30 @@ export default function InquiriesPage() {
 
     setFollowUps((current) => [newFollowUp, ...current]);
 
-    setInquiries((current) =>
-      current.map((inquiry) =>
-        inquiry.id === followUpInquiryId
-          ? {
-              ...inquiry,
-              followUpDate:
-                followUpOutcome === "Converted" ||
-                followUpOutcome === "Not Interested"
-                  ? ""
-                  : followUpNextDate,
-              lastFollowUpDate: today,
-              assignedTo: followUpAssignedTo,
-              status:
-                followUpOutcome === "Converted"
-                  ? "Converted"
-                  : followUpOutcome === "Not Interested"
-                    ? "Lost"
-                    : inquiry.status === "New"
-                      ? "Follow-up"
-                      : inquiry.status,
-            }
-          : inquiry,
-      ),
+    const nextInquiries = inquiries.map((inquiry) =>
+      inquiry.id === followUpInquiryId
+        ? {
+            ...inquiry,
+            followUpDate:
+              followUpOutcome === "Converted" ||
+              followUpOutcome === "Not Interested"
+                ? ""
+                : followUpNextDate,
+            lastFollowUpDate: today,
+            assignedTo: followUpAssignedTo,
+            status:
+              followUpOutcome === "Converted"
+                ? "Converted"
+                : followUpOutcome === "Not Interested"
+                  ? "Lost"
+                  : inquiry.status === "New"
+                    ? "Follow-up"
+                    : inquiry.status,
+          }
+        : inquiry,
     );
+
+    persistInquiries(nextInquiries);
 
     setFollowUpNotes("");
     setFollowUpOutcome("Interested");
@@ -2141,11 +2251,17 @@ export default function InquiriesPage() {
 
                                   <button
                                     type="button"
-                                    onClick={() => openFollowUp(inquiry.id)}
-                                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                    onClick={() => convertInquiryToStudent(inquiry)}
+                                    disabled={
+                                      inquiry.status === "Lost" ||
+                                      Boolean(inquiry.convertedStudentId)
+                                    }
+                                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-emerald-700 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
                                   >
-                                    <CalendarDays size={15} />
-                                    Follow-up
+                                    <UserPlus size={15} />
+                                    {inquiry.convertedStudentId
+                                      ? `Converted (${inquiry.convertedStudentId})`
+                                      : "Convert to Student"}
                                   </button>
 
                                   <div className="my-1 border-t border-slate-100" />
@@ -2944,6 +3060,21 @@ export default function InquiriesPage() {
                 >
                   <CalendarDays size={16} />
                   Follow-up
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => convertInquiryToStudent(selectedInquiry)}
+                  disabled={
+                    selectedInquiry.status === "Lost" ||
+                    Boolean(selectedInquiry.convertedStudentId)
+                  }
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  <UserPlus size={16} />
+                  {selectedInquiry.convertedStudentId
+                    ? `Converted (${selectedInquiry.convertedStudentId})`
+                    : "Convert to Student"}
                 </button>
               </div>
             </div>

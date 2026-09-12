@@ -543,20 +543,6 @@ export default function AttendancePage() {
     }
   }, [students, studentsHydrated]);
 
-  useEffect(() => {
-    if (!attendanceHydrated) return;
-
-    const storedAttendance =
-      getCollection<AttendanceRecord>("attendance");
-
-    if (
-      JSON.stringify(storedAttendance) !==
-      JSON.stringify(attendance)
-    ) {
-      setCollection("attendance", attendance);
-    }
-  }, [attendance, attendanceHydrated]);
-
   const batches = useMemo(
     () =>
       Array.from(
@@ -1082,62 +1068,78 @@ export default function AttendancePage() {
   ) => {
     event.preventDefault();
 
-    const studentsInBatch =
-      students.filter(
-        (student) =>
-          student.batch === bulkBatch
+    const studentsInBatch = students.filter(
+      (student) => student.batch === bulkBatch
+    );
+
+    if (studentsInBatch.length === 0) {
+      showToast("No students found in this batch.");
+      return;
+    }
+
+    const updated = [...attendance];
+    const changedRecords: AttendanceRecord[] = [];
+
+    studentsInBatch.forEach((student) => {
+      const existingIndex = updated.findIndex(
+        (item) =>
+          item.studentId === student.id &&
+          item.date === selectedDate
       );
 
-    setAttendance((current) => {
-      const updated = [...current];
+      if (existingIndex >= 0) {
+        const nextRecord: AttendanceRecord = {
+          ...updated[existingIndex],
+          status: bulkStatus,
+          method: "Manual",
+          checkIn:
+            bulkStatus === "Absent" ||
+            bulkStatus === "Leave"
+              ? "—"
+              : "09:00",
+          whatsappSent:
+            bulkStatus === "Present" ||
+            bulkStatus === "Late",
+        };
 
-      studentsInBatch.forEach((student) => {
-        const existingIndex =
-          updated.findIndex(
-            (item) =>
-              item.studentId === student.id &&
-              item.date === selectedDate
-          );
+        updated[existingIndex] = nextRecord;
+        changedRecords.push(nextRecord);
+      } else {
+        const nextRecord: AttendanceRecord = {
+          id: createAttendanceId(updated),
+          studentId: student.id,
+          studentName: student.name,
+          course: student.course,
+          batch: student.batch,
+          date: selectedDate,
+          checkIn:
+            bulkStatus === "Absent" ||
+            bulkStatus === "Leave"
+              ? "—"
+              : "09:00",
+          status: bulkStatus,
+          method: "Manual",
+          remarks: "",
+          whatsappSent:
+            bulkStatus === "Present" ||
+            bulkStatus === "Late",
+        };
 
-        if (existingIndex >= 0) {
-          updated[existingIndex] = {
-            ...updated[existingIndex],
-            status: bulkStatus,
-            method: "Manual",
-            checkIn:
-              bulkStatus === "Absent" ||
-              bulkStatus === "Leave"
-                ? "—"
-                : "09:00",
-            whatsappSent:
-              bulkStatus === "Present" ||
-              bulkStatus === "Late",
-          };
-        } else {
-          updated.unshift({
-            id: createAttendanceId(updated),
-            studentId: student.id,
-            studentName: student.name,
-            course: student.course,
-            batch: student.batch,
-            date: selectedDate,
-            checkIn:
-              bulkStatus === "Absent" ||
-              bulkStatus === "Leave"
-                ? "—"
-                : "09:00",
-            status: bulkStatus,
-            method: "Manual",
-            remarks: "",
-            whatsappSent:
-              bulkStatus === "Present" ||
-              bulkStatus === "Late",
-          });
-        }
-      });
-
-      return updated;
+        updated.unshift(nextRecord);
+        changedRecords.push(nextRecord);
+      }
     });
+
+    setAttendance(updated);
+    setCollection("attendance", updated);
+
+    if (
+      bulkStatus === "Absent" ||
+      bulkStatus === "Late" ||
+      bulkStatus === "Leave"
+    ) {
+      changedRecords.forEach(createAttendanceNotification);
+    }
 
     setShowBulkModal(false);
     setPage(1);
@@ -1210,19 +1212,27 @@ export default function AttendancePage() {
                 : item.checkIn === "—"
                   ? "09:00"
                   : item.checkIn,
+            method: item.method || "Manual",
           }
         : item
     );
 
     setAttendance(nextAttendance);
+    setCollection("attendance", nextAttendance);
 
-    nextAttendance
-      .filter(
-        (item) =>
-          item.date === selectedDate &&
-          selectedStudents.includes(item.studentId)
-      )
-      .forEach(createAttendanceNotification);
+    if (
+      status === "Absent" ||
+      status === "Late" ||
+      status === "Leave"
+    ) {
+      nextAttendance
+        .filter(
+          (item) =>
+            item.date === selectedDate &&
+            selectedStudents.includes(item.studentId)
+        )
+        .forEach(createAttendanceNotification);
+    }
 
     showToast(
       `${selectedStudents.length} selected students updated.`

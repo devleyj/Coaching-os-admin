@@ -3,11 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
-import {
-  getCollection,
-  setCollection,
-  subscribeToStore,
-} from "../data/store";
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
+import { courses as sharedCourses } from "../data/courses";
 import {
   AlertTriangle,
   ArrowDown,
@@ -53,6 +50,23 @@ type Teacher = {
   joiningDate: string;
   salary: number;
   specialization: string;
+  courseIds?: string[];
+  batchIds?: string[];
+};
+
+type SharedBatch = {
+  id: string;
+  name: string;
+  course: string;
+  teacher: string;
+  teacherId?: string;
+  courseId?: string;
+  students: number;
+};
+
+type SharedCourse = {
+  id: string;
+  name: string;
 };
 
 const initialTeachers: Teacher[] = [
@@ -290,10 +304,8 @@ const inputClass =
 
 export default function TeachersPage() {
   const [teachers, setTeachers] = useState<Teacher[]>(initialTeachers);
-  const saveTeachers = (nextTeachers: Teacher[]) => {
-    setTeachers(nextTeachers);
-    setCollection("teachers", nextTeachers);
-  };
+  const [sharedBatches, setSharedBatches] = useState<SharedBatch[]>([]);
+  const [sharedCourseList, setSharedCourseList] = useState<SharedCourse[]>(sharedCourses as SharedCourse[]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("All Subjects");
@@ -338,27 +350,51 @@ export default function TeachersPage() {
 
   useEffect(() => {
     const storedTeachers = getCollection<Teacher>("teachers");
+    setTeachers(storedTeachers.length > 0 ? storedTeachers : initialTeachers);
 
-    if (storedTeachers.length > 0) {
-      setTeachers(storedTeachers);
-    } else {
-      setCollection("teachers", initialTeachers);
-      setTeachers(initialTeachers);
-    }
+    const storedBatches = getCollection<SharedBatch>("batches");
+    setSharedBatches(storedBatches);
+
+    const storedCourses = getCollection<SharedCourse>("courses");
+    setSharedCourseList(storedCourses.length > 0 ? storedCourses : (sharedCourses as SharedCourse[]));
 
     return subscribeToStore(() => {
       const nextTeachers = getCollection<Teacher>("teachers");
-
-      if (nextTeachers.length === 0) return;
-
-      setTeachers((currentTeachers) => {
-        const currentJson = JSON.stringify(currentTeachers);
-        const nextJson = JSON.stringify(nextTeachers);
-
-        return currentJson === nextJson ? currentTeachers : nextTeachers;
-      });
+      if (nextTeachers.length > 0) setTeachers(nextTeachers);
+      setSharedBatches(getCollection<SharedBatch>("batches"));
+      const nextCourses = getCollection<SharedCourse>("courses");
+      if (nextCourses.length > 0) setSharedCourseList(nextCourses);
     });
   }, []);
+
+  const teachersWithAssignments = useMemo(() => {
+    return teachers.map((teacher) => {
+      const assignedBatches = sharedBatches.filter(
+        (batch) => batch.teacherId === teacher.id || batch.teacher === teacher.name,
+      );
+
+      const assignedCourseIds = assignedBatches
+        .map((batch) => {
+          if (batch.courseId) return batch.courseId;
+          return sharedCourseList.find((course) => course.name === batch.course)?.id;
+        })
+        .filter((id): id is string => Boolean(id));
+
+      const uniqueCourseIds = [...new Set(assignedCourseIds)];
+      const studentCount = assignedBatches.reduce(
+        (total, batch) => total + Number(batch.students || 0),
+        0,
+      );
+
+      return {
+        ...teacher,
+        batches: assignedBatches.length,
+        students: studentCount > 0 ? studentCount : teacher.students,
+        batchIds: assignedBatches.map((batch) => batch.id),
+        courseIds: uniqueCourseIds,
+      };
+    });
+  }, [teachers, sharedBatches, sharedCourseList]);
 
   const showToast = (message: string) => {
     setToast(message);
@@ -368,44 +404,44 @@ export default function TeachersPage() {
     }, 2500);
   };
 
-  const activeTeachers = teachers.filter(
+  const activeTeachers = teachersWithAssignments.filter(
     (teacher) => teacher.status === "Active",
   ).length;
 
-  const inactiveTeachers = teachers.filter(
+  const inactiveTeachers = teachersWithAssignments.filter(
     (teacher) => teacher.status === "Inactive",
   ).length;
 
-  const onLeaveTeachers = teachers.filter(
+  const onLeaveTeachers = teachersWithAssignments.filter(
     (teacher) => teacher.status === "On Leave",
   ).length;
 
-  const totalStudents = teachers.reduce(
+  const totalStudents = teachersWithAssignments.reduce(
     (total, teacher) => total + teacher.students,
     0,
   );
 
   const averagePerformance =
-    teachers.length > 0
+    teachersWithAssignments.length > 0
       ? Math.round(
-          teachers.reduce(
+          teachersWithAssignments.reduce(
             (total, teacher) => total + teacher.performanceScore,
             0,
-          ) / teachers.length,
+          ) / teachersWithAssignments.length,
         )
       : 0;
 
   const averageAttendance =
-    teachers.length > 0
+    teachersWithAssignments.length > 0
       ? Math.round(
-          teachers.reduce(
+          teachersWithAssignments.reduce(
             (total, teacher) => total + teacher.attendanceRate,
             0,
-          ) / teachers.length,
+          ) / teachersWithAssignments.length,
         )
       : 0;
 
-  const totalWeeklyClasses = teachers.reduce(
+  const totalWeeklyClasses = teachersWithAssignments.reduce(
     (total, teacher) => total + teacher.classesThisWeek,
     0,
   );
@@ -413,7 +449,7 @@ export default function TeachersPage() {
   const filteredTeachers = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
 
-    const result = teachers.filter((teacher) => {
+    const result = teachersWithAssignments.filter((teacher) => {
       const matchesSearch =
         !search ||
         teacher.name.toLowerCase().includes(search) ||
@@ -458,7 +494,7 @@ export default function TeachersPage() {
     });
 
     return result;
-  }, [teachers, searchTerm, subjectFilter, statusFilter, sortBy, sortOrder]);
+  }, [teachersWithAssignments, searchTerm, subjectFilter, statusFilter, sortBy, sortOrder]);
 
   const totalPages = Math.max(
     1,
@@ -548,24 +584,28 @@ export default function TeachersPage() {
     }
 
     if (editingTeacher) {
-      const nextTeachers = teachers.map((teacher) =>
-        teacher.id === editingTeacher.id
-          ? {
-              ...teacher,
-              name: form.name.trim(),
-              subject: form.subject.trim(),
-              phone: form.phone.trim(),
-              email: form.email.trim(),
-              experience: form.experience.trim(),
-              qualification: form.qualification.trim(),
-              specialization: form.specialization.trim() || "General Faculty",
-              status: form.status,
-              salary: salaryNumber,
-            }
-          : teacher,
-      );
+      setTeachers((currentTeachers) => {
+        const nextTeachers = currentTeachers.map((teacher) =>
+          teacher.id === editingTeacher.id
+            ? {
+                ...teacher,
+                name: form.name.trim(),
+                subject: form.subject.trim(),
+                phone: form.phone.trim(),
+                email: form.email.trim(),
+                experience: form.experience.trim(),
+                qualification: form.qualification.trim(),
+                specialization: form.specialization.trim() || "General Faculty",
+                status: form.status,
+                salary: salaryNumber,
+              }
+            : teacher,
+        );
 
-      saveTeachers(nextTeachers);
+        setCollection("teachers", nextTeachers);
+        return nextTeachers;
+      });
+
       showToast("Teacher updated successfully.");
     } else {
       const nextNumber =
@@ -593,7 +633,12 @@ export default function TeachersPage() {
         joiningDate: "Today",
       };
 
-      saveTeachers([...teachers, newTeacher]);
+      setTeachers((currentTeachers) => {
+        const nextTeachers = [...currentTeachers, newTeacher];
+        setCollection("teachers", nextTeachers);
+        return nextTeachers;
+      });
+
       showToast("Teacher added successfully.");
     }
 
@@ -609,8 +654,11 @@ export default function TeachersPage() {
       return;
     }
 
-    const nextTeachers = teachers.filter((item) => item.id !== teacher.id);
-    saveTeachers(nextTeachers);
+    setTeachers((currentTeachers) => {
+      const nextTeachers = currentTeachers.filter((item) => item.id !== teacher.id);
+      setCollection("teachers", nextTeachers);
+      return nextTeachers;
+    });
 
     setSelectedTeacher(null);
     setActionMenuId(null);
@@ -909,7 +957,7 @@ export default function TeachersPage() {
 
                 <p className="mt-2 text-2xl font-bold text-slate-900">
                   {
-                    teachers.filter((teacher) => teacher.performanceScore >= 90)
+                    teachersWithAssignments.filter((teacher) => teacher.performanceScore >= 90)
                       .length
                   }
                 </p>
@@ -1358,7 +1406,7 @@ export default function TeachersPage() {
 
             <p className="mt-4 text-sm leading-6 text-green-800">
               {
-                teachers.filter((teacher) => teacher.performanceScore >= 90)
+                teachersWithAssignments.filter((teacher) => teacher.performanceScore >= 90)
                   .length
               }{" "}
               teachers currently have performance scores above 90%.
@@ -1869,6 +1917,30 @@ export default function TeachersPage() {
               >
                 <X className="h-5 w-5" />
               </button>
+            </div>
+
+            <div className="border-b border-slate-100 px-6 py-5">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Assigned courses & batches</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(teachersWithAssignments.find((item) => item.id === showSchedule.id)?.courseIds ?? []).map((courseId) => {
+                  const course = sharedCourseList.find((item) => item.id === courseId);
+                  return course ? (
+                    <span key={course.id} className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
+                      {course.name}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(teachersWithAssignments.find((item) => item.id === showSchedule.id)?.batchIds ?? []).map((batchId) => {
+                  const batch = sharedBatches.find((item) => item.id === batchId);
+                  return batch ? (
+                    <span key={batch.id} className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                      {batch.name}
+                    </span>
+                  ) : null;
+                })}
+              </div>
             </div>
 
             <div className="space-y-3 p-6">
