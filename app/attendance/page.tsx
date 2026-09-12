@@ -75,6 +75,21 @@ type Student = {
   batch: string;
 };
 
+type NotificationRecord = {
+  id: string;
+  type: "attendance";
+  title: string;
+  message: string;
+  studentId: string;
+  studentName: string;
+  batch: string;
+  date: string;
+  attendanceId: string;
+  status: AttendanceStatus;
+  read: boolean;
+  createdAt: string;
+};
+
 const fallbackStudents: Student[] = [
   {
     id: "STU-1001",
@@ -871,6 +886,64 @@ export default function AttendancePage() {
     ).padStart(4, "0")}`;
   };
 
+  const createAttendanceNotification = (
+    record: AttendanceRecord,
+  ) => {
+    if (
+      record.status !== "Absent" &&
+      record.status !== "Late" &&
+      record.status !== "Leave"
+    ) {
+      return;
+    }
+
+    const notifications =
+      getCollection<NotificationRecord>("notifications");
+
+    const notificationId =
+      `NTF-ATT-${record.id}-${record.status.toUpperCase()}`;
+
+    const alreadyExists = notifications.some(
+      (item) => String(item.id) === notificationId,
+    );
+
+    if (alreadyExists) return;
+
+    const statusLabel =
+      record.status === "Absent"
+        ? "Absent"
+        : record.status === "Late"
+          ? "Late"
+          : "Leave";
+
+    const message =
+      record.status === "Absent"
+        ? `${record.studentName} was marked absent for ${record.batch}.`
+        : record.status === "Late"
+          ? `${record.studentName} was marked late for ${record.batch}.`
+          : `${record.studentName}'s leave was recorded for ${record.batch}.`;
+
+    const notification: NotificationRecord = {
+      id: notificationId,
+      type: "attendance",
+      title: `Attendance: ${statusLabel}`,
+      message,
+      studentId: record.studentId,
+      studentName: record.studentName,
+      batch: record.batch,
+      date: record.date,
+      attendanceId: record.id,
+      status: record.status,
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+
+    setCollection("notifications", [
+      notification,
+      ...notifications,
+    ]);
+  };
+
   const handleMarkAttendance = (
     event: React.FormEvent
   ) => {
@@ -883,40 +956,31 @@ export default function AttendancePage() {
 
     if (!student) return;
 
-    setAttendance((current) => {
-      const existing = current.find(
-        (item) =>
-          item.studentId === student.id &&
-          item.date === selectedDate
-      );
+    const existing = attendance.find(
+      (item) =>
+        item.studentId === student.id &&
+        item.date === selectedDate
+    );
 
-      if (existing) {
-        return current.map((item) =>
-          item.id === existing.id
-            ? {
-                ...item,
-                status: markForm.status,
-                method: markForm.method,
-                checkIn:
-                  markForm.status === "Absent" ||
-                  markForm.status === "Leave"
-                    ? "—"
-                    : markForm.checkIn,
-                remarks:
-                  markForm.remarks.trim(),
-                whatsappSent:
-                  markForm.status === "Absent" ||
-                  markForm.status === "Leave"
-                    ? false
-                    : item.whatsappSent,
-              }
-            : item
-        );
-      }
-
-      return [
-        {
-          id: createAttendanceId(current),
+    const nextRecord: AttendanceRecord = existing
+      ? {
+          ...existing,
+          status: markForm.status,
+          method: markForm.method,
+          checkIn:
+            markForm.status === "Absent" ||
+            markForm.status === "Leave"
+              ? "—"
+              : markForm.checkIn,
+          remarks: markForm.remarks.trim(),
+          whatsappSent:
+            markForm.status === "Absent" ||
+            markForm.status === "Leave"
+              ? false
+              : existing.whatsappSent,
+        }
+      : {
+          id: createAttendanceId(attendance),
           studentId: student.id,
           studentName: student.name,
           course: student.course,
@@ -935,10 +999,17 @@ export default function AttendancePage() {
             markForm.status === "Late"
               ? true
               : false,
-        },
-        ...current,
-      ];
-    });
+        };
+
+    const nextAttendance = existing
+      ? attendance.map((item) =>
+          item.id === existing.id ? nextRecord : item
+        )
+      : [nextRecord, ...attendance];
+
+    setAttendance(nextAttendance);
+    setCollection("attendance", nextAttendance);
+    createAttendanceNotification(nextRecord);
 
     setShowMarkModal(false);
     setPage(1);
@@ -951,25 +1022,32 @@ export default function AttendancePage() {
     id: string,
     status: AttendanceStatus
   ) => {
-    setAttendance((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status,
-              checkIn:
-                status === "Absent" ||
-                status === "Leave"
-                  ? "—"
-                  : item.checkIn === "—"
-                  ? "09:00"
-                  : item.checkIn,
-              method:
-                item.method || "Manual",
-            }
-          : item
-      )
+    const currentRecord = attendance.find(
+      (item) => item.id === id,
     );
+
+    if (!currentRecord) return;
+
+    const nextRecord: AttendanceRecord = {
+      ...currentRecord,
+      status,
+      checkIn:
+        status === "Absent" ||
+        status === "Leave"
+          ? "—"
+          : currentRecord.checkIn === "—"
+            ? "09:00"
+            : currentRecord.checkIn,
+      method: currentRecord.method || "Manual",
+    };
+
+    const nextAttendance = attendance.map((item) =>
+      item.id === id ? nextRecord : item
+    );
+
+    setAttendance(nextAttendance);
+    setCollection("attendance", nextAttendance);
+    createAttendanceNotification(nextRecord);
 
     setOpenActionMenu(null);
 
@@ -1119,26 +1197,32 @@ export default function AttendancePage() {
       return;
     }
 
-    setAttendance((current) =>
-      current.map((item) =>
-        item.date === selectedDate &&
-        selectedStudents.includes(
-          item.studentId
-        )
-          ? {
-              ...item,
-              status,
-              checkIn:
-                status === "Absent" ||
-                status === "Leave"
-                  ? "—"
-                  : item.checkIn === "—"
+    const nextAttendance = attendance.map((item) =>
+      item.date === selectedDate &&
+      selectedStudents.includes(item.studentId)
+        ? {
+            ...item,
+            status,
+            checkIn:
+              status === "Absent" ||
+              status === "Leave"
+                ? "—"
+                : item.checkIn === "—"
                   ? "09:00"
                   : item.checkIn,
-            }
-          : item
-      )
+          }
+        : item
     );
+
+    setAttendance(nextAttendance);
+
+    nextAttendance
+      .filter(
+        (item) =>
+          item.date === selectedDate &&
+          selectedStudents.includes(item.studentId)
+      )
+      .forEach(createAttendanceNotification);
 
     showToast(
       `${selectedStudents.length} selected students updated.`
@@ -1260,33 +1344,23 @@ export default function AttendancePage() {
 
     if (!student) return;
 
-    setAttendance((current) => {
-      const existing = current.find(
-        (item) =>
-          item.studentId === student.id &&
-          item.date === selectedDate
-      );
+    const existing = attendance.find(
+      (item) =>
+        item.studentId === student.id &&
+        item.date === selectedDate
+    );
 
-      if (existing) {
-        return current.map((item) =>
-          item.id === existing.id
-            ? {
-                ...item,
-                status: "Leave",
-                method: "Manual",
-                checkIn: "—",
-                remarks:
-                  leaveReason ||
-                  "Leave approved.",
-                whatsappSent: true,
-              }
-            : item
-        );
-      }
-
-      return [
-        {
-          id: createAttendanceId(current),
+    const nextRecord: AttendanceRecord = existing
+      ? {
+          ...existing,
+          status: "Leave",
+          method: "Manual",
+          checkIn: "—",
+          remarks: leaveReason || "Leave approved.",
+          whatsappSent: true,
+        }
+      : {
+          id: createAttendanceId(attendance),
           studentId: student.id,
           studentName: student.name,
           course: student.course,
@@ -1295,14 +1369,18 @@ export default function AttendancePage() {
           checkIn: "—",
           status: "Leave",
           method: "Manual",
-          remarks:
-            leaveReason ||
-            "Leave approved.",
+          remarks: leaveReason || "Leave approved.",
           whatsappSent: true,
-        },
-        ...current,
-      ];
-    });
+        };
+
+    const nextAttendance = existing
+      ? attendance.map((item) =>
+          item.id === existing.id ? nextRecord : item
+        )
+      : [nextRecord, ...attendance];
+
+    setAttendance(nextAttendance);
+    createAttendanceNotification(nextRecord);
 
     setLeaveReason("");
     setShowLeaveModal(false);

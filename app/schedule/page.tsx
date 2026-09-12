@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import { batches as fallbackBatches } from "../data/batches";
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
 import {
   AlertTriangle,
   ArrowDown,
@@ -271,6 +273,45 @@ function getStatusClass(status: ScheduleStatus) {
 
 export default function SchedulePage() {
   const [schedules, setSchedules] = useState<Schedule[]>(initialSchedules);
+  const [availableBatches, setAvailableBatches] = useState(fallbackBatches);
+
+  useEffect(() => {
+    const storedSchedules = getCollection<Schedule>("schedule");
+    const storedBatches = getCollection<typeof fallbackBatches[number]>("batches");
+
+    if (storedSchedules.length > 0) {
+      setSchedules(storedSchedules);
+    } else {
+      setCollection("schedule", initialSchedules);
+      setSchedules(initialSchedules);
+    }
+
+    if (storedBatches.length > 0) {
+      setAvailableBatches(storedBatches);
+    } else {
+      setCollection("batches", fallbackBatches);
+      setAvailableBatches(fallbackBatches);
+    }
+
+    const unsubscribe = subscribeToStore(() => {
+      const nextSchedules = getCollection<Schedule>("schedule");
+      const nextBatches = getCollection<typeof fallbackBatches[number]>("batches");
+
+      setSchedules((current) =>
+        JSON.stringify(current) === JSON.stringify(nextSchedules)
+          ? current
+          : nextSchedules,
+      );
+
+      setAvailableBatches((current) =>
+        JSON.stringify(current) === JSON.stringify(nextBatches)
+          ? current
+          : nextBatches,
+      );
+    });
+
+    return unsubscribe;
+  }, []);
 
   const [showAddSchedule, setShowAddSchedule] = useState(false);
   const [showEditSchedule, setShowEditSchedule] = useState(false);
@@ -309,8 +350,14 @@ export default function SchedulePage() {
   };
 
   const teachers = useMemo(
-    () => Array.from(new Set(schedules.map((schedule) => schedule.teacher))),
-    [schedules],
+    () =>
+      Array.from(
+        new Set([
+          ...availableBatches.map((batch) => batch.teacher),
+          ...schedules.map((schedule) => schedule.teacher),
+        ]),
+      ).filter(Boolean),
+    [availableBatches, schedules],
   );
 
   const rooms = useMemo(
@@ -319,13 +366,25 @@ export default function SchedulePage() {
   );
 
   const courses = useMemo(
-    () => Array.from(new Set(schedules.map((schedule) => schedule.course))),
-    [schedules],
+    () =>
+      Array.from(
+        new Set([
+          ...availableBatches.map((batch) => batch.course),
+          ...schedules.map((schedule) => schedule.course),
+        ]),
+      ).filter(Boolean),
+    [availableBatches, schedules],
   );
 
   const batches = useMemo(
-    () => Array.from(new Set(schedules.map((schedule) => schedule.batch))),
-    [schedules],
+    () =>
+      Array.from(
+        new Set([
+          ...availableBatches.map((batch) => batch.name),
+          ...schedules.map((schedule) => schedule.batch),
+        ]),
+      ).filter(Boolean),
+    [availableBatches, schedules],
   );
 
   const filteredSchedules = useMemo(() => {
@@ -485,6 +544,27 @@ export default function SchedulePage() {
     setFormError("");
   };
 
+  const applyBatchDetails = (batchName: string) => {
+    const selectedBatch = availableBatches.find(
+      (batch) => batch.name.trim().toLowerCase() === batchName.trim().toLowerCase(),
+    );
+
+    setForm((current) => ({
+      ...current,
+      batch: batchName,
+      course: selectedBatch?.course ?? current.course,
+      teacher: selectedBatch?.teacher ?? current.teacher,
+      capacity:
+        selectedBatch && Number.isFinite(selectedBatch.capacity)
+          ? String(selectedBatch.capacity)
+          : current.capacity,
+      enrolled:
+        selectedBatch && Number.isFinite(selectedBatch.students)
+          ? String(selectedBatch.students)
+          : current.enrolled,
+    }));
+  };
+
   const openAddModal = () => {
     resetForm();
     setShowAddSchedule(true);
@@ -614,7 +694,9 @@ export default function SchedulePage() {
       notes: form.notes.trim(),
     };
 
-    setSchedules((current) => [...current, newSchedule]);
+    const nextSchedules = [...schedules, newSchedule];
+    setSchedules(nextSchedules);
+    setCollection("schedule", nextSchedules);
     setSelectedDate(form.date);
 
     resetForm();
@@ -665,29 +747,30 @@ export default function SchedulePage() {
       return;
     }
 
-    setSchedules((current) =>
-      current.map((schedule) =>
-        schedule.id === selectedSchedule.id
-          ? {
-              ...schedule,
-              batch: form.batch.trim(),
-              course: form.course.trim(),
-              teacher: form.teacher.trim(),
-              date: form.date,
-              startTime: form.startTime,
-              endTime: form.endTime,
-              room: form.room.trim(),
-              status: form.status,
-              type: form.type,
-              recurring: form.recurring,
-              days: form.days,
-              capacity: Number(form.capacity),
-              enrolled: Number(form.enrolled),
-              notes: form.notes.trim(),
-            }
-          : schedule,
-      ),
+    const nextSchedules = schedules.map((schedule) =>
+      schedule.id === selectedSchedule.id
+        ? {
+            ...schedule,
+            batch: form.batch.trim(),
+            course: form.course.trim(),
+            teacher: form.teacher.trim(),
+            date: form.date,
+            startTime: form.startTime,
+            endTime: form.endTime,
+            room: form.room.trim(),
+            status: form.status,
+            type: form.type,
+            recurring: form.recurring,
+            days: form.days,
+            capacity: Number(form.capacity),
+            enrolled: Number(form.enrolled),
+            notes: form.notes.trim(),
+          }
+        : schedule,
     );
+
+    setSchedules(nextSchedules);
+    setCollection("schedule", nextSchedules);
 
     setSelectedSchedule(null);
     setShowEditSchedule(false);
@@ -703,9 +786,12 @@ export default function SchedulePage() {
 
     if (!confirmed) return;
 
-    setSchedules((current) =>
-      current.filter((schedule) => schedule.id !== scheduleId),
+    const nextSchedules = schedules.filter(
+      (schedule) => schedule.id !== scheduleId,
     );
+
+    setSchedules(nextSchedules);
+    setCollection("schedule", nextSchedules);
 
     if (selectedSchedule?.id === scheduleId) {
       setSelectedSchedule(null);
@@ -1677,6 +1763,7 @@ export default function SchedulePage() {
               batches={batches}
               teachers={teachers}
               rooms={rooms}
+              onBatchChange={applyBatchDetails}
             />
 
             <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 p-6">
@@ -1740,6 +1827,7 @@ export default function SchedulePage() {
               batches={batches}
               teachers={teachers}
               rooms={rooms}
+              onBatchChange={applyBatchDetails}
             />
 
             <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 p-6">
@@ -1935,6 +2023,7 @@ function ScheduleForm({
   batches,
   teachers,
   rooms,
+  onBatchChange,
 }: {
   form: {
     batch: string;
@@ -1976,6 +2065,7 @@ function ScheduleForm({
   batches: string[];
   teachers: string[];
   rooms: string[];
+  onBatchChange: (batchName: string) => void;
 }) {
   return (
     <div className="p-6">
@@ -1992,12 +2082,7 @@ function ScheduleForm({
             list="schedule-batches"
             type="text"
             value={form.batch}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                batch: event.target.value,
-              }))
-            }
+            onChange={(event) => onBatchChange(event.target.value)}
             placeholder="Enter batch name"
             className="form-input"
           />

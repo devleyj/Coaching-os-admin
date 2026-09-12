@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { getCollection, setCollection, subscribeToStore } from "./data/store";
 
 type InsightType = "success" | "warning" | "info" | "danger";
 
@@ -142,36 +143,15 @@ const stats = [
   },
 ];
 
-const notifications = [
-  {
-    id: 1,
-    title: "New student registered",
-    description: "Aarav Mehta joined JEE Advanced",
-    time: "10 minutes ago",
-    type: "student",
-  },
-  {
-    id: 2,
-    title: "Fee payment received",
-    description: "₹12,000 received from Riya Sharma",
-    time: "32 minutes ago",
-    type: "payment",
-  },
-  {
-    id: 3,
-    title: "Attendance completed",
-    description: "Physics batch attendance marked",
-    time: "1 hour ago",
-    type: "attendance",
-  },
-  {
-    id: 4,
-    title: "New inquiry received",
-    description: "Parent inquiry for NEET 2027",
-    time: "2 hours ago",
-    type: "inquiry",
-  },
-];
+type DashboardNotification = {
+  id: string | number;
+  title: string;
+  description: string;
+  time: string;
+  type: string;
+  read?: boolean;
+};
+
 
 const quickActions = [
   {
@@ -304,7 +284,8 @@ export default function Home() {
   const [selectedDateRange, setSelectedDateRange] = useState("This Month");
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
 
-  const [unreadNotifications, setUnreadNotifications] = useState(3);
+  const [dashboardNotifications, setDashboardNotifications] = useState<DashboardNotification[]>([]);
+  const unreadNotifications = dashboardNotifications.filter((notification) => !notification.read).length;
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -356,6 +337,16 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const loadNotifications = () => {
+      const records = getCollection<DashboardNotification>("notifications");
+      setDashboardNotifications(records);
+    };
+
+    loadNotifications();
+    return subscribeToStore(loadNotifications);
+  }, []);
+
+  useEffect(() => {
     if (searchOpen) {
       setTimeout(() => searchInputRef.current?.focus(), 50);
     }
@@ -393,7 +384,14 @@ export default function Home() {
   };
 
   const handleMarkAllRead = () => {
-    setUnreadNotifications(0);
+    const records = getCollection<DashboardNotification>("notifications");
+    const nextRecords = records.map((notification) => ({
+      ...notification,
+      read: true,
+    }));
+
+    setCollection("notifications", nextRecords);
+    setDashboardNotifications(nextRecords);
     setToast("All notifications marked as read");
   };
 
@@ -564,7 +562,8 @@ export default function Home() {
                     </div>
 
                     <div className="max-h-[360px] overflow-y-auto">
-                      {notifications.map((notification) => (
+                      {dashboardNotifications.length > 0 ? (
+                        dashboardNotifications.slice(0, 8).map((notification) => (
                         <div
                           key={notification.id}
                           className="cursor-pointer border-b border-slate-100 px-4 py-3.5 transition hover:bg-slate-50"
@@ -603,7 +602,14 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                      ))}
+                        ))
+                      ) : (
+                        <div className="px-4 py-10 text-center">
+                          <Bell size={24} className="mx-auto text-slate-300" />
+                          <p className="mt-2 text-sm font-semibold text-slate-700">No notifications yet</p>
+                          <p className="mt-1 text-xs text-slate-500">New attendance and system notifications will appear here.</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="border-t border-slate-100 p-3 text-center">
