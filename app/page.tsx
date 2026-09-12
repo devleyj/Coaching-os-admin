@@ -755,7 +755,7 @@ export default function Home() {
 
               <Link
                 href="/reports"
-                className="flex items-center gap-2 rounded-xl bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-400 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800"
               >
                 <TrendingUp size={17} />
                 View Reports

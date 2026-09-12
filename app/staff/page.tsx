@@ -5,24 +5,50 @@ import {
   Search,
   Plus,
   Users,
-  BriefcaseBusiness,
   UserCheck,
   UserX,
-  MoreHorizontal,
-  Eye,
-  Pencil,
-  Trash2,
-  X,
-  RotateCcw,
-  Phone,
-  Mail,
   CalendarDays,
   Building2,
+  BriefcaseBusiness,
+  Phone,
+  Mail,
+  MapPin,
+  Pencil,
+  Eye,
+  Trash2,
+  MoreHorizontal,
+  X,
+  RotateCcw,
   ShieldCheck,
+  IndianRupee,
+  TrendingUp,
+  TrendingDown,
+  BrainCircuit,
+  Sparkles,
+  ArrowUpRight,
+  Clock3,
+  WalletCards,
+  UserRoundCheck,
+  AlertTriangle,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Download,
+  RefreshCw,
+  FileText,
+  CircleDollarSign,
+  BadgeCheck,
+  UserRound,
+  CalendarClock,
+  MessageCircle,
+  BarChart3,
+  Zap,
 } from "lucide-react";
 import Slidebar from "../components/Slidebar";
 
 type StaffStatus = "Active" | "On Leave" | "Inactive";
+
 type EmploymentType = "Full-time" | "Part-time" | "Contract";
 
 type StaffMember = {
@@ -36,6 +62,21 @@ type StaffMember = {
   employmentType: EmploymentType;
   status: StaffStatus;
   salary: number;
+  emergencyContact: string;
+  address: string;
+  notes: string;
+};
+
+type FormState = {
+  name: string;
+  role: string;
+  department: string;
+  phone: string;
+  email: string;
+  joiningDate: string;
+  employmentType: EmploymentType;
+  status: StaffStatus;
+  salary: string;
   emergencyContact: string;
   address: string;
   notes: string;
@@ -132,17 +173,107 @@ const initialStaff: StaffMember[] = [
     address: "Sudama Nagar, Indore",
     notes: "Counsels prospective students and handles admissions.",
   },
+  {
+    id: "STF-1007",
+    name: "Rohit Malviya",
+    role: "Office Executive",
+    department: "Administration",
+    phone: "9876543216",
+    email: "rohit.malviya@example.com",
+    joiningDate: "2024-08-15",
+    employmentType: "Full-time",
+    status: "Active",
+    salary: 24000,
+    emergencyContact: "9876500017",
+    address: "Vijay Nagar, Indore",
+    notes: "Handles administrative documentation and coordination.",
+  },
+  {
+    id: "STF-1008",
+    name: "Kavita Joshi",
+    role: "Admission Executive",
+    department: "Admissions",
+    phone: "9876543217",
+    email: "kavita.joshi@example.com",
+    joiningDate: "2025-02-14",
+    employmentType: "Full-time",
+    status: "Active",
+    salary: 26000,
+    emergencyContact: "9876500018",
+    address: "LIG Colony, Indore",
+    notes: "Manages admissions follow-ups and student onboarding.",
+  },
+  {
+    id: "STF-1009",
+    name: "Manish Yadav",
+    role: "Account Assistant",
+    department: "Finance",
+    phone: "9876543218",
+    email: "manish.yadav@example.com",
+    joiningDate: "2025-05-21",
+    employmentType: "Part-time",
+    status: "Active",
+    salary: 18000,
+    emergencyContact: "9876500019",
+    address: "Bengali Square, Indore",
+    notes: "Supports accounting and daily payment reconciliation.",
+  },
+  {
+    id: "STF-1010",
+    name: "Pooja Mehta",
+    role: "Reception Executive",
+    department: "Front Office",
+    phone: "9876543219",
+    email: "pooja.mehta@example.com",
+    joiningDate: "2024-12-01",
+    employmentType: "Full-time",
+    status: "Inactive",
+    salary: 21000,
+    emergencyContact: "9876500020",
+    address: "Palasia, Indore",
+    notes: "Previously managed front-office operations.",
+  },
+  {
+    id: "STF-1011",
+    name: "Arjun Rathore",
+    role: "IT Administrator",
+    department: "Technology",
+    phone: "9876543220",
+    email: "arjun.rathore@example.com",
+    joiningDate: "2025-07-05",
+    employmentType: "Contract",
+    status: "Active",
+    salary: 35000,
+    emergencyContact: "9876500021",
+    address: "Rau, Indore",
+    notes: "Maintains infrastructure, systems and classroom devices.",
+  },
+  {
+    id: "STF-1012",
+    name: "Nisha Agarwal",
+    role: "HR Coordinator",
+    department: "Human Resources",
+    phone: "9876543221",
+    email: "nisha.agarwal@example.com",
+    joiningDate: "2025-03-11",
+    employmentType: "Full-time",
+    status: "Active",
+    salary: 29000,
+    emergencyContact: "9876500022",
+    address: "Geeta Bhawan, Indore",
+    notes: "Coordinates HR documentation and employee records.",
+  },
 ];
 
-const emptyForm = {
+const emptyForm: FormState = {
   name: "",
   role: "",
   department: "",
   phone: "",
   email: "",
   joiningDate: "",
-  employmentType: "Full-time" as EmploymentType,
-  status: "Active" as StaffStatus,
+  employmentType: "Full-time",
+  status: "Active",
   salary: "",
   emergencyContact: "",
   address: "",
@@ -150,15 +281,17 @@ const emptyForm = {
 };
 
 const statusClasses: Record<StaffStatus, string> = {
-  Active: "bg-emerald-50 text-emerald-700",
-  "On Leave": "bg-amber-50 text-amber-700",
-  Inactive: "bg-red-50 text-red-700",
+  Active: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  "On Leave": "bg-amber-50 text-amber-700 border-amber-100",
+  Inactive: "bg-red-50 text-red-700 border-red-100",
 };
 
-const getInitial = (name: string) => name.trim().charAt(0).toUpperCase();
+const getInitial = (name: string) =>
+  name.trim().charAt(0).toUpperCase() || "?";
 
 const formatDate = (value: string) => {
   if (!value) return "—";
+
   return new Date(`${value}T00:00:00`).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
@@ -169,40 +302,193 @@ const formatDate = (value: string) => {
 const formatCurrency = (value: number) =>
   `₹${value.toLocaleString("en-IN")}`;
 
+const calculateExperience = (joiningDate: string) => {
+  if (!joiningDate) return "—";
+
+  const start = new Date(`${joiningDate}T00:00:00`);
+  const now = new Date();
+
+  let months =
+    (now.getFullYear() - start.getFullYear()) * 12 +
+    (now.getMonth() - start.getMonth());
+
+  if (now.getDate() < start.getDate()) {
+    months -= 1;
+  }
+
+  months = Math.max(0, months);
+
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+
+  if (years === 0) {
+    return `${remainingMonths} month${remainingMonths === 1 ? "" : "s"}`;
+  }
+
+  if (remainingMonths === 0) {
+    return `${years} year${years === 1 ? "" : "s"}`;
+  }
+
+  return `${years}y ${remainingMonths}m`;
+};
+
+const escapeCsv = (value: string | number) => {
+  const stringValue = String(value);
+  return `"${stringValue.replace(/"/g, '""')}"`;
+};
+
+const downloadCsv = (staff: StaffMember[]) => {
+  const headers = [
+    "Staff ID",
+    "Name",
+    "Role",
+    "Department",
+    "Phone",
+    "Email",
+    "Joining Date",
+    "Employment Type",
+    "Status",
+    "Monthly Salary",
+    "Emergency Contact",
+    "Address",
+    "Notes",
+  ];
+
+  const rows = staff.map((item) => [
+    item.id,
+    item.name,
+    item.role,
+    item.department,
+    item.phone,
+    item.email,
+    item.joiningDate,
+    item.employmentType,
+    item.status,
+    item.salary,
+    item.emergencyContact,
+    item.address,
+    item.notes,
+  ]);
+
+  const csv = [
+    headers.map(escapeCsv).join(","),
+    ...rows.map((row) => row.map(escapeCsv).join(",")),
+  ].join("\n");
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "staff-directory.csv";
+  link.click();
+
+  URL.revokeObjectURL(url);
+};
+
 export default function StaffPage() {
-  const [staffList, setStaffList] = useState<StaffMember[]>(initialStaff);
+  const [staffList, setStaffList] =
+    useState<StaffMember[]>(initialStaff);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [employmentFilter, setEmploymentFilter] = useState("All");
+
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
 
   const [page, setPage] = useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 6;
 
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState("");
 
-  const [viewingStaff, setViewingStaff] = useState<StaffMember | null>(null);
-  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
+  const [viewingStaff, setViewingStaff] =
+    useState<StaffMember | null>(null);
+
+  const [openActionMenu, setOpenActionMenu] =
+    useState<string | null>(null);
+
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [showPayrollModal, setShowPayrollModal] = useState(false);
+
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "info" | "error";
+  } | null>(null);
 
   const departments = useMemo(
-    () => Array.from(new Set(staffList.map((staff) => staff.department))).sort(),
+    () =>
+      Array.from(
+        new Set(staffList.map((staff) => staff.department))
+      ).sort(),
     [staffList]
   );
 
   const stats = useMemo(() => {
     const total = staffList.length;
-    const active = staffList.filter((staff) => staff.status === "Active").length;
-    const onLeave = staffList.filter((staff) => staff.status === "On Leave").length;
-    const inactive = staffList.filter((staff) => staff.status === "Inactive").length;
 
-    return { total, active, onLeave, inactive };
+    const active = staffList.filter(
+      (staff) => staff.status === "Active"
+    ).length;
+
+    const onLeave = staffList.filter(
+      (staff) => staff.status === "On Leave"
+    ).length;
+
+    const inactive = staffList.filter(
+      (staff) => staff.status === "Inactive"
+    ).length;
+
+    const monthlyPayroll = staffList
+      .filter((staff) => staff.status !== "Inactive")
+      .reduce((sum, staff) => sum + staff.salary, 0);
+
+    const annualPayroll = monthlyPayroll * 12;
+
+    const averageSalary =
+      total > 0
+        ? Math.round(
+            staffList.reduce((sum, staff) => sum + staff.salary, 0) /
+              total
+          )
+        : 0;
+
+    return {
+      total,
+      active,
+      onLeave,
+      inactive,
+      monthlyPayroll,
+      annualPayroll,
+      averageSalary,
+    };
   }, [staffList]);
+
+  const departmentStats = useMemo(() => {
+    return departments
+      .map((department) => {
+        const count = staffList.filter(
+          (staff) => staff.department === department
+        ).length;
+
+        return {
+          department,
+          count,
+          percentage:
+            staffList.length > 0
+              ? Math.round((count / staffList.length) * 100)
+              : 0,
+        };
+      })
+      .sort((a, b) => b.count - a.count);
+  }, [departments, staffList]);
 
   const filteredStaff = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -214,13 +500,16 @@ export default function StaffPage() {
         staff.id.toLowerCase().includes(query) ||
         staff.phone.includes(query) ||
         staff.email.toLowerCase().includes(query) ||
-        staff.role.toLowerCase().includes(query);
+        staff.role.toLowerCase().includes(query) ||
+        staff.department.toLowerCase().includes(query);
 
       const matchesDepartment =
-        departmentFilter === "All" || staff.department === departmentFilter;
+        departmentFilter === "All" ||
+        staff.department === departmentFilter;
 
       const matchesStatus =
-        statusFilter === "All" || staff.status === statusFilter;
+        statusFilter === "All" ||
+        staff.status === statusFilter;
 
       const matchesEmployment =
         employmentFilter === "All" ||
@@ -271,11 +560,73 @@ export default function StaffPage() {
   );
 
   const safePage = Math.min(page, totalPages);
+
   const startIndex = (safePage - 1) * rowsPerPage;
+
   const paginatedStaff = filteredStaff.slice(
     startIndex,
     startIndex + rowsPerPage
   );
+
+  const highSalaryStaff = useMemo(
+    () =>
+      [...staffList]
+        .sort((a, b) => b.salary - a.salary)
+        .slice(0, 3),
+    [staffList]
+  );
+
+  const aiInsights = useMemo(() => {
+    const activePercentage =
+      stats.total > 0
+        ? Math.round((stats.active / stats.total) * 100)
+        : 0;
+
+    const highestSalary =
+      highSalaryStaff.length > 0
+        ? highSalaryStaff[0]
+        : null;
+
+    return [
+      {
+        title: "Workforce health",
+        description: `${activePercentage}% of your staff is currently active. ${
+          stats.onLeave > 0
+            ? `${stats.onLeave} staff member${
+                stats.onLeave > 1 ? "s are" : " is"
+              } currently on leave.`
+            : "No staff members are currently on leave."
+        }`,
+        type: "positive",
+      },
+      {
+        title: "Retention opportunity",
+        description:
+          "Review staff with longer tenure and consistently strong operational responsibility for recognition, growth and retention planning.",
+        type: "recommendation",
+      },
+      {
+        title: "Payroll concentration",
+        description: highestSalary
+          ? `${highestSalary.name} currently has the highest monthly salary at ${formatCurrency(
+              highestSalary.salary
+            )}.`
+          : "No salary data available.",
+        type: "info",
+      },
+    ];
+  }, [stats, highSalaryStaff]);
+
+  const showToast = (
+    message: string,
+    type: "success" | "info" | "error" = "success"
+  ) => {
+    setToast({ message, type });
+
+    window.setTimeout(() => {
+      setToast(null);
+    }, 2800);
+  };
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -289,7 +640,10 @@ export default function StaffPage() {
 
   const openAddModal = () => {
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      joiningDate: new Date().toISOString().slice(0, 10),
+    });
     setFormError("");
     setOpenActionMenu(null);
     setShowModal(true);
@@ -297,6 +651,7 @@ export default function StaffPage() {
 
   const openEditModal = (staff: StaffMember) => {
     setEditingId(staff.id);
+
     setForm({
       name: staff.name,
       role: staff.role,
@@ -311,15 +666,32 @@ export default function StaffPage() {
       address: staff.address,
       notes: staff.notes,
     });
+
     setFormError("");
     setOpenActionMenu(null);
+    setViewingStaff(null);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setEditingId(null);
+    setForm(emptyForm);
     setFormError("");
+  };
+
+  const setField = (
+    field: keyof FormState,
+    value: string
+  ) => {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    if (formError) {
+      setFormError("");
+    }
   };
 
   const handleSave = (event: React.FormEvent) => {
@@ -329,9 +701,16 @@ export default function StaffPage() {
     const role = form.role.trim();
     const department = form.department.trim();
     const phone = form.phone.trim();
+    const email = form.email.trim();
     const salary = Number(form.salary);
 
-    if (!name || !role || !department || !phone || !form.joiningDate) {
+    if (
+      !name ||
+      !role ||
+      !department ||
+      !phone ||
+      !form.joiningDate
+    ) {
       setFormError(
         "Please fill in Name, Role, Department, Phone and Joining Date."
       );
@@ -339,17 +718,32 @@ export default function StaffPage() {
     }
 
     if (!/^[0-9]{10}$/.test(phone)) {
-      setFormError("Phone number must contain exactly 10 digits.");
+      setFormError(
+        "Phone number must contain exactly 10 digits."
+      );
       return;
     }
 
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    if (
+      email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
       setFormError("Please enter a valid email address.");
       return;
     }
 
     if (!Number.isFinite(salary) || salary < 0) {
-      setFormError("Please enter a valid salary.");
+      setFormError("Please enter a valid monthly salary.");
+      return;
+    }
+
+    if (
+      form.emergencyContact &&
+      !/^[0-9]{10}$/.test(form.emergencyContact)
+    ) {
+      setFormError(
+        "Emergency contact must contain exactly 10 digits."
+      );
       return;
     }
 
@@ -363,25 +757,31 @@ export default function StaffPage() {
                 role,
                 department,
                 phone,
-                email: form.email.trim(),
+                email,
                 joiningDate: form.joiningDate,
                 employmentType: form.employmentType,
                 status: form.status,
                 salary,
-                emergencyContact: form.emergencyContact.trim(),
+                emergencyContact:
+                  form.emergencyContact.trim(),
                 address: form.address.trim(),
                 notes: form.notes.trim(),
               }
             : staff
         )
       );
+
+      showToast("Staff profile updated successfully.");
     } else {
       const nextNumber =
         Math.max(
-          0,
+          1000,
           ...staffList.map((staff) => {
-            const number = Number(staff.id.replace("STF-", ""));
-            return Number.isFinite(number) ? number : 0;
+            const number = Number(
+              staff.id.replace("STF-", "")
+            );
+
+            return Number.isFinite(number) ? number : 1000;
           })
         ) + 1;
 
@@ -391,95 +791,168 @@ export default function StaffPage() {
         role,
         department,
         phone,
-        email: form.email.trim(),
+        email,
         joiningDate: form.joiningDate,
         employmentType: form.employmentType,
         status: form.status,
         salary,
-        emergencyContact: form.emergencyContact.trim(),
+        emergencyContact:
+          form.emergencyContact.trim(),
         address: form.address.trim(),
         notes: form.notes.trim(),
       };
 
-      setStaffList((current) => [newStaff, ...current]);
+      setStaffList((current) => [
+        newStaff,
+        ...current,
+      ]);
+
       setPage(1);
+
+      showToast("New staff member added successfully.");
     }
 
     closeModal();
   };
 
   const deleteStaff = (id: string) => {
-    const staff = staffList.find((item) => item.id === id);
+    const staff = staffList.find(
+      (item) => item.id === id
+    );
+
     if (!staff) return;
 
     const confirmed = window.confirm(
-      `Delete ${staff.name} (${staff.id})? This demo action removes the staff member from the current page data.`
+      `Delete ${staff.name} (${staff.id})? This will remove the staff member from the current demo data.`
     );
 
     if (!confirmed) return;
 
-    setStaffList((current) => current.filter((item) => item.id !== id));
+    setStaffList((current) =>
+      current.filter((item) => item.id !== id)
+    );
+
     setOpenActionMenu(null);
     setViewingStaff(null);
+
+    showToast(
+      `${staff.name} was removed from staff records.`,
+      "info"
+    );
   };
 
-  const updateStatus = (id: string, status: StaffStatus) => {
+  const updateStatus = (
+    id: string,
+    status: StaffStatus
+  ) => {
+    const staff = staffList.find(
+      (item) => item.id === id
+    );
+
     setStaffList((current) =>
-      current.map((staff) =>
-        staff.id === id ? { ...staff, status } : staff
+      current.map((item) =>
+        item.id === id
+          ? { ...item, status }
+          : item
       )
     );
+
     setOpenActionMenu(null);
+
+    if (staff) {
+      showToast(
+        `${staff.name}'s status changed to ${status}.`
+      );
+    }
   };
 
-  const setField = (field: keyof typeof emptyForm, value: string) => {
-    setForm((current) => ({ ...current, [field]: value }));
-    if (formError) setFormError("");
+  const handleExport = () => {
+    downloadCsv(filteredStaff);
+    showToast(
+      `${filteredStaff.length} staff records exported.`,
+      "success"
+    );
+  };
+
+  const sendMessage = (staff: StaffMember) => {
+    showToast(
+      `Communication action prepared for ${staff.name}.`,
+      "info"
+    );
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div
+      className="min-h-screen bg-slate-50"
+      onClick={() => {
+        if (openActionMenu) {
+          setOpenActionMenu(null);
+        }
+      }}
+    >
       <Slidebar />
 
-      <main className="ml-64 min-h-screen p-8">
+      <main className="min-h-screen p-4 sm:p-6 lg:ml-64 lg:p-8">
         <div className="mx-auto max-w-[1600px]">
-          {/* Header */}
-          <div className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          {/* HEADER */}
+          <div className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <p className="mb-1 text-sm font-semibold text-blue-600">
+              <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                <BriefcaseBusiness size={14} />
                 Administration
-              </p>
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              </div>
+
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
                 Staff Management
               </h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Manage non-teaching staff, roles, departments and employment
-                details.
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                Manage your non-teaching workforce, departments,
+                employment details, payroll visibility and staff
+                operations from one place.
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={openAddModal}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <Plus size={18} />
-              Add Staff
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={handleExport}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
+              >
+                <Download size={17} />
+                Export
+              </button>
+
+              <button
+                type="button"
+                onClick={openAddModal}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <Plus size={18} />
+                Add Staff
+              </button>
+            </div>
           </div>
 
-          {/* Stats */}
+          {/* KPI CARDS */}
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">
+                  <p className="text-sm font-semibold text-slate-500">
                     Total Staff
                   </p>
-                  <p className="mt-2 text-2xl font-bold text-slate-900">
+
+                  <p className="mt-2 text-3xl font-bold text-slate-900">
                     {stats.total}
                   </p>
+
+                  <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                    <TrendingUp size={13} />
+                    {stats.active} active members
+                  </p>
                 </div>
+
                 <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
                   <Users size={21} />
                 </div>
@@ -487,98 +960,393 @@ export default function StaffPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Active</p>
-                  <p className="mt-2 text-2xl font-bold text-emerald-600">
+                  <p className="text-sm font-semibold text-slate-500">
+                    Active Workforce
+                  </p>
+
+                  <p className="mt-2 text-3xl font-bold text-emerald-600">
                     {stats.active}
                   </p>
+
+                  <p className="mt-2 text-xs font-semibold text-slate-400">
+                    {stats.total > 0
+                      ? Math.round(
+                          (stats.active / stats.total) * 100
+                        )
+                      : 0}
+                    % of total staff
+                  </p>
                 </div>
+
                 <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
-                  <UserCheck size={21} />
+                  <UserRoundCheck size={21} />
                 </div>
               </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">On Leave</p>
-                  <p className="mt-2 text-2xl font-bold text-amber-600">
+                  <p className="text-sm font-semibold text-slate-500">
+                    On Leave
+                  </p>
+
+                  <p className="mt-2 text-3xl font-bold text-amber-600">
                     {stats.onLeave}
                   </p>
+
+                  <p className="mt-2 text-xs font-semibold text-slate-400">
+                    Currently unavailable
+                  </p>
                 </div>
+
                 <div className="rounded-xl bg-amber-50 p-3 text-amber-600">
-                  <CalendarDays size={21} />
+                  <CalendarClock size={21} />
                 </div>
               </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Inactive</p>
-                  <p className="mt-2 text-2xl font-bold text-red-600">
-                    {stats.inactive}
+                  <p className="text-sm font-semibold text-slate-500">
+                    Monthly Payroll
                   </p>
+
+                  <p className="mt-2 text-3xl font-bold text-slate-900">
+                    {formatCurrency(stats.monthlyPayroll)}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPayrollModal(true)}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700"
+                  >
+                    View payroll
+                    <ArrowUpRight size={13} />
+                  </button>
                 </div>
-                <div className="rounded-xl bg-red-50 p-3 text-red-600">
-                  <UserX size={21} />
+
+                <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
+                  <WalletCards size={21} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Filters */}
+          {/* AI COMMAND CENTER */}
+          <div className="mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-indigo-50 shadow-sm">
+            <div className="p-5 sm:p-6">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
+                    <BrainCircuit size={23} />
+                  </div>
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-bold text-slate-900">
+                        AI Workforce Command Center
+                      </h2>
+
+                      <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-600 shadow-sm">
+                        AI Ready
+                      </span>
+                    </div>
+
+                    <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+                      Analyze workforce health, payroll concentration,
+                      staffing risks and operational opportunities.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAiModal(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                >
+                  <Sparkles size={16} />
+                  Open AI Insights
+                </button>
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
+                {aiInsights.map((insight) => (
+                  <div
+                    key={insight.title}
+                    className="rounded-xl border border-white bg-white/80 p-4"
+                  >
+                    <div className="flex items-center gap-2">
+                      {insight.type === "positive" ? (
+                        <CheckCircle2
+                          size={16}
+                          className="text-emerald-600"
+                        />
+                      ) : insight.type === "recommendation" ? (
+                        <Sparkles
+                          size={16}
+                          className="text-blue-600"
+                        />
+                      ) : (
+                        <BarChart3
+                          size={16}
+                          className="text-indigo-600"
+                        />
+                      )}
+
+                      <p className="text-sm font-bold text-slate-900">
+                        {insight.title}
+                      </p>
+                    </div>
+
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      {insight.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* OPERATIONS SNAPSHOT */}
+          <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm xl:col-span-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">
+                    Workforce Overview
+                  </h2>
+
+                  <p className="text-sm text-slate-500">
+                    Current staffing distribution and operational health.
+                  </p>
+                </div>
+
+                <span className="inline-flex w-fit items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600">
+                  <Users size={14} />
+                  {stats.total} employees
+                </span>
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-xs font-semibold text-slate-500">
+                    Active
+                  </p>
+                  <p className="mt-2 text-xl font-bold text-emerald-600">
+                    {stats.active}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-xs font-semibold text-slate-500">
+                    On Leave
+                  </p>
+                  <p className="mt-2 text-xl font-bold text-amber-600">
+                    {stats.onLeave}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-xs font-semibold text-slate-500">
+                    Inactive
+                  </p>
+                  <p className="mt-2 text-xl font-bold text-red-600">
+                    {stats.inactive}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-xs font-semibold text-slate-500">
+                    Avg. Salary
+                  </p>
+                  <p className="mt-2 text-xl font-bold text-slate-900">
+                    {formatCurrency(stats.averageSalary)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-bold text-slate-800">
+                    Department Distribution
+                  </p>
+
+                  <p className="text-xs font-semibold text-slate-400">
+                    {departments.length} departments
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {departmentStats.slice(0, 5).map((item) => (
+                    <div key={item.department}>
+                      <div className="mb-1.5 flex items-center justify-between gap-3">
+                        <span className="text-xs font-bold text-slate-700">
+                          {item.department}
+                        </span>
+
+                        <span className="text-xs font-semibold text-slate-400">
+                          {item.count} · {item.percentage}%
+                        </span>
+                      </div>
+
+                      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className="h-full rounded-full bg-blue-600 transition-all"
+                          style={{
+                            width: `${item.percentage}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">
+                    Payroll Snapshot
+                  </h2>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Current workforce cost overview.
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
+                  <CircleDollarSign size={20} />
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-2xl bg-slate-900 p-5 text-white">
+                <p className="text-xs font-semibold text-slate-300">
+                  Estimated Annual Payroll
+                </p>
+
+                <p className="mt-2 text-2xl font-bold">
+                  {formatCurrency(stats.annualPayroll)}
+                </p>
+
+                <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-300">
+                  <TrendingUp size={14} />
+                  Based on current active workforce
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                  <span className="text-xs font-semibold text-slate-500">
+                    Active payroll
+                  </span>
+
+                  <span className="text-sm font-bold text-slate-900">
+                    {formatCurrency(stats.monthlyPayroll)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                  <span className="text-xs font-semibold text-slate-500">
+                    Average salary
+                  </span>
+
+                  <span className="text-sm font-bold text-slate-900">
+                    {formatCurrency(stats.averageSalary)}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowPayrollModal(true)}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  <WalletCards size={16} />
+                  Open Payroll Summary
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* STAFF DIRECTORY */}
           <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
-                  Staff Directory
-                </h2>
-                <p className="text-sm text-slate-500">
-                  Search, filter and organize your staff records.
+                <div className="flex items-center gap-2">
+                  <Users
+                    size={19}
+                    className="text-blue-600"
+                  />
+
+                  <h2 className="text-lg font-bold text-slate-900">
+                    Staff Directory
+                  </h2>
+                </div>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Search, filter and manage every staff record.
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="inline-flex w-fit items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                <RotateCcw size={15} />
-                Clear Filters
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  <RotateCcw size={15} />
+                  Reset
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  <Download size={15} />
+                  Export CSV
+                </button>
+              </div>
             </div>
 
+            {/* FILTERS */}
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
               <div className="relative xl:col-span-2">
                 <Search
                   size={17}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
+
                 <input
                   value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
+                  onChange={(event) => {
+                    setSearchQuery(event.target.value);
                     setPage(1);
                   }}
-                  placeholder="Name, ID, phone, email or role..."
+                  placeholder="Name, ID, phone, email, role or department..."
                   className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
               <select
                 value={departmentFilter}
-                onChange={(e) => {
-                  setDepartmentFilter(e.target.value);
+                onChange={(event) => {
+                  setDepartmentFilter(event.target.value);
                   setPage(1);
                 }}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500"
               >
                 <option value="All">All Departments</option>
+
                 {departments.map((department) => (
-                  <option key={department} value={department}>
+                  <option
+                    key={department}
+                    value={department}
+                  >
                     {department}
                   </option>
                 ))}
@@ -586,11 +1354,11 @@ export default function StaffPage() {
 
               <select
                 value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
+                onChange={(event) => {
+                  setStatusFilter(event.target.value);
                   setPage(1);
                 }}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500"
               >
                 <option value="All">All Statuses</option>
                 <option value="Active">Active</option>
@@ -600,67 +1368,107 @@ export default function StaffPage() {
 
               <select
                 value={employmentFilter}
-                onChange={(e) => {
-                  setEmploymentFilter(e.target.value);
+                onChange={(event) => {
+                  setEmploymentFilter(event.target.value);
                   setPage(1);
                 }}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-blue-500"
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500"
               >
-                <option value="All">All Employment Types</option>
+                <option value="All">
+                  All Employment Types
+                </option>
                 <option value="Full-time">Full-time</option>
                 <option value="Part-time">Part-time</option>
                 <option value="Contract">Contract</option>
               </select>
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Sort
-              </span>
+            <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2">
+                <Filter
+                  size={15}
+                  className="text-slate-400"
+                />
 
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-800 outline-none"
-              >
-                <option value="name">Name</option>
-                <option value="role">Role</option>
-                <option value="department">Department</option>
-                <option value="salary">Salary</option>
-                <option value="joiningDate">Joining Date</option>
-                <option value="status">Status</option>
-              </select>
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  Sort
+                </span>
 
-              <select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-800 outline-none"
-              >
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-              </select>
+                <select
+                  value={sortBy}
+                  onChange={(event) =>
+                    setSortBy(event.target.value)
+                  }
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none"
+                >
+                  <option value="name">Name</option>
+                  <option value="role">Role</option>
+                  <option value="department">
+                    Department
+                  </option>
+                  <option value="salary">Salary</option>
+                  <option value="joiningDate">
+                    Joining Date
+                  </option>
+                  <option value="status">Status</option>
+                </select>
 
-              <span className="ml-auto text-sm font-semibold text-slate-500">
+                <select
+                  value={sortOrder}
+                  onChange={(event) =>
+                    setSortOrder(event.target.value)
+                  }
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none"
+                >
+                  <option value="asc">A → Z</option>
+                  <option value="desc">Z → A</option>
+                </select>
+              </div>
+
+              <span className="sm:ml-auto text-sm font-bold text-slate-500">
                 {filteredStaff.length} staff member
                 {filteredStaff.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
 
-          {/* Table */}
+          {/* TABLE */}
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1100px] text-left">
+              <table className="w-full min-w-[1250px] text-left">
                 <thead className="border-b border-slate-200 bg-slate-50">
                   <tr className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                    <th className="px-5 py-4">Staff</th>
-                    <th className="px-5 py-4">Role</th>
-                    <th className="px-5 py-4">Department</th>
-                    <th className="px-5 py-4">Contact</th>
-                    <th className="px-5 py-4">Joining Date</th>
-                    <th className="px-5 py-4">Salary</th>
-                    <th className="px-5 py-4">Status</th>
-                    <th className="px-5 py-4 text-right">Actions</th>
+                    <th className="px-5 py-4">
+                      Staff
+                    </th>
+
+                    <th className="px-5 py-4">
+                      Role
+                    </th>
+
+                    <th className="px-5 py-4">
+                      Department
+                    </th>
+
+                    <th className="px-5 py-4">
+                      Contact
+                    </th>
+
+                    <th className="px-5 py-4">
+                      Experience
+                    </th>
+
+                    <th className="px-5 py-4">
+                      Salary
+                    </th>
+
+                    <th className="px-5 py-4">
+                      Status
+                    </th>
+
+                    <th className="px-5 py-4 text-right">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
 
@@ -669,16 +1477,21 @@ export default function StaffPage() {
                     <tr
                       key={staff.id}
                       className="transition hover:bg-blue-50/40"
+                      onClick={(event) =>
+                        event.stopPropagation()
+                      }
                     >
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
                             {getInitial(staff.name)}
                           </div>
-                          <div>
+
+                          <div className="min-w-0">
                             <p className="font-bold text-slate-900">
                               {staff.name}
                             </p>
+
                             <p className="mt-0.5 text-xs font-semibold text-slate-500">
                               {staff.id}
                             </p>
@@ -687,47 +1500,78 @@ export default function StaffPage() {
                       </td>
 
                       <td className="px-5 py-4">
-                        <p className="font-semibold text-slate-800">
+                        <p className="font-bold text-slate-800">
                           {staff.role}
                         </p>
-                        <p className="mt-0.5 text-xs text-slate-500">
+
+                        <p className="mt-1 text-xs font-semibold text-slate-400">
                           {staff.employmentType}
                         </p>
                       </td>
 
                       <td className="px-5 py-4">
-                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-700">
                           <Building2 size={13} />
                           {staff.department}
                         </span>
                       </td>
 
                       <td className="px-5 py-4">
-                        <p className="font-semibold text-slate-800">
+                        <p className="flex items-center gap-1.5 text-sm font-bold text-slate-800">
+                          <Phone
+                            size={13}
+                            className="text-slate-400"
+                          />
                           {staff.phone}
                         </p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          {staff.email || "No email"}
-                        </p>
-                      </td>
 
-                      <td className="px-5 py-4 text-sm font-semibold text-slate-700">
-                        {formatDate(staff.joiningDate)}
+                        <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                          <Mail
+                            size={13}
+                            className="text-slate-400"
+                          />
+                          <span className="max-w-[180px] truncate">
+                            {staff.email || "No email"}
+                          </span>
+                        </p>
                       </td>
 
                       <td className="px-5 py-4">
-                        <span className="font-bold text-slate-900">
+                        <p className="text-sm font-bold text-slate-800">
+                          {calculateExperience(
+                            staff.joiningDate
+                          )}
+                        </p>
+
+                        <p className="mt-1 text-xs font-medium text-slate-400">
+                          Joined {formatDate(staff.joiningDate)}
+                        </p>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <p className="font-bold text-slate-900">
                           {formatCurrency(staff.salary)}
-                        </span>
-                        <span className="ml-1 text-xs text-slate-400">
+                        </p>
+
+                        <p className="mt-1 text-xs font-medium text-slate-400">
                           / month
-                        </span>
+                        </p>
                       </td>
 
                       <td className="px-5 py-4">
                         <span
-                          className={`inline-flex rounded-full px-3 py-1.5 text-xs font-bold ${statusClasses[staff.status]}`}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold ${statusClasses[staff.status]}`}
                         >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              staff.status === "Active"
+                                ? "bg-emerald-500"
+                                : staff.status === "On Leave"
+                                ? "bg-amber-500"
+                                : "bg-red-500"
+                            }`}
+                          />
+
                           {staff.status}
                         </span>
                       </td>
@@ -736,9 +1580,12 @@ export default function StaffPage() {
                         <div className="relative flex justify-end gap-2">
                           <button
                             type="button"
-                            onClick={() => setViewingStaff(staff)}
-                            className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+                            onClick={() =>
+                              setViewingStaff(staff)
+                            }
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                           >
+                            <Eye size={14} />
                             View
                           </button>
 
@@ -746,7 +1593,9 @@ export default function StaffPage() {
                             type="button"
                             onClick={() =>
                               setOpenActionMenu(
-                                openActionMenu === staff.id ? null : staff.id
+                                openActionMenu === staff.id
+                                  ? null
+                                  : staff.id
                               )
                             }
                             className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50"
@@ -756,11 +1605,19 @@ export default function StaffPage() {
                           </button>
 
                           {openActionMenu === staff.id && (
-                            <div className="absolute right-0 top-11 z-30 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">
+                            <div
+                              className="absolute right-0 top-11 z-40 w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl"
+                              onClick={(event) =>
+                                event.stopPropagation()
+                              }
+                            >
                               <button
                                 type="button"
-                                onClick={() => setViewingStaff(staff)}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                onClick={() => {
+                                  setViewingStaff(staff);
+                                  setOpenActionMenu(null);
+                                }}
+                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
                               >
                                 <Eye size={16} />
                                 View Profile
@@ -768,47 +1625,72 @@ export default function StaffPage() {
 
                               <button
                                 type="button"
-                                onClick={() => openEditModal(staff)}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                onClick={() =>
+                                  openEditModal(staff)
+                                }
+                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
                               >
                                 <Pencil size={16} />
                                 Edit Staff
                               </button>
 
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  sendMessage(staff)
+                                }
+                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                              >
+                                <MessageCircle size={16} />
+                                Contact Staff
+                              </button>
+
                               <div className="my-1 border-t border-slate-100" />
 
-                              <p className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                              <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                 Change Status
                               </p>
 
-                              {(["Active", "On Leave", "Inactive"] as StaffStatus[]).map(
-                                (status) => (
-                                  <button
-                                    key={status}
-                                    type="button"
-                                    onClick={() => updateStatus(staff.id, status)}
-                                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                                  >
-                                    <span
-                                      className={`h-2 w-2 rounded-full ${
-                                        status === "Active"
-                                          ? "bg-emerald-500"
-                                          : status === "On Leave"
-                                          ? "bg-amber-500"
-                                          : "bg-red-500"
-                                      }`}
-                                    />
-                                    {status}
-                                  </button>
-                                )
-                              )}
+                              {(
+                                [
+                                  "Active",
+                                  "On Leave",
+                                  "Inactive",
+                                ] as StaffStatus[]
+                              ).map((status) => (
+                                <button
+                                  key={status}
+                                  type="button"
+                                  onClick={() =>
+                                    updateStatus(
+                                      staff.id,
+                                      status
+                                    )
+                                  }
+                                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                >
+                                  <span
+                                    className={`h-2 w-2 rounded-full ${
+                                      status === "Active"
+                                        ? "bg-emerald-500"
+                                        : status === "On Leave"
+                                        ? "bg-amber-500"
+                                        : "bg-red-500"
+                                    }`}
+                                  />
+
+                                  {status}
+                                </button>
+                              ))}
 
                               <div className="my-1 border-t border-slate-100" />
 
                               <button
                                 type="button"
-                                onClick={() => deleteStaff(staff.id)}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
+                                onClick={() =>
+                                  deleteStaff(staff.id)
+                                }
+                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
                               >
                                 <Trash2 size={16} />
                                 Delete Staff
@@ -822,16 +1704,31 @@ export default function StaffPage() {
 
                   {paginatedStaff.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="px-6 py-16 text-center">
-                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                          <Users size={22} />
+                      <td
+                        colSpan={8}
+                        className="px-6 py-20 text-center"
+                      >
+                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                          <Users size={24} />
                         </div>
+
                         <h3 className="mt-4 font-bold text-slate-900">
                           No staff found
                         </h3>
+
                         <p className="mt-1 text-sm text-slate-500">
-                          Try changing your filters or add a new staff member.
+                          Try changing your filters or add a
+                          new staff member.
                         </p>
+
+                        <button
+                          type="button"
+                          onClick={clearFilters}
+                          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700"
+                        >
+                          <RotateCcw size={15} />
+                          Reset Filters
+                        </button>
                       </td>
                     </tr>
                   )}
@@ -839,69 +1736,113 @@ export default function StaffPage() {
               </table>
             </div>
 
-            {/* Pagination */}
+            {/* PAGINATION */}
             <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm font-medium text-slate-500">
+              <p className="text-sm font-semibold text-slate-500">
                 Showing{" "}
-                {filteredStaff.length === 0 ? 0 : startIndex + 1}–
-                {Math.min(startIndex + rowsPerPage, filteredStaff.length)} of{" "}
-                {filteredStaff.length}
+                {filteredStaff.length === 0
+                  ? 0
+                  : startIndex + 1}
+                –
+                {Math.min(
+                  startIndex + rowsPerPage,
+                  filteredStaff.length
+                )}{" "}
+                of {filteredStaff.length}
               </p>
 
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   disabled={safePage === 1}
-                  onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  onClick={() =>
+                    setPage((current) =>
+                      Math.max(1, current - 1)
+                    )
+                  }
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
+                  <ChevronLeft size={15} />
                   Previous
                 </button>
 
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-                  (pageNumber) => (
-                    <button
-                      type="button"
-                      key={pageNumber}
-                      onClick={() => setPage(pageNumber)}
-                      className={`h-9 min-w-9 rounded-lg px-3 text-sm font-bold ${
-                        safePage === pageNumber
-                          ? "bg-blue-600 text-white"
-                          : "border border-slate-200 text-slate-700 hover:bg-slate-50"
-                      }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  )
-                )}
+                {Array.from(
+                  { length: totalPages },
+                  (_, index) => index + 1
+                ).map((pageNumber) => (
+                  <button
+                    type="button"
+                    key={pageNumber}
+                    onClick={() => setPage(pageNumber)}
+                    className={`h-9 min-w-9 rounded-lg px-3 text-sm font-bold ${
+                      safePage === pageNumber
+                        ? "bg-blue-600 text-white"
+                        : "border border-slate-200 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
 
                 <button
                   type="button"
                   disabled={safePage === totalPages}
                   onClick={() =>
-                    setPage((current) => Math.min(totalPages, current + 1))
+                    setPage((current) =>
+                      Math.min(
+                        totalPages,
+                        current + 1
+                      )
+                    )
                   }
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next
+                  <ChevronRight size={15} />
                 </button>
               </div>
             </div>
           </div>
+
+          {/* FOOTER */}
+          <div className="mt-5 flex flex-col gap-2 border-t border-slate-200 pt-5 text-xs font-medium text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              Staff Management Control Center · v0.1.20
+            </p>
+
+            <p>
+              AI insights are currently simulated and will
+              connect to the backend AI engine later.
+            </p>
+          </div>
         </div>
       </main>
 
-      {/* Add/Edit Modal */}
+      {/* ADD / EDIT MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+          <div
+            className="max-h-[94vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-5 sm:px-7">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">
-                  {editingId ? "Edit Staff" : "Add New Staff"}
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Enter the staff member&apos;s professional and contact
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="rounded-lg bg-blue-50 p-2 text-blue-600">
+                    <BriefcaseBusiness size={17} />
+                  </div>
+
+                  <h2 className="text-xl font-bold text-slate-900">
+                    {editingId
+                      ? "Edit Staff Profile"
+                      : "Add New Staff"}
+                  </h2>
+                </div>
+
+                <p className="text-sm text-slate-500">
+                  Add professional, contact and employment
                   information.
                 </p>
               </div>
@@ -909,153 +1850,245 @@ export default function StaffPage() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100"
+                aria-label="Close modal"
               >
-                <X size={20} />
+                <X size={21} />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-6 p-6">
+            <form
+              onSubmit={handleSave}
+              className="space-y-7 p-5 sm:p-7"
+            >
               {formError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                  <AlertTriangle
+                    size={18}
+                    className="mt-0.5 shrink-0"
+                  />
                   {formError}
                 </div>
               )}
 
+              {/* EMPLOYMENT */}
               <section>
-                <div className="mb-4 flex items-center gap-2">
-                  <BriefcaseBusiness size={18} className="text-blue-600" />
-                  <h3 className="font-bold text-slate-900">
-                    Employment Details
-                  </h3>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-lg bg-blue-50 p-2 text-blue-600">
+                    <BriefcaseBusiness size={17} />
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-slate-900">
+                      Employment Details
+                    </h3>
+
+                    <p className="text-xs text-slate-500">
+                      Role, department, employment type and salary.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Full Name *
                     </span>
+
                     <input
                       value={form.name}
-                      onChange={(e) => setField("name", e.target.value)}
+                      onChange={(event) =>
+                        setField(
+                          "name",
+                          event.target.value
+                        )
+                      }
                       placeholder="Enter full name"
                       className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Role *
                     </span>
+
                     <input
                       value={form.role}
-                      onChange={(e) => setField("role", e.target.value)}
+                      onChange={(event) =>
+                        setField(
+                          "role",
+                          event.target.value
+                        )
+                      }
                       placeholder="e.g. Accountant"
                       className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Department *
                     </span>
+
                     <input
                       list="staff-departments"
                       value={form.department}
-                      onChange={(e) => setField("department", e.target.value)}
+                      onChange={(event) =>
+                        setField(
+                          "department",
+                          event.target.value
+                        )
+                      }
                       placeholder="e.g. Finance"
                       className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
+
                     <datalist id="staff-departments">
                       {departments.map((department) => (
-                        <option key={department} value={department} />
+                        <option
+                          key={department}
+                          value={department}
+                        />
                       ))}
                     </datalist>
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Joining Date *
                     </span>
+
                     <input
                       type="date"
                       value={form.joiningDate}
-                      onChange={(e) =>
-                        setField("joiningDate", e.target.value)
+                      onChange={(event) =>
+                        setField(
+                          "joiningDate",
+                          event.target.value
+                        )
                       }
                       className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Employment Type
                     </span>
+
                     <select
                       value={form.employmentType}
-                      onChange={(e) =>
-                        setField("employmentType", e.target.value)
+                      onChange={(event) =>
+                        setField(
+                          "employmentType",
+                          event.target.value
+                        )
                       }
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                     >
-                      <option value="Full-time">Full-time</option>
-                      <option value="Part-time">Part-time</option>
-                      <option value="Contract">Contract</option>
+                      <option value="Full-time">
+                        Full-time
+                      </option>
+                      <option value="Part-time">
+                        Part-time
+                      </option>
+                      <option value="Contract">
+                        Contract
+                      </option>
                     </select>
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Status
                     </span>
+
                     <select
                       value={form.status}
-                      onChange={(e) => setField("status", e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                      onChange={(event) =>
+                        setField(
+                          "status",
+                          event.target.value
+                        )
+                      }
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
                     >
-                      <option value="Active">Active</option>
-                      <option value="On Leave">On Leave</option>
-                      <option value="Inactive">Inactive</option>
+                      <option value="Active">
+                        Active
+                      </option>
+                      <option value="On Leave">
+                        On Leave
+                      </option>
+                      <option value="Inactive">
+                        Inactive
+                      </option>
                     </select>
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Monthly Salary
                     </span>
-                    <input
-                      type="number"
-                      min="0"
-                      value={form.salary}
-                      onChange={(e) => setField("salary", e.target.value)}
-                      placeholder="e.g. 30000"
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
+
+                    <div className="relative">
+                      <IndianRupee
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                      />
+
+                      <input
+                        type="number"
+                        min="0"
+                        value={form.salary}
+                        onChange={(event) =>
+                          setField(
+                            "salary",
+                            event.target.value
+                          )
+                        }
+                        placeholder="e.g. 30000"
+                        className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
                   </label>
                 </div>
               </section>
 
-              <section className="border-t border-slate-100 pt-6">
-                <div className="mb-4 flex items-center gap-2">
-                  <Phone size={18} className="text-blue-600" />
-                  <h3 className="font-bold text-slate-900">
-                    Contact Information
-                  </h3>
+              {/* CONTACT */}
+              <section className="border-t border-slate-100 pt-7">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+                    <Phone size={17} />
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-slate-900">
+                      Contact Information
+                    </h3>
+
+                    <p className="text-xs text-slate-500">
+                      Contact and emergency communication details.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Phone *
                     </span>
+
                     <input
                       inputMode="numeric"
                       maxLength={10}
                       value={form.phone}
-                      onChange={(e) =>
+                      onChange={(event) =>
                         setField(
                           "phone",
-                          e.target.value.replace(/\D/g, "").slice(0, 10)
+                          event.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 10)
                         )
                       }
                       placeholder="10-digit phone number"
@@ -1063,31 +2096,40 @@ export default function StaffPage() {
                     />
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Email
                     </span>
+
                     <input
                       type="email"
                       value={form.email}
-                      onChange={(e) => setField("email", e.target.value)}
+                      onChange={(event) =>
+                        setField(
+                          "email",
+                          event.target.value
+                        )
+                      }
                       placeholder="staff@example.com"
                       className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
                   </label>
 
-                  <label className="block">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Emergency Contact
                     </span>
+
                     <input
                       inputMode="numeric"
                       maxLength={10}
                       value={form.emergencyContact}
-                      onChange={(e) =>
+                      onChange={(event) =>
                         setField(
                           "emergencyContact",
-                          e.target.value.replace(/\D/g, "").slice(0, 10)
+                          event.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 10)
                         )
                       }
                       placeholder="Emergency phone number"
@@ -1095,52 +2137,75 @@ export default function StaffPage() {
                     />
                   </label>
 
-                  <label className="block md:col-span-2">
+                  <label>
                     <span className="mb-1.5 block text-sm font-bold text-slate-700">
                       Address
                     </span>
-                    <textarea
-                      rows={2}
+
+                    <input
                       value={form.address}
-                      onChange={(e) => setField("address", e.target.value)}
-                      placeholder="Enter residential address"
-                      className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      onChange={(event) =>
+                        setField(
+                          "address",
+                          event.target.value
+                        )
+                      }
+                      placeholder="Residential address"
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
                   </label>
                 </div>
               </section>
 
-              <section className="border-t border-slate-100 pt-6">
-                <div className="mb-4 flex items-center gap-2">
-                  <ShieldCheck size={18} className="text-blue-600" />
-                  <h3 className="font-bold text-slate-900">
-                    Internal Notes
-                  </h3>
+              {/* NOTES */}
+              <section className="border-t border-slate-100 pt-7">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-lg bg-violet-50 p-2 text-violet-600">
+                    <FileText size={17} />
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-slate-900">
+                      Internal Notes
+                    </h3>
+
+                    <p className="text-xs text-slate-500">
+                      Private administrative notes for this staff profile.
+                    </p>
+                  </div>
                 </div>
 
                 <textarea
-                  rows={3}
+                  rows={4}
                   value={form.notes}
-                  onChange={(e) => setField("notes", e.target.value)}
-                  placeholder="Add internal notes about this staff member..."
+                  onChange={(event) =>
+                    setField(
+                      "notes",
+                      event.target.value
+                    )
+                  }
+                  placeholder="Add internal notes..."
                   className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </section>
 
-              <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
+              <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+                  className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
                 >
-                  {editingId ? "Save Changes" : "Add Staff"}
+                  <CheckCircle2 size={17} />
+                  {editingId
+                    ? "Save Changes"
+                    : "Add Staff"}
                 </button>
               </div>
             </form>
@@ -1148,148 +2213,560 @@ export default function StaffPage() {
         </div>
       )}
 
-      {/* View Modal */}
+      {/* VIEW PROFILE MODAL */}
       {viewingStaff && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+          <div
+            className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-200 bg-white px-5 py-5 sm:px-7">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-700">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-xl font-bold text-blue-700">
                   {getInitial(viewingStaff.name)}
                 </div>
+
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900">
-                    {viewingStaff.name}
-                  </h2>
-                  <p className="text-sm font-semibold text-slate-500">
-                    {viewingStaff.role} · {viewingStaff.id}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-xl font-bold text-slate-900">
+                      {viewingStaff.name}
+                    </h2>
+
+                    <span
+                      className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${statusClasses[viewingStaff.status]}`}
+                    >
+                      {viewingStaff.status}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 text-sm font-semibold text-slate-500">
+                    {viewingStaff.role}
+                  </p>
+
+                  <p className="mt-1 text-xs font-bold text-slate-400">
+                    {viewingStaff.id}
                   </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => setViewingStaff(null)}
+                onClick={() =>
+                  setViewingStaff(null)
+                }
+                className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-5 sm:p-7">
+              {/* PROFILE SUMMARY */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                    Department
+                  </p>
+
+                  <p className="mt-2 text-sm font-bold text-slate-900">
+                    {viewingStaff.department}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                    Employment
+                  </p>
+
+                  <p className="mt-2 text-sm font-bold text-slate-900">
+                    {viewingStaff.employmentType}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                    Experience
+                  </p>
+
+                  <p className="mt-2 text-sm font-bold text-slate-900">
+                    {calculateExperience(
+                      viewingStaff.joiningDate
+                    )}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                    Monthly Salary
+                  </p>
+
+                  <p className="mt-2 text-sm font-bold text-slate-900">
+                    {formatCurrency(
+                      viewingStaff.salary
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* CONTACT */}
+              <div className="mt-6">
+                <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
+                  <Phone
+                    size={16}
+                    className="text-blue-600"
+                  />
+                  Contact Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-slate-100 p-4">
+                    <p className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                      <Phone size={14} />
+                      Phone
+                    </p>
+
+                    <p className="mt-2 font-bold text-slate-900">
+                      {viewingStaff.phone}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-100 p-4">
+                    <p className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                      <Mail size={14} />
+                      Email
+                    </p>
+
+                    <p className="mt-2 break-all font-bold text-slate-900">
+                      {viewingStaff.email ||
+                        "Not provided"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-100 p-4">
+                    <p className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                      <Phone size={14} />
+                      Emergency Contact
+                    </p>
+
+                    <p className="mt-2 font-bold text-slate-900">
+                      {viewingStaff.emergencyContact ||
+                        "Not provided"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-100 p-4">
+                    <p className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                      <MapPin size={14} />
+                      Address
+                    </p>
+
+                    <p className="mt-2 font-bold text-slate-900">
+                      {viewingStaff.address ||
+                        "Not provided"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* EMPLOYMENT */}
+              <div className="mt-6">
+                <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
+                  <BriefcaseBusiness
+                    size={16}
+                    className="text-blue-600"
+                  />
+                  Employment Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="rounded-xl border border-slate-100 p-4">
+                    <p className="text-xs font-bold text-slate-400">
+                      Joining Date
+                    </p>
+
+                    <p className="mt-2 font-bold text-slate-900">
+                      {formatDate(
+                        viewingStaff.joiningDate
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-100 p-4">
+                    <p className="text-xs font-bold text-slate-400">
+                      Current Experience
+                    </p>
+
+                    <p className="mt-2 font-bold text-slate-900">
+                      {calculateExperience(
+                        viewingStaff.joiningDate
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-100 p-4">
+                    <p className="text-xs font-bold text-slate-400">
+                      Annual Salary
+                    </p>
+
+                    <p className="mt-2 font-bold text-slate-900">
+                      {formatCurrency(
+                        viewingStaff.salary * 12
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* NOTES */}
+              <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+                  <FileText size={14} />
+                  Internal Notes
+                </p>
+
+                <p className="mt-2 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">
+                  {viewingStaff.notes ||
+                    "No internal notes added."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
+              <button
+                type="button"
+                onClick={() =>
+                  sendMessage(viewingStaff)
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+              >
+                <MessageCircle size={16} />
+                Contact
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  openEditModal(viewingStaff)
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
+              >
+                <Pencil size={16} />
+                Edit Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI MODAL */}
+      {showAiModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+          <div
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-blue-600 p-3 text-white">
+                  <BrainCircuit size={20} />
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">
+                    AI Workforce Insights
+                  </h2>
+
+                  <p className="text-sm text-slate-500">
+                    Intelligent recommendations based on current
+                    staff data.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowAiModal(false)}
                 className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Status
-                </p>
-                <span
-                  className={`mt-2 inline-flex rounded-full px-3 py-1.5 text-xs font-bold ${statusClasses[viewingStaff.status]}`}
-                >
-                  {viewingStaff.status}
-                </span>
-              </div>
+            <div className="space-y-4 p-6">
+              <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles
+                    size={17}
+                    className="text-blue-600"
+                  />
 
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Department
-                </p>
-                <p className="mt-2 font-bold text-slate-900">
-                  {viewingStaff.department}
-                </p>
-              </div>
+                  <p className="font-bold text-slate-900">
+                    Workforce recommendation
+                  </p>
+                </div>
 
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Employment Type
-                </p>
-                <p className="mt-2 font-bold text-slate-900">
-                  {viewingStaff.employmentType}
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Your current staff structure is distributed across
+                  {` ${departments.length}`} departments. Consider
+                  monitoring workload concentration within the largest
+                  departments before hiring additional staff.
                 </p>
               </div>
 
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Monthly Salary
-                </p>
-                <p className="mt-2 font-bold text-slate-900">
-                  {formatCurrency(viewingStaff.salary)}
+              <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle
+                    size={17}
+                    className="text-amber-600"
+                  />
+
+                  <p className="font-bold text-slate-900">
+                    Leave coverage
+                  </p>
+                </div>
+
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {stats.onLeave === 0
+                    ? "No current leave coverage issue detected."
+                    : `${stats.onLeave} staff member${
+                        stats.onLeave > 1 ? "s are" : " is"
+                      } currently on leave. Review department coverage for critical operational roles.`}
                 </p>
               </div>
 
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
-                  <Phone size={14} />
-                  Phone
-                </p>
-                <p className="mt-2 font-bold text-slate-900">
-                  {viewingStaff.phone}
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                <div className="flex items-center gap-2">
+                  <TrendingUp
+                    size={17}
+                    className="text-emerald-600"
+                  />
+
+                  <p className="font-bold text-slate-900">
+                    Retention opportunity
+                  </p>
+                </div>
+
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Staff tenure can be used later to build automated
+                  retention scoring, recognition recommendations and
+                  performance-review reminders.
                 </p>
               </div>
 
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
-                  <Mail size={14} />
-                  Email
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center gap-2">
+                  <Zap
+                    size={17}
+                    className="text-indigo-600"
+                  />
+
+                  <p className="font-bold text-slate-900">
+                    Future AI capabilities
+                  </p>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {[
+                    "Staff attrition prediction",
+                    "Workload balancing",
+                    "Payroll forecasting",
+                    "Hiring recommendations",
+                    "Performance insights",
+                    "Leave planning",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+                    >
+                      ✓ {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-center text-xs font-medium text-slate-400">
+                AI insights shown here are simulated. Real AI
+                analysis will be connected after the backend and
+                AI service are implemented.
+              </p>
+            </div>
+
+            <div className="border-t border-slate-200 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setShowAiModal(false)}
+                className="w-full rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
+              >
+                Close Insights
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PAYROLL MODAL */}
+      {showPayrollModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+          <div
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
+                  <WalletCards size={20} />
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">
+                    Payroll Summary
+                  </h2>
+
+                  <p className="text-sm text-slate-500">
+                    Current estimated staff payroll.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPayrollModal(false)
+                }
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="rounded-2xl bg-slate-900 p-6 text-white">
+                <p className="text-xs font-semibold text-slate-300">
+                  Current Monthly Payroll
                 </p>
-                <p className="mt-2 break-all font-bold text-slate-900">
-                  {viewingStaff.email || "Not provided"}
+
+                <p className="mt-2 text-3xl font-bold">
+                  {formatCurrency(
+                    stats.monthlyPayroll
+                  )}
+                </p>
+
+                <p className="mt-2 text-xs font-semibold text-slate-400">
+                  Estimated annual payroll:{" "}
+                  {formatCurrency(stats.annualPayroll)}
                 </p>
               </div>
 
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Joining Date
-                </p>
-                <p className="mt-2 font-bold text-slate-900">
-                  {formatDate(viewingStaff.joiningDate)}
-                </p>
-              </div>
+              <div className="mt-5 space-y-2">
+                {staffList
+                  .filter(
+                    (staff) =>
+                      staff.status !== "Inactive"
+                  )
+                  .sort(
+                    (a, b) => b.salary - a.salary
+                  )
+                  .map((staff) => (
+                    <div
+                      key={staff.id}
+                      className="flex items-center justify-between rounded-xl border border-slate-100 p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                          {getInitial(staff.name)}
+                        </div>
 
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Emergency Contact
-                </p>
-                <p className="mt-2 font-bold text-slate-900">
-                  {viewingStaff.emergencyContact || "Not provided"}
-                </p>
-              </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">
+                            {staff.name}
+                          </p>
 
-              <div className="rounded-xl bg-slate-50 p-4 sm:col-span-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Address
-                </p>
-                <p className="mt-2 font-semibold text-slate-800">
-                  {viewingStaff.address || "Not provided"}
-                </p>
-              </div>
+                          <p className="text-xs font-medium text-slate-400">
+                            {staff.role}
+                          </p>
+                        </div>
+                      </div>
 
-              <div className="rounded-xl bg-slate-50 p-4 sm:col-span-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                  Internal Notes
-                </p>
-                <p className="mt-2 whitespace-pre-wrap font-semibold text-slate-800">
-                  {viewingStaff.notes || "No notes added."}
-                </p>
+                      <p className="text-sm font-bold text-slate-900">
+                        {formatCurrency(staff.salary)}
+                      </p>
+                    </div>
+                  ))}
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-4">
+            <div className="border-t border-slate-200 px-6 py-4">
               <button
                 type="button"
-                onClick={() => openEditModal(viewingStaff)}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+                onClick={() =>
+                  setShowPayrollModal(false)
+                }
+                className="w-full rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
               >
-                <Pencil size={16} />
-                Edit
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setViewingStaff(null)}
-                className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800"
-              >
-                Close
+                Close Payroll
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST */}
+      {toast && (
+        <div className="fixed bottom-5 right-5 z-[200] w-[calc(100%-40px)] max-w-sm">
+          <div
+            className={`flex items-start gap-3 rounded-2xl border bg-white p-4 shadow-2xl ${
+              toast.type === "success"
+                ? "border-emerald-200"
+                : toast.type === "error"
+                ? "border-red-200"
+                : "border-blue-200"
+            }`}
+          >
+            <div
+              className={`mt-0.5 rounded-lg p-2 ${
+                toast.type === "success"
+                  ? "bg-emerald-50 text-emerald-600"
+                  : toast.type === "error"
+                  ? "bg-red-50 text-red-600"
+                  : "bg-blue-50 text-blue-600"
+              }`}
+            >
+              {toast.type === "success" ? (
+                <CheckCircle2 size={17} />
+              ) : toast.type === "error" ? (
+                <AlertTriangle size={17} />
+              ) : (
+                <RefreshCw size={17} />
+              )}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-slate-900">
+                {toast.type === "success"
+                  ? "Success"
+                  : toast.type === "error"
+                  ? "Action failed"
+                  : "Information"}
+              </p>
+
+              <p className="mt-0.5 text-xs font-medium leading-5 text-slate-500">
+                {toast.message}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setToast(null)}
+              className="rounded-lg p-1 text-slate-400 hover:bg-slate-100"
+            >
+              <X size={15} />
+            </button>
           </div>
         </div>
       )}
