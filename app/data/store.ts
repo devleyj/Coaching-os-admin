@@ -1,5 +1,3 @@
-// app/data/store.ts
-
 "use client";
 
 export const APP_STORE_KEY = "coaching-os-app-store";
@@ -17,7 +15,8 @@ export type StoreCollection =
   | "exams"
   | "schedule"
   | "onlineClasses"
-  | "notifications";
+  | "notifications"
+  | "reports";
 
 export type AppStoreData = Record<StoreCollection, unknown[]>;
 
@@ -34,6 +33,7 @@ const emptyStore: AppStoreData = {
   schedule: [],
   onlineClasses: [],
   notifications: [],
+  reports: [],
 };
 
 function isBrowser() {
@@ -73,7 +73,9 @@ export function writeAppStore(data: AppStoreData) {
 export function getCollection<T>(
   collection: StoreCollection,
 ): T[] {
-  return readAppStore()[collection] as T[];
+  const value = readAppStore()[collection];
+
+  return Array.isArray(value) ? (value as T[]) : [];
 }
 
 export function setCollection<T>(

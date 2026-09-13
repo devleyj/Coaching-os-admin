@@ -1,8 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import {
+  getCollection,
+  setCollection,
+  subscribeToStore,
+} from "../data/store";
 import {
   AlertTriangle,
   ArrowDown,
@@ -592,6 +597,45 @@ export default function ReportsPage() {
 
   const [copied, setCopied] = useState(false);
 
+  type StoreRecord = Record<string, unknown>;
+  const [storeStudents, setStoreStudents] = useState<StoreRecord[]>([]);
+  const [storeTeachers, setStoreTeachers] = useState<StoreRecord[]>([]);
+  const [storeCourses, setStoreCourses] = useState<StoreRecord[]>([]);
+  const [storeBatches, setStoreBatches] = useState<StoreRecord[]>([]);
+  const [storeFees, setStoreFees] = useState<StoreRecord[]>([]);
+  const [storeAttendance, setStoreAttendance] = useState<StoreRecord[]>([]);
+  const [storeExams, setStoreExams] = useState<StoreRecord[]>([]);
+  const [storeInquiries, setStoreInquiries] = useState<StoreRecord[]>([]);
+  const [storeSchedule, setStoreSchedule] = useState<StoreRecord[]>([]);
+  const [storeOnlineClasses, setStoreOnlineClasses] = useState<StoreRecord[]>([]);
+
+  const hydrateStore = () => {
+    setStoreStudents(getCollection<StoreRecord>("students"));
+    setStoreTeachers(getCollection<StoreRecord>("teachers"));
+    setStoreCourses(getCollection<StoreRecord>("courses"));
+    setStoreBatches(getCollection<StoreRecord>("batches"));
+    setStoreFees(getCollection<StoreRecord>("fees"));
+    setStoreAttendance(getCollection<StoreRecord>("attendance"));
+    setStoreExams(getCollection<StoreRecord>("exams"));
+    setStoreInquiries(getCollection<StoreRecord>("inquiries"));
+    setStoreSchedule(getCollection<StoreRecord>("schedule"));
+    setStoreOnlineClasses(getCollection<StoreRecord>("onlineClasses"));
+  };
+
+  useEffect(() => {
+    hydrateStore();
+    return subscribeToStore(hydrateStore);
+  }, []);
+
+  useEffect(() => {
+    const storedReports = getCollection<Report>("reports");
+    if (storedReports.length > 0) {
+      setReports(storedReports);
+    } else {
+      setCollection("reports", initialReports);
+    }
+  }, []);
+
   const categories: ReportCategory[] = [
     "All",
     "Students",
@@ -660,30 +704,107 @@ export default function ReportsPage() {
     page * rowsPerPage,
   );
 
-  const totalStudents = 1248;
+  const reportStudentPerformance = useMemo<StudentPerformance[]>(() => {
+    if (storeStudents.length === 0) return studentPerformance;
 
+    const rows = storeStudents.map((student, index) => {
+      const id = String(student.id ?? `STU-${index + 1001}`);
+      const name = String(student.name ?? "Unnamed Student");
+      const course = String(student.course ?? "—");
+      const batch = String(student.batch ?? "—");
+      const attendance = Number(student.attendance ?? student.attendanceRate ?? 0);
+      const average = Number(student.performance ?? student.averageScore ?? 0);
+      const risk: StudentPerformance["risk"] =
+        attendance < 75 || average < 60
+          ? "High"
+          : attendance < 85 || average < 75
+            ? "Medium"
+            : "Low";
+      return {
+        rank: index + 1,
+        name,
+        id,
+        course,
+        batch,
+        attendance: Number.isFinite(attendance) ? attendance : 0,
+        average: Number.isFinite(average) ? average : 0,
+        exams: storeExams.filter((exam) =>
+          String(exam.batch ?? exam.batchName ?? "") === batch,
+        ).length,
+        risk,
+      };
+    });
+
+    return rows
+      .sort((a, b) => b.average - a.average)
+      .map((student, index) => ({ ...student, rank: index + 1 }));
+  }, [storeStudents, storeExams]);
+
+  const reportAttendanceData = useMemo<AttendanceRecord[]>(() => {
+    if (storeAttendance.length === 0) return attendanceData;
+    const map = new Map<string, { present: number; absent: number; late: number; leave: number }>();
+    storeAttendance.forEach((record) => {
+      const batch = String(record.batch ?? "Unknown Batch");
+      const current = map.get(batch) ?? { present: 0, absent: 0, late: 0, leave: 0 };
+      const status = String(record.status ?? "Present").toLowerCase();
+      if (status === "absent") current.absent += 1;
+      else if (status === "late") current.late += 1;
+      else if (status === "leave") current.leave += 1;
+      else current.present += 1;
+      map.set(batch, current);
+    });
+    return Array.from(map.entries()).map(([batch, data]) => {
+      const total = data.present + data.absent + data.late + data.leave;
+      return {
+        batch,
+        ...data,
+        percentage: total ? Math.round((data.present / total) * 100) : 0,
+      };
+    });
+  }, [storeAttendance]);
+
+  const reportFeeData = useMemo<FeeRecord[]>(() => {
+    if (storeFees.length === 0 && storeStudents.length === 0) return feeData;
+    if (storeFees.length === 0) {
+      const collected = storeStudents.reduce((sum, s) => sum + Number(s.paidFees ?? 0), 0);
+      const pending = storeStudents.reduce((sum, s) => sum + Number(s.pendingFees ?? 0), 0);
+      const target = collected + pending;
+      return [{ month: "Current", collected, pending, target }];
+    }
+    const collected = storeFees.reduce((sum, fee) =>
+      sum + Number(fee.paid ?? fee.paidAmount ?? fee.collected ?? 0), 0);
+    const pending = storeFees.reduce((sum, fee) =>
+      sum + Number(fee.pending ?? fee.pendingAmount ?? 0), 0);
+    const target = storeFees.reduce((sum, fee) =>
+      sum + Number(fee.total ?? fee.totalFees ?? fee.target ?? 0), 0);
+    return [{ month: "Current", collected, pending, target: target || collected + pending }];
+  }, [storeFees, storeStudents]);
+
+  const totalStudents = storeStudents.length || 1248;
   const totalReports = reports.length;
-
   const attendanceAverage = Math.round(
-    attendanceData.reduce((sum, item) => sum + item.percentage, 0) /
-      attendanceData.length,
+    reportAttendanceData.reduce((sum, item) => sum + item.percentage, 0) /
+      Math.max(1, reportAttendanceData.length),
   );
+  const totalCollected = reportFeeData.reduce((sum, item) => sum + item.collected, 0);
+  const totalPending = reportFeeData.reduce((sum, item) => sum + item.pending, 0);
+  const totalTarget = reportFeeData.reduce((sum, item) => sum + item.target, 0);
+  const collectionRate = totalTarget > 0 ? Math.round((totalCollected / totalTarget) * 100) : 0;
+  const highRiskStudents = reportStudentPerformance.filter((student) => student.risk === "High").length;
+  const mediumRiskStudents = reportStudentPerformance.filter((student) => student.risk === "Medium").length;
 
-  const totalCollected = feeData.reduce((sum, item) => sum + item.collected, 0);
-
-  const totalPending = feeData.reduce((sum, item) => sum + item.pending, 0);
-
-  const totalTarget = feeData.reduce((sum, item) => sum + item.target, 0);
-
-  const collectionRate = Math.round((totalCollected / totalTarget) * 100);
-
-  const highRiskStudents = studentPerformance.filter(
-    (student) => student.risk === "High",
-  ).length;
-
-  const mediumRiskStudents = studentPerformance.filter(
-    (student) => student.risk === "Medium",
-  ).length;
+  const liveDataCounts = {
+    students: storeStudents.length,
+    teachers: storeTeachers.length,
+    courses: storeCourses.length,
+    batches: storeBatches.length,
+    fees: storeFees.length,
+    attendance: storeAttendance.length,
+    exams: storeExams.length,
+    inquiries: storeInquiries.length,
+    schedule: storeSchedule.length,
+    onlineClasses: storeOnlineClasses.length,
+  };
 
   const showToast = (message: string) => {
     setToast(message);
@@ -715,17 +836,29 @@ export default function ReportsPage() {
         status: "Ready",
         records:
           builderCategory === "Students"
-            ? 1248
+            ? totalStudents
             : builderCategory === "Teachers"
-              ? 42
-              : builderCategory === "Batches"
-                ? 28
-                : 500,
+              ? (storeTeachers.length || 42)
+              : builderCategory === "Courses"
+                ? (storeCourses.length || 18)
+                : builderCategory === "Batches"
+                  ? (storeBatches.length || 28)
+                  : builderCategory === "Fees"
+                    ? (storeFees.length || totalStudents)
+                    : builderCategory === "Attendance"
+                      ? (storeAttendance.length || 4280)
+                      : builderCategory === "Exams"
+                        ? (storeExams.length || 1132)
+                        : totalStudents,
         owner: builderIncludeAI ? "AI Analytics" : "Admin",
         frequency: "On Demand",
       };
 
-      setReports((current) => [newReport, ...current]);
+      setReports((current) => {
+        const next = [newReport, ...current];
+        setCollection("reports", next);
+        return next;
+      });
 
       setBuilderName("");
 
@@ -740,7 +873,11 @@ export default function ReportsPage() {
   };
 
   const handleDeleteReport = (id: string) => {
-    setReports((current) => current.filter((report) => report.id !== id));
+    setReports((current) => {
+      const next = current.filter((report) => report.id !== id);
+      setCollection("reports", next);
+      return next;
+    });
 
     setShowActionMenu(null);
 
@@ -760,7 +897,11 @@ export default function ReportsPage() {
       }),
     };
 
-    setReports((current) => [duplicate, ...current]);
+    setReports((current) => {
+      const next = [duplicate, ...current];
+      setCollection("reports", next);
+      return next;
+    });
 
     setShowActionMenu(null);
 
@@ -1206,7 +1347,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
                     />
 
                     <span className="text-[10px] font-medium text-slate-400">
-                      {feeData[index]?.month}
+                      {reportFeeData[index]?.month}
                     </span>
                   </div>
                 ))}
@@ -1289,7 +1430,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
             </div>
 
             <div className="space-y-4">
-              {feeData.map((item) => {
+              {reportFeeData.map((item) => {
                 const percentage = Math.round(
                   (item.collected / item.target) * 100,
                 );
@@ -1363,7 +1504,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
             </div>
 
             <div className="space-y-5">
-              {attendanceData.map((item) => (
+              {reportAttendanceData.map((item) => (
                 <div key={item.batch}>
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm font-semibold text-slate-700">
@@ -1553,7 +1694,7 @@ Medium Risk Students: ${mediumRiskStudents}`;
               </thead>
 
               <tbody className="divide-y divide-slate-100">
-                {studentPerformance.slice(0, 8).map((student) => (
+                {reportStudentPerformance.slice(0, 8).map((student) => (
                   <tr
                     key={student.id}
                     className="transition hover:bg-blue-50/30"
@@ -1642,6 +1783,10 @@ Medium Risk Students: ${mediumRiskStudents}`;
 
                 <p className="mt-1 text-sm text-slate-500">
                   Generated, saved and scheduled reports.
+                </p>
+
+                <p className="mt-2 text-xs font-medium text-slate-400">
+                  Live data: {liveDataCounts.students} students · {liveDataCounts.teachers} teachers · {liveDataCounts.batches} batches · {liveDataCounts.exams} exams · {liveDataCounts.attendance} attendance records · {liveDataCounts.inquiries} inquiries · {liveDataCounts.schedule} schedules · {liveDataCounts.onlineClasses} online classes
                 </p>
               </div>
 
