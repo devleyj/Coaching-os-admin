@@ -1,8 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import {
+  getCollection,
+  setCollection,
+  subscribeToStore,
+} from "../data/store";
+import { courses as sharedCourses } from "../data/courses";
 import {
   Search,
   Plus,
@@ -63,7 +69,9 @@ type Exam = {
   id: string;
   name: string;
   course: string;
+  courseId?: string;
   batch: string;
+  batchId?: string;
   subject: string;
   examDate: string;
   startTime: string;
@@ -92,10 +100,35 @@ type Exam = {
   createdAt: string;
 };
 
+type SharedStudent = {
+  id: string;
+  name?: string;
+  course?: string;
+  courseId?: string;
+  batch?: string;
+  batchId?: string;
+};
+
+type SharedBatch = {
+  id: string;
+  name?: string;
+  batch?: string;
+  course?: string;
+  courseId?: string;
+  teacher?: string;
+  teacherId?: string;
+  capacity?: number;
+  enrolled?: number;
+  students?: number;
+  status?: string;
+};
+
 type ExamForm = {
   name: string;
   course: string;
+  courseId?: string;
   batch: string;
+  batchId?: string;
   subject: string;
   examDate: string;
   startTime: string;
@@ -496,7 +529,9 @@ const initialExams: Exam[] = [
 const emptyForm: ExamForm = {
   name: "",
   course: "",
+  courseId: "",
   batch: "",
+  batchId: "",
   subject: "",
   examDate: "",
   startTime: "",
@@ -519,6 +554,8 @@ const emptyForm: ExamForm = {
 
 export default function ExamsPage() {
   const [exams, setExams] = useState<Exam[]>(initialExams);
+  const [students, setStudents] = useState<SharedStudent[]>([]);
+  const [sharedBatches, setSharedBatches] = useState<SharedBatch[]>([]);
 
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
 
@@ -560,14 +597,127 @@ export default function ExamsPage() {
     new Date("2026-09-01T00:00:00"),
   );
 
+  useEffect(() => {
+    const hydrate = () => {
+      const storedExams = getCollection<Exam>("exams");
+      const storedStudents = getCollection<SharedStudent>("students");
+      const storedBatches = getCollection<SharedBatch>("batches");
+
+      if (storedExams.length > 0) {
+        setExams(storedExams);
+      }
+
+      setStudents(storedStudents);
+      setSharedBatches(storedBatches);
+    };
+
+    hydrate();
+    return subscribeToStore(hydrate);
+  }, []);
+
+  const persistExams = (nextExams: Exam[]) => {
+    setExams(nextExams);
+    setCollection("exams", nextExams);
+  };
+
+  const courseOptions = useMemo(() => {
+    const names = new Set<string>();
+    sharedCourses.forEach((course) => names.add(course.name));
+    exams.forEach((exam) => names.add(exam.course));
+    return Array.from(names);
+  }, [exams]);
+
+  const batchOptions = useMemo(() => {
+    const names = new Set<string>();
+    sharedBatches.forEach((batch) => {
+      if (batch.name) names.add(batch.name);
+      if (batch.batch) names.add(batch.batch);
+    });
+    exams.forEach((exam) => names.add(exam.batch));
+    return Array.from(names);
+  }, [exams, sharedBatches]);
+
+  const resolveCourseId = (courseName: string) => {
+    const course = sharedCourses.find((item) => item.name === courseName);
+    return course?.id;
+  };
+
+  const resolveBatch = (batchName: string) =>
+    sharedBatches.find(
+      (batch) => batch.name === batchName || batch.batch === batchName,
+    );
+
+  const getStudentsForBatch = (batchName: string, batchId?: string) => {
+    return students.filter((student) => {
+      if (batchId && student.batchId) {
+        return String(student.batchId) === String(batchId);
+      }
+
+      return student.batch === batchName;
+    });
+  };
+
+  const getBatchStudentCount = (batchName: string, batchId?: string) => {
+    const linkedStudents = getStudentsForBatch(batchName, batchId);
+
+    if (linkedStudents.length > 0) {
+      return linkedStudents.length;
+    }
+
+    const batch = resolveBatch(batchName);
+    return Number(batch?.enrolled ?? batch?.students ?? 0);
+  };
+
+  const normalizeExamRelationships = (exam: Exam): Exam => {
+    const batch = resolveBatch(exam.batch);
+    const courseId =
+      exam.courseId ||
+      batch?.courseId ||
+      resolveCourseId(exam.course);
+
+    const batchId = exam.batchId || batch?.id;
+    const studentCount = getBatchStudentCount(exam.batch, batchId);
+
+    return {
+      ...exam,
+      courseId,
+      batchId,
+      students:
+        studentCount > 0 || !batchId
+          ? studentCount
+          : exam.students,
+    };
+  };
+
+  useEffect(() => {
+    if (!sharedBatches.length && !students.length) return;
+
+    const normalized = exams.map(normalizeExamRelationships);
+    const changed = normalized.some(
+      (exam, index) =>
+        exam.courseId !== exams[index].courseId ||
+        exam.batchId !== exams[index].batchId ||
+        exam.students !== exams[index].students,
+    );
+
+    if (changed) {
+      persistExams(normalized);
+    }
+  }, [sharedBatches, students]);
+
+  const selectedFormBatch = useMemo(
+    () => resolveBatch(form.batch),
+    [form.batch, sharedBatches],
+  );
+
   const courses = useMemo(
-    () => Array.from(new Set(exams.map((exam) => exam.course))),
-    [exams],
+    () => Array.from(new Set([...courseOptions, ...exams.map((exam) => exam.course)])),
+    [courseOptions, exams],
   );
 
   const batches = useMemo(
-    () => Array.from(new Set(exams.map((exam) => exam.batch))),
-    [exams],
+    () => Array.from(new Set([...batchOptions, ...exams.map((exam) => exam.batch)])),
+    [batchOptions, exams],
   );
 
   const subjects = useMemo(
@@ -812,7 +962,9 @@ export default function ExamsPage() {
     setForm({
       name: exam.name,
       course: exam.course,
+      courseId: exam.courseId || resolveCourseId(exam.course) || "",
       batch: exam.batch,
+      batchId: exam.batchId || resolveBatch(exam.batch)?.id || "",
       subject: exam.subject,
       examDate: exam.examDate,
       startTime: exam.startTime,
@@ -849,6 +1001,11 @@ export default function ExamsPage() {
 
     if (!form.batch.trim()) {
       return "Batch is required.";
+    }
+
+    const linkedBatch = resolveBatch(form.batch);
+    if (sharedBatches.length > 0 && !linkedBatch) {
+      return "Please select a valid batch from the coaching batches.";
     }
 
     if (!form.subject.trim()) {
@@ -906,47 +1063,53 @@ export default function ExamsPage() {
     const totalMarks = Number(form.totalMarks);
     const passingMarks = Number(form.passingMarks);
     const questions = Number(form.questions);
+    const linkedBatch = resolveBatch(form.batch);
+    const courseId =
+      form.courseId || linkedBatch?.courseId || resolveCourseId(form.course);
+    const batchId = form.batchId || linkedBatch?.id;
+    const linkedStudentCount = getBatchStudentCount(form.batch, batchId);
 
     if (editingExamId) {
-      setExams((current) =>
-        current.map((exam) =>
-          exam.id === editingExamId
-            ? {
-                ...exam,
-                name: form.name.trim(),
-                course: form.course.trim(),
-                batch: form.batch.trim(),
-                subject: form.subject.trim(),
-                examDate: form.examDate,
-                startTime: form.startTime,
-                duration,
-                totalMarks,
-                passingMarks,
-                questions,
-                mode: form.mode,
-                difficulty: form.difficulty,
-                instructions: form.instructions.trim(),
-                negativeMarking: form.negativeMarking,
-                negativeMarks: form.negativeMarking
-                  ? Number(form.negativeMarks)
-                  : 0,
-                randomizeQuestions: form.randomizeQuestions,
-                randomizeOptions: form.randomizeOptions,
-                publishResultsAutomatically: form.publishResultsAutomatically,
-                proctoring: form.proctoring,
-                allowReattempt: form.allowReattempt,
-              }
-            : exam,
-        ),
+      const nextExams = exams.map((exam) =>
+        exam.id === editingExamId
+          ? {
+              ...exam,
+              name: form.name.trim(),
+              course: form.course.trim(),
+              courseId,
+              batch: form.batch.trim(),
+              batchId,
+              subject: form.subject.trim(),
+              examDate: form.examDate,
+              startTime: form.startTime,
+              duration,
+              totalMarks,
+              passingMarks,
+              questions,
+              mode: form.mode,
+              difficulty: form.difficulty,
+              instructions: form.instructions.trim(),
+              negativeMarking: form.negativeMarking,
+              negativeMarks: form.negativeMarking
+                ? Number(form.negativeMarks)
+                : 0,
+              randomizeQuestions: form.randomizeQuestions,
+              randomizeOptions: form.randomizeOptions,
+              publishResultsAutomatically: form.publishResultsAutomatically,
+              proctoring: form.proctoring,
+              allowReattempt: form.allowReattempt,
+              students: linkedStudentCount,
+            }
+          : exam,
       );
 
+      persistExams(nextExams);
       showToast("Exam updated successfully.");
     } else {
       const newNumber =
         Math.max(
           ...exams.map((exam) => {
             const number = Number(exam.id.replace("EXM-", ""));
-
             return Number.isFinite(number) ? number : 1000;
           }),
           1000,
@@ -956,7 +1119,9 @@ export default function ExamsPage() {
         id: `EXM-${newNumber}`,
         name: form.name.trim(),
         course: form.course.trim(),
+        courseId,
         batch: form.batch.trim(),
+        batchId,
         subject: form.subject.trim(),
         examDate: form.examDate,
         startTime: form.startTime,
@@ -966,9 +1131,8 @@ export default function ExamsPage() {
         questions,
         mode: form.mode,
         status: "Upcoming",
-        students: 0,
+        students: linkedStudentCount,
         instructions: form.instructions.trim(),
-
         negativeMarking: form.negativeMarking,
         negativeMarks: form.negativeMarking ? Number(form.negativeMarks) : 0,
         randomizeQuestions: form.randomizeQuestions,
@@ -977,18 +1141,19 @@ export default function ExamsPage() {
         proctoring: form.proctoring,
         allowReattempt: form.allowReattempt,
         difficulty: form.difficulty,
-
         averageScore: 0,
         attendanceRate: 0,
         passRate: 0,
         topScore: 0,
-
         createdAt: new Date().toISOString().split("T")[0],
       };
 
-      setExams((current) => [newExam, ...current]);
-
-      showToast("Exam created successfully.");
+      persistExams([newExam, ...exams]);
+      showToast(
+        linkedStudentCount > 0
+          ? `Exam created and linked to ${linkedStudentCount} students.`
+          : "Exam created successfully.",
+      );
     }
 
     setShowForm(false);
@@ -1001,7 +1166,8 @@ export default function ExamsPage() {
   const handleDeleteExam = () => {
     if (!deleteExamId) return;
 
-    setExams((current) => current.filter((exam) => exam.id !== deleteExamId));
+    const nextExams = exams.filter((exam) => exam.id !== deleteExamId);
+    persistExams(nextExams);
 
     setDeleteExamId(null);
     setActionMenuId(null);
@@ -1010,17 +1176,17 @@ export default function ExamsPage() {
   };
 
   const handleStartExam = (examId: string) => {
-    setExams((current) =>
-      current.map((exam) =>
-        exam.id === examId
-          ? {
-              ...exam,
-              status: "Ongoing",
-              attendanceRate: exam.attendanceRate || 88,
-            }
-          : exam,
-      ),
+    const nextExams = exams.map((exam) =>
+      exam.id === examId
+        ? {
+            ...exam,
+            status: "Ongoing" as ExamStatus,
+            attendanceRate: exam.attendanceRate || 88,
+          }
+        : exam,
     );
+
+    persistExams(nextExams);
 
     setActionMenuId(null);
     setViewingExam(null);
@@ -1029,21 +1195,21 @@ export default function ExamsPage() {
   };
 
   const handleCompleteExam = (examId: string) => {
-    setExams((current) =>
-      current.map((exam) =>
-        exam.id === examId
-          ? {
-              ...exam,
-              status: "Completed",
-              averageScore:
-                exam.averageScore || Math.round(exam.totalMarks * 0.68),
-              attendanceRate: exam.attendanceRate || 91,
-              passRate: exam.passRate || 74,
-              topScore: exam.topScore || Math.round(exam.totalMarks * 0.94),
-            }
-          : exam,
-      ),
+    const nextExams = exams.map((exam) =>
+      exam.id === examId
+        ? {
+            ...exam,
+            status: "Completed" as ExamStatus,
+            averageScore:
+              exam.averageScore || Math.round(exam.totalMarks * 0.68),
+            attendanceRate: exam.attendanceRate || 91,
+            passRate: exam.passRate || 74,
+            topScore: exam.topScore || Math.round(exam.totalMarks * 0.94),
+          }
+        : exam,
     );
+
+    persistExams(nextExams);
 
     setActionMenuId(null);
     setViewingExam(null);
@@ -1071,7 +1237,7 @@ export default function ExamsPage() {
       createdAt: new Date().toISOString().split("T")[0],
     };
 
-    setExams((current) => [duplicate, ...current]);
+    persistExams([duplicate, ...exams]);
     setActionMenuId(null);
 
     showToast("Exam duplicated successfully.");
@@ -3185,16 +3351,23 @@ export default function ExamsPage() {
                     </label>
 
                     <input
+                      list="exam-course-options"
                       value={form.course}
                       onChange={(event) =>
                         setForm({
                           ...form,
                           course: event.target.value,
+                          courseId: resolveCourseId(event.target.value) || "",
                         })
                       }
-                      placeholder="JEE Preparation"
+                      placeholder="Select course"
                       className="h-11 w-full rounded-xl border border-slate-200 px-4 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
+                    <datalist id="exam-course-options">
+                      {courses.map((course) => (
+                        <option key={course} value={course} />
+                      ))}
+                    </datalist>
                   </div>
 
                   <div>
@@ -3203,16 +3376,38 @@ export default function ExamsPage() {
                     </label>
 
                     <input
+                      list="exam-batch-options"
                       value={form.batch}
-                      onChange={(event) =>
+                      onChange={(event) => {
+                        const batchName = event.target.value;
+                        const batch = resolveBatch(batchName);
+                        const linkedCourse = batch?.course || form.course;
                         setForm({
                           ...form,
-                          batch: event.target.value,
-                        })
-                      }
-                      placeholder="JEE Main 2027"
+                          batch: batchName,
+                          batchId: batch?.id || "",
+                          course: linkedCourse,
+                          courseId:
+                            batch?.courseId ||
+                            resolveCourseId(linkedCourse) ||
+                            "",
+                        });
+                      }}
+                      placeholder="Select batch"
                       className="h-11 w-full rounded-xl border border-slate-200 px-4 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
+                    <datalist id="exam-batch-options">
+                      {batches.map((batch) => (
+                        <option key={batch} value={batch} />
+                      ))}
+                    </datalist>
+                    {form.batch && (
+                      <p className="mt-1.5 text-[11px] font-semibold text-slate-500">
+                        {selectedFormBatch
+                          ? `${getBatchStudentCount(form.batch, selectedFormBatch.id)} students linked from this batch`
+                          : "Batch relationship will be resolved when a matching batch is selected."}
+                      </p>
+                    )}
                   </div>
 
                   <div>
