@@ -60,85 +60,53 @@ type Insight = {
   href?: string;
 };
 
-const stats = [
+const statDefinitions = [
   {
     title: "Total Students",
-    value: "1,248",
-    change: "+12.5%",
-    description: "from last month",
     icon: Users,
     iconStyle: "bg-blue-50 text-blue-600",
-    trend: "up",
     href: "/students",
   },
   {
     title: "Total Teachers",
-    value: "42",
-    change: "+7.1%",
-    description: "from last month",
     icon: GraduationCap,
     iconStyle: "bg-indigo-50 text-indigo-600",
-    trend: "up",
     href: "/teachers",
   },
   {
     title: "Total Batches",
-    value: "28",
-    change: "+8.3%",
-    description: "from last month",
     icon: Layers,
     iconStyle: "bg-emerald-50 text-emerald-600",
-    trend: "up",
     href: "/batches",
   },
   {
     title: "Total Revenue",
-    value: "₹8.4L",
-    change: "+15.2%",
-    description: "from last month",
     icon: IndianRupee,
     iconStyle: "bg-orange-50 text-orange-600",
-    trend: "up",
     href: "/fees",
   },
   {
     title: "Pending Fees",
-    value: "₹2.1L",
-    change: "-4.8%",
-    description: "from last month",
     icon: CircleDollarSign,
     iconStyle: "bg-red-50 text-red-600",
-    trend: "down",
     href: "/fees",
   },
   {
     title: "Attendance",
-    value: "91.8%",
-    change: "+2.4%",
-    description: "this month",
     icon: ClipboardCheck,
     iconStyle: "bg-cyan-50 text-cyan-600",
-    trend: "up",
     href: "/attendance",
   },
   {
     title: "New Inquiries",
-    value: "86",
-    change: "+18.6%",
-    description: "this month",
     icon: UserRoundSearch,
     iconStyle: "bg-purple-50 text-purple-600",
-    trend: "up",
     href: "/inquiries",
   },
   {
     title: "Upcoming Exams",
-    value: "6",
-    change: "+2",
-    description: "next 30 days",
     icon: FileText,
     iconStyle: "bg-yellow-50 text-yellow-700",
-    trend: "up",
     href: "/exams",
   },
 ];
@@ -151,6 +119,34 @@ type DashboardNotification = {
   type: string;
   read?: boolean;
 };
+
+type DashboardRecord = Record<string, unknown>;
+
+type DashboardStats = {
+  title: string;
+  value: string;
+  change: string;
+  description: string;
+  icon: typeof Users;
+  iconStyle: string;
+  trend: "up" | "down";
+  href: string;
+};
+
+function numberValue(value: unknown) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function dateValue(value: unknown) {
+  if (!value) return null;
+  const date = new Date(String(value));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatCurrency(value: number) {
+  return `₹${value.toLocaleString("en-IN")}`;
+}
 
 
 const quickActions = [
@@ -198,76 +194,6 @@ const quickActions = [
   },
 ];
 
-const attentionItems = [
-  {
-    title: "12 students have low attendance",
-    description: "Attendance below 75%",
-    count: "12",
-    type: "attendance",
-    href: "/attendance",
-  },
-  {
-    title: "₹2.1L fee amount is pending",
-    description: "Requires collection follow-up",
-    count: "₹2.1L",
-    type: "fees",
-    href: "/fees",
-  },
-  {
-    title: "8 students are at performance risk",
-    description: "Based on recent exam trends",
-    count: "8",
-    type: "risk",
-    href: "/reports",
-  },
-  {
-    title: "14 inquiries need follow-up",
-    description: "Follow-up due today",
-    count: "14",
-    type: "inquiry",
-    href: "/inquiries",
-  },
-];
-
-const aiInsights: Insight[] = [
-  {
-    id: 1,
-    type: "warning",
-    title: "Attendance risk detected",
-    description:
-      "12 students have attendance below 75%. Early intervention may reduce academic risk.",
-    action: "Review attendance",
-    href: "/attendance",
-  },
-  {
-    id: 2,
-    type: "success",
-    title: "Revenue trend is positive",
-    description:
-      "Fee collection is 15.2% higher than last month. The current collection trend is healthy.",
-    action: "View fees",
-    href: "/fees",
-  },
-  {
-    id: 3,
-    type: "info",
-    title: "Inquiry conversion opportunity",
-    description:
-      "86 new inquiries were recorded this month. 14 require follow-up today.",
-    action: "Open inquiries",
-    href: "/inquiries",
-  },
-  {
-    id: 4,
-    type: "danger",
-    title: "Performance risk requires attention",
-    description:
-      "8 students show a downward academic trend and should be reviewed by their teachers.",
-    action: "View reports",
-    href: "/reports",
-  },
-];
-
 const aiQuestions = [
   "Which students are at highest risk?",
   "Why is attendance falling?",
@@ -296,6 +222,19 @@ export default function Home() {
   const profileRef = useRef<HTMLDivElement>(null);
   const dateRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const [dashboardData, setDashboardData] = useState({
+    students: [] as DashboardRecord[],
+    teachers: [] as DashboardRecord[],
+    courses: [] as DashboardRecord[],
+    batches: [] as DashboardRecord[],
+    fees: [] as DashboardRecord[],
+    inquiries: [] as DashboardRecord[],
+    attendance: [] as DashboardRecord[],
+    exams: [] as DashboardRecord[],
+    schedule: [] as DashboardRecord[],
+    onlineClasses: [] as DashboardRecord[],
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -347,6 +286,26 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const loadDashboardData = () => {
+      setDashboardData({
+        students: getCollection<DashboardRecord>("students"),
+        teachers: getCollection<DashboardRecord>("teachers"),
+        courses: getCollection<DashboardRecord>("courses"),
+        batches: getCollection<DashboardRecord>("batches"),
+        fees: getCollection<DashboardRecord>("fees"),
+        inquiries: getCollection<DashboardRecord>("inquiries"),
+        attendance: getCollection<DashboardRecord>("attendance"),
+        exams: getCollection<DashboardRecord>("exams"),
+        schedule: getCollection<DashboardRecord>("schedule"),
+        onlineClasses: getCollection<DashboardRecord>("onlineClasses"),
+      });
+    };
+
+    loadDashboardData();
+    return subscribeToStore(loadDashboardData);
+  }, []);
+
+  useEffect(() => {
     if (searchOpen) {
       setTimeout(() => searchInputRef.current?.focus(), 50);
     }
@@ -361,6 +320,229 @@ export default function Home() {
 
     return () => clearTimeout(timer);
   }, [toast]);
+
+  const dashboardStats = useMemo<DashboardStats[]>(() => {
+    const {
+      students,
+      teachers,
+      batches,
+      inquiries,
+      attendance,
+      exams,
+    } = dashboardData;
+
+    const totalRevenue = students.reduce(
+      (sum, student) => sum + numberValue(student.paidFees),
+      0,
+    );
+
+    const pendingFees = students.reduce(
+      (sum, student) => sum + numberValue(student.pendingFees),
+      0,
+    );
+
+    const studentAttendance = students
+      .map((student) =>
+        numberValue(student.attendance ?? student.attendanceRate),
+      )
+      .filter((value) => value > 0);
+
+    const attendanceRecords = attendance
+      .map((record) => String(record.status ?? "").toLowerCase())
+      .filter(Boolean);
+
+    const attendanceAverage =
+      studentAttendance.length > 0
+        ? Math.round(
+            studentAttendance.reduce((sum, value) => sum + value, 0) /
+              studentAttendance.length,
+          )
+        : attendanceRecords.length > 0
+          ? Math.round(
+              (attendanceRecords.filter((status) => status === "present").length /
+                attendanceRecords.length) *
+                100,
+            )
+          : 0;
+
+    const today = new Date();
+    const rangeStart = new Date(today);
+    if (selectedDateRange === "Today") {
+      rangeStart.setHours(0, 0, 0, 0);
+    } else if (selectedDateRange === "This Week") {
+      rangeStart.setDate(today.getDate() - 6);
+      rangeStart.setHours(0, 0, 0, 0);
+    } else if (selectedDateRange === "This Quarter") {
+      rangeStart.setMonth(Math.floor(today.getMonth() / 3) * 3, 1);
+      rangeStart.setHours(0, 0, 0, 0);
+    } else {
+      rangeStart.setDate(1);
+      rangeStart.setHours(0, 0, 0, 0);
+    }
+
+    const upcomingExamCount = exams.filter((exam) => {
+      const examDate = dateValue(exam.examDate ?? exam.date);
+      if (!examDate) return false;
+
+      const diff = examDate.getTime() - today.getTime();
+      return diff >= 0 && diff <= 30 * 24 * 60 * 60 * 1000;
+    }).length;
+
+    const newInquiryCount = inquiries.filter((inquiry) => {
+      const inquiryDate = dateValue(
+        inquiry.date ?? inquiry.createdAt ?? inquiry.inquiryDate,
+      );
+      return inquiryDate ? inquiryDate >= rangeStart : true;
+    }).length;
+
+    return statDefinitions.map((definition) => {
+      let value = "0";
+      let description = "live shared data";
+      let change = "Live";
+      let trend: "up" | "down" = "up";
+
+      switch (definition.title) {
+        case "Total Students":
+          value = students.length.toLocaleString("en-IN");
+          description = "from shared student records";
+          break;
+        case "Total Teachers":
+          value = teachers.length.toLocaleString("en-IN");
+          description = "from shared teacher records";
+          break;
+        case "Total Batches":
+          value = batches.length.toLocaleString("en-IN");
+          description = "from shared batch records";
+          break;
+        case "Total Revenue":
+          value = formatCurrency(totalRevenue);
+          description = "total collected from students";
+          break;
+        case "Pending Fees":
+          value = formatCurrency(pendingFees);
+          description = "current outstanding balance";
+          trend = pendingFees > 0 ? "down" : "up";
+          break;
+        case "Attendance":
+          value = `${attendanceAverage}%`;
+          description = "current student attendance";
+          break;
+        case "New Inquiries":
+          value = newInquiryCount.toLocaleString("en-IN");
+          description = `within ${selectedDateRange.toLowerCase()}`;
+          break;
+        case "Upcoming Exams":
+          value = upcomingExamCount.toLocaleString("en-IN");
+          description = "next 30 days";
+          break;
+      }
+
+      return {
+        ...definition,
+        value,
+        change,
+        description,
+        trend,
+      };
+    });
+  }, [dashboardData, selectedDateRange]);
+
+  const lowAttendanceCount = dashboardData.students.filter(
+    (student) =>
+      numberValue(student.attendance ?? student.attendanceRate) > 0 &&
+      numberValue(student.attendance ?? student.attendanceRate) < 75,
+  ).length;
+
+  const performanceRiskCount = dashboardData.students.filter(
+    (student) =>
+      numberValue(student.performance ?? student.averageScore) > 0 &&
+      numberValue(student.performance ?? student.averageScore) < 60,
+  ).length;
+
+  const pendingFeeAmount = dashboardData.students.reduce(
+    (sum, student) => sum + numberValue(student.pendingFees),
+    0,
+  );
+
+  const followUpInquiryCount = dashboardData.inquiries.filter((inquiry) => {
+    const status = String(inquiry.status ?? inquiry.stage ?? "").toLowerCase();
+    return status.includes("follow") || status === "new" || status === "pending";
+  }).length;
+
+  const dashboardAttentionItems = [
+    {
+      title: `${lowAttendanceCount} students have low attendance`,
+      description: "Attendance below 75%",
+      count: String(lowAttendanceCount),
+      type: "attendance",
+      href: "/attendance",
+    },
+    {
+      title: `${formatCurrency(pendingFeeAmount)} fee amount is pending`,
+      description: "Requires collection follow-up",
+      count: formatCurrency(pendingFeeAmount),
+      type: "fees",
+      href: "/fees",
+    },
+    {
+      title: `${performanceRiskCount} students are at performance risk`,
+      description: "Based on current performance data",
+      count: String(performanceRiskCount),
+      type: "risk",
+      href: "/reports",
+    },
+    {
+      title: `${followUpInquiryCount} inquiries need follow-up`,
+      description: "Based on current inquiry status",
+      count: String(followUpInquiryCount),
+      type: "inquiry",
+      href: "/inquiries",
+    },
+  ];
+
+  const dashboardAiInsights: Insight[] = [
+    {
+      id: 1,
+      type: lowAttendanceCount > 0 ? "warning" : "success",
+      title: lowAttendanceCount > 0 ? "Attendance risk detected" : "Attendance is healthy",
+      description:
+        lowAttendanceCount > 0
+          ? `${lowAttendanceCount} students currently have attendance below 75%.`
+          : "No students in the shared student records are currently below 75% attendance.",
+      action: "Review attendance",
+      href: "/attendance",
+    },
+    {
+      id: 2,
+      type: pendingFeeAmount > 0 ? "warning" : "success",
+      title: pendingFeeAmount > 0 ? "Fee collection needs attention" : "Fees are up to date",
+      description:
+        pendingFeeAmount > 0
+          ? `${formatCurrency(pendingFeeAmount)} is currently outstanding across student records.`
+          : "There is no outstanding fee balance in the shared student records.",
+      action: "View fees",
+      href: "/fees",
+    },
+    {
+      id: 3,
+      type: followUpInquiryCount > 0 ? "info" : "success",
+      title: "Inquiry pipeline",
+      description: `${followUpInquiryCount} inquiries currently appear to need follow-up based on their status.`,
+      action: "Open inquiries",
+      href: "/inquiries",
+    },
+    {
+      id: 4,
+      type: performanceRiskCount > 0 ? "danger" : "success",
+      title: performanceRiskCount > 0 ? "Performance risk requires attention" : "Performance looks stable",
+      description:
+        performanceRiskCount > 0
+          ? `${performanceRiskCount} students have current performance below 60%.`
+          : "No student with a recorded performance score is currently below 60%.",
+      action: "View reports",
+      href: "/reports",
+    },
+  ];
 
   const filteredQuickActions = useMemo(() => {
     if (!searchQuery.trim()) return quickActions;
@@ -731,7 +913,7 @@ export default function Home() {
                 </span>
 
                 <span className="hidden rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold text-slate-500 sm:inline-flex">
-                  v0.1.21
+                  v0.1.29
                 </span>
               </div>
 
@@ -811,7 +993,7 @@ export default function Home() {
               KPI CARDS
           ===================================================== */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {stats.map((stat) => {
+            {dashboardStats.map((stat) => {
               const Icon = stat.icon;
 
               return (
@@ -916,7 +1098,7 @@ export default function Home() {
                 </div>
 
                 <p className="mt-1 text-sm font-bold text-slate-900">
-                  8 students need review
+                  {performanceRiskCount} students need review
                 </p>
               </div>
 
@@ -927,7 +1109,7 @@ export default function Home() {
                 </div>
 
                 <p className="mt-1 text-sm font-bold text-slate-900">
-                  Revenue trend is positive
+                  Fee collection is {pendingFeeAmount > 0 ? "in progress" : "up to date"}
                 </p>
               </div>
 
@@ -938,7 +1120,7 @@ export default function Home() {
                 </div>
 
                 <p className="mt-1 text-sm font-bold text-slate-900">
-                  Follow up with 14 inquiries
+                  Follow up with {followUpInquiryCount} inquiries
                 </p>
               </div>
             </div>
@@ -1019,7 +1201,7 @@ export default function Home() {
               </div>
 
               <div className="mt-4 space-y-2">
-                {attentionItems.map((item) => (
+                {dashboardAttentionItems.map((item) => (
                   <Link
                     href={item.href}
                     key={item.title}
@@ -1111,7 +1293,7 @@ export default function Home() {
             </div>
 
             <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
-              {aiInsights.map((insight) => (
+              {dashboardAiInsights.map((insight) => (
                 <div
                   key={insight.id}
                   className="rounded-xl border border-slate-100 p-4 transition hover:border-slate-200 hover:shadow-sm"
@@ -1210,7 +1392,7 @@ export default function Home() {
                   </p>
 
                   <p className="text-sm font-semibold text-slate-900">
-                    28 active batches
+                    {dashboardData.batches.filter((batch) => String(batch.status ?? "Active").toLowerCase() === "active").length} active batches
                   </p>
                 </div>
               </div>
@@ -1228,7 +1410,7 @@ export default function Home() {
                   </p>
 
                   <p className="text-sm font-semibold text-slate-900">
-                    9 classes scheduled
+                    {dashboardData.schedule.filter((item) => { const date = dateValue(item.date ?? item.scheduleDate); const today = new Date(); return date ? date.toDateString() === today.toDateString() : false; }).length} classes scheduled
                   </p>
                 </div>
               </div>
