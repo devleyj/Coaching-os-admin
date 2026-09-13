@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
 
 import {
   Activity,
@@ -62,8 +63,12 @@ type OnlineClass = {
   id: string;
   title: string;
   teacher: string;
+  teacherId?: string;
   batch: string;
+  batchId?: string;
   course: string;
+  courseId?: string;
+  scheduleId?: string;
   date: string;
   time: string;
   duration: string;
@@ -86,6 +91,37 @@ type ActivityItem = {
   description: string;
   time: string;
   type: "live" | "schedule" | "recording" | "system";
+};
+
+type SharedBatch = {
+  id: string;
+  name: string;
+  course?: string;
+  courseId?: string;
+  teacher?: string;
+  teacherId?: string;
+  capacity?: number;
+  students?: number;
+};
+
+type SharedTeacher = {
+  id: string;
+  name: string;
+};
+
+type SharedSchedule = {
+  id: string;
+  batch: string;
+  batchId?: string;
+  course?: string;
+  courseId?: string;
+  teacher?: string;
+  teacherId?: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  capacity?: number;
+  enrolled?: number;
 };
 
 /* =========================================================
@@ -300,7 +336,7 @@ const initialActivities: ActivityItem[] = [
   },
 ];
 
-const teachers = [
+const fallbackTeachers = [
   "Dr. Rahul Sharma",
   "Dr. Priya Verma",
   "Amit Patel",
@@ -310,9 +346,9 @@ const teachers = [
   "Ms. Sneha Kapoor",
 ];
 
-const courses = ["JEE Preparation", "NEET Preparation", "Foundation Program"];
+const fallbackCourses = ["JEE Preparation", "NEET Preparation", "Foundation Program"];
 
-const batches = ["JEE Advanced", "JEE Main", "NEET 2027", "Foundation 2027"];
+const fallbackBatches = ["JEE Advanced", "JEE Main", "NEET 2027", "Foundation 2027"];
 
 const rooms = [
   "Virtual Room A",
@@ -403,6 +439,10 @@ export default function OnlineClassesPage() {
   const [activities, setActivities] =
     useState<ActivityItem[]>(initialActivities);
 
+  const [sharedBatches, setSharedBatches] = useState<SharedBatch[]>([]);
+  const [sharedTeachers, setSharedTeachers] = useState<SharedTeacher[]>([]);
+  const [sharedSchedules, setSharedSchedules] = useState<SharedSchedule[]>([]);
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | ClassStatus>("All");
   const [batchFilter, setBatchFilter] = useState("All");
@@ -447,6 +487,106 @@ export default function OnlineClassesPage() {
   const [newDescription, setNewDescription] = useState("");
 
   const [formError, setFormError] = useState("");
+
+  /* =========================================================
+     SHARED APP STORE
+  ========================================================= */
+
+  useEffect(() => {
+    const hydrate = () => {
+      const storedClasses = getCollection<OnlineClass>("onlineClasses");
+      const storedBatches = getCollection<SharedBatch>("batches");
+      const storedTeachers = getCollection<SharedTeacher>("teachers");
+      const storedSchedules = getCollection<SharedSchedule>("schedule");
+
+      setSharedBatches(storedBatches);
+      setSharedTeachers(storedTeachers);
+      setSharedSchedules(storedSchedules);
+
+      if (storedClasses.length > 0) {
+        setClasses(storedClasses);
+      } else {
+        setCollection("onlineClasses", initialClasses);
+        setClasses(initialClasses);
+      }
+    };
+
+    hydrate();
+    return subscribeToStore(hydrate);
+  }, []);
+
+  const availableBatches = useMemo(() => {
+    const names = sharedBatches.map((batch) => batch.name).filter(Boolean);
+    return names.length > 0 ? names : fallbackBatches;
+  }, [sharedBatches]);
+
+  const availableTeachers = useMemo(() => {
+    const names = sharedTeachers.map((teacher) => teacher.name).filter(Boolean);
+    return names.length > 0 ? names : fallbackTeachers;
+  }, [sharedTeachers]);
+
+  const availableCourses = useMemo(() => {
+    const names = sharedBatches
+      .map((batch) => batch.course)
+      .filter((course): course is string => Boolean(course));
+    return names.length > 0 ? Array.from(new Set(names)) : fallbackCourses;
+  }, [sharedBatches]);
+
+  const findBatch = (batchName: string) =>
+    sharedBatches.find(
+      (batch) => batch.name.toLowerCase() === batchName.toLowerCase(),
+    );
+
+  const findTeacher = (teacherName: string) =>
+    sharedTeachers.find(
+      (teacher) => teacher.name.toLowerCase() === teacherName.toLowerCase(),
+    );
+
+  const findSchedule = (batchName: string, date: string, time: string) => {
+    const matching = sharedSchedules.filter(
+      (schedule) =>
+        (schedule.batchId && findBatch(batchName)?.id === schedule.batchId) ||
+        schedule.batch.toLowerCase() === batchName.toLowerCase(),
+    );
+
+    if (!matching.length) return undefined;
+
+    if (date) {
+      return matching.find((schedule) => schedule.date === date);
+    }
+
+    return matching[0];
+  };
+
+  const getLinkedDetails = (batchName: string, date = "", time = "") => {
+    const batch = findBatch(batchName);
+    const schedule = findSchedule(batchName, date, time);
+    const teacher = findTeacher(schedule?.teacher || batch?.teacher || "");
+
+    return {
+      batch,
+      schedule,
+      teacher,
+      course: schedule?.course || batch?.course || "",
+      teacherName: schedule?.teacher || batch?.teacher || "",
+      capacity: schedule?.capacity ?? batch?.capacity,
+      students: schedule?.enrolled ?? batch?.students ?? 0,
+    };
+  };
+
+  const persistClasses = (nextClasses: OnlineClass[]) => {
+    setClasses(nextClasses);
+    setCollection("onlineClasses", nextClasses);
+  };
+
+  const getNextClassId = (records: OnlineClass[]) => {
+    const highest = records.reduce((max, item) => {
+      const match = String(item.id).match(/^CLS-(\d+)$/);
+      return match ? Math.max(max, Number(match[1])) : max;
+    }, 1000);
+
+    return `CLS-${highest + 1}`;
+  };
 
   /* =========================================================
      TOAST
@@ -496,7 +636,7 @@ export default function OnlineClassesPage() {
     (item) => item.recording === "Available",
   ).length;
 
-  const today = "2026-09-11";
+  const today = new Date().toLocaleDateString("en-CA");
 
   const todaysClasses = useMemo(() => {
     return classes
@@ -507,8 +647,8 @@ export default function OnlineClassesPage() {
   }, [classes]);
 
   const batches = useMemo(() => {
-    return ["All", ...Array.from(new Set(classes.map((item) => item.batch)))];
-  }, [classes]);
+    return ["All", ...Array.from(new Set([...availableBatches, ...classes.map((item) => item.batch)]))];
+  }, [availableBatches, classes]);
 
   const filteredClasses = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -644,6 +784,18 @@ export default function OnlineClassesPage() {
     return insights;
   }, [classes, completedClasses, liveClasses, upcomingClasses]);
 
+  const handleBatchSelection = (batchName: string) => {
+    setNewBatch(batchName);
+
+    const details = getLinkedDetails(batchName, newDate, newTime);
+
+    if (details.course) setNewCourse(details.course);
+    if (details.teacherName) setNewTeacher(details.teacherName);
+    if (typeof details.capacity === "number") {
+      setNewCapacity(String(details.capacity));
+    }
+  };
+
   /* =========================================================
      FORM HELPERS
   ========================================================= */
@@ -677,9 +829,10 @@ export default function OnlineClassesPage() {
     setEditingClass(item);
 
     setNewTitle(item.title);
-    setNewTeacher(item.teacher);
+    const linked = getLinkedDetails(item.batch, item.date, item.time);
+    setNewTeacher(linked.teacherName || item.teacher);
     setNewBatch(item.batch);
-    setNewCourse(item.course);
+    setNewCourse(linked.course || item.course);
     setNewDate(item.date);
     setNewTime(item.time);
     setNewDuration(item.duration);
@@ -723,17 +876,23 @@ export default function OnlineClassesPage() {
       return;
     }
 
+    const linked = getLinkedDetails(newBatch, newDate, newTime);
+
     const newClass: OnlineClass = {
-      id: `CLS-${1000 + classes.length + 1}`,
+      id: getNextClassId(classes),
       title: newTitle.trim(),
       teacher: newTeacher,
+      teacherId: linked.teacher?.id,
       batch: newBatch,
+      batchId: linked.batch?.id,
       course: newCourse,
+      courseId: linked.batch?.courseId,
+      scheduleId: linked.schedule?.id,
       date: newDate,
       time: newTime,
       duration: newDuration,
-      students: 0,
-      capacity: numericCapacity,
+      students: linked.students,
+      capacity: linked.capacity ?? numericCapacity,
       status: "Upcoming",
       platform: "Coaching Live",
       room: newRoom,
@@ -747,7 +906,17 @@ export default function OnlineClassesPage() {
       createdAt: new Date().toISOString().slice(0, 10),
     };
 
-    setClasses((current) => [newClass, ...current]);
+    const nextClasses = [newClass, ...classes];
+    persistClasses(nextClasses);
+
+    // Always return the user to the full class list so a newly created class
+    // cannot be hidden by an old filter or timeline view.
+    setSearch("");
+    setStatusFilter("All");
+    setBatchFilter("All");
+    setCourseFilter("All");
+    setTeacherFilter("All");
+    setClassView("list");
 
     setActivities((current) => [
       {
@@ -790,26 +959,32 @@ export default function OnlineClassesPage() {
       return;
     }
 
-    setClasses((current) =>
-      current.map((item) =>
-        item.id === editingClass.id
-          ? {
-              ...item,
-              title: newTitle.trim(),
-              teacher: newTeacher,
-              batch: newBatch,
-              course: newCourse,
-              date: newDate,
-              time: newTime,
-              duration: newDuration,
-              room: newRoom,
-              capacity: numericCapacity,
-              topic: newTopic.trim() || item.topic,
-              description: newDescription.trim() || item.description,
-            }
-          : item,
-      ),
+    const linked = getLinkedDetails(newBatch, newDate, newTime);
+
+    const nextClasses = classes.map((item) =>
+      item.id === editingClass.id
+        ? {
+            ...item,
+            title: newTitle.trim(),
+            teacher: newTeacher,
+            teacherId: linked.teacher?.id,
+            batch: newBatch,
+            batchId: linked.batch?.id,
+            course: newCourse,
+            courseId: linked.batch?.courseId,
+            scheduleId: linked.schedule?.id,
+            date: newDate,
+            time: newTime,
+            duration: newDuration,
+            room: newRoom,
+            capacity: numericCapacity,
+            topic: newTopic.trim() || item.topic,
+            description: newDescription.trim() || item.description,
+          }
+        : item,
     );
+
+    persistClasses(nextClasses);
 
     closeEditModal();
     showToast("Class details updated.");
@@ -820,13 +995,10 @@ export default function OnlineClassesPage() {
   ========================================================= */
 
   const handleStartClass = (item: OnlineClass) => {
-    setClasses((current) =>
-      current.map((classItem) =>
+    persistClasses(
+      classes.map((classItem) =>
         classItem.id === item.id
-          ? {
-              ...classItem,
-              status: "Live",
-            }
+          ? { ...classItem, status: "Live" as ClassStatus }
           : classItem,
       ),
     );
@@ -849,15 +1021,15 @@ export default function OnlineClassesPage() {
   };
 
   const handleCompleteClass = (item: OnlineClass) => {
-    setClasses((current) =>
-      current.map((classItem) =>
+    persistClasses(
+      classes.map((classItem) =>
         classItem.id === item.id
           ? {
               ...classItem,
-              status: "Completed",
+              status: "Completed" as ClassStatus,
               recording:
                 classItem.recording === "Not Recorded"
-                  ? "Processing"
+                  ? "Processing" as RecordingStatus
                   : classItem.recording,
             }
           : classItem,
@@ -882,13 +1054,10 @@ export default function OnlineClassesPage() {
   };
 
   const handleCancelClass = (item: OnlineClass) => {
-    setClasses((current) =>
-      current.map((classItem) =>
+    persistClasses(
+      classes.map((classItem) =>
         classItem.id === item.id
-          ? {
-              ...classItem,
-              status: "Cancelled",
-            }
+          ? { ...classItem, status: "Cancelled" as ClassStatus }
           : classItem,
       ),
     );
@@ -912,7 +1081,7 @@ export default function OnlineClassesPage() {
 
     if (!confirmed) return;
 
-    setClasses((current) => current.filter((classItem) => classItem.id !== id));
+    persistClasses(classes.filter((classItem) => classItem.id !== id));
 
     setOpenMenu(null);
     setViewingClass(null);
@@ -927,7 +1096,7 @@ export default function OnlineClassesPage() {
   const duplicateClass = (item: OnlineClass) => {
     const duplicated: OnlineClass = {
       ...item,
-      id: `CLS-${1000 + classes.length + 1}`,
+      id: getNextClassId(classes),
       title: `${item.title} — Copy`,
       status: "Upcoming",
       recording: "Not Recorded",
@@ -937,7 +1106,7 @@ export default function OnlineClassesPage() {
       createdAt: new Date().toISOString().slice(0, 10),
     };
 
-    setClasses((current) => [duplicated, ...current]);
+    persistClasses([duplicated, ...classes]);
 
     setOpenMenu(null);
 
@@ -1030,11 +1199,12 @@ export default function OnlineClassesPage() {
         <select
           value={newTeacher}
           onChange={(event) => setNewTeacher(event.target.value)}
+          disabled={Boolean(newBatch && getLinkedDetails(newBatch).teacherName)}
           className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
         >
           <option value="">Select teacher</option>
 
-          {teachers.map((teacher) => (
+          {availableTeachers.map((teacher) => (
             <option key={teacher} value={teacher}>
               {teacher}
             </option>
@@ -1049,19 +1219,23 @@ export default function OnlineClassesPage() {
 
         <select
           value={newBatch}
-          onChange={(event) => setNewBatch(event.target.value)}
+          onChange={(event) => handleBatchSelection(event.target.value)}
           className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
         >
           <option value="">Select batch</option>
 
-          {batches
-            .filter((item) => item !== "All")
-            .map((batch) => (
+          {availableBatches.map((batch) => (
               <option key={batch} value={batch}>
                 {batch}
               </option>
             ))}
         </select>
+
+        {newBatch && (
+          <div className="mt-2 rounded-xl border border-blue-100 bg-blue-50/70 px-3 py-2 text-xs font-semibold text-blue-700">
+            Batch linked automatically to its course, teacher and capacity.
+          </div>
+        )}
       </div>
 
       <div>
@@ -1072,11 +1246,12 @@ export default function OnlineClassesPage() {
         <select
           value={newCourse}
           onChange={(event) => setNewCourse(event.target.value)}
+          disabled={Boolean(newBatch && getLinkedDetails(newBatch).course)}
           className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
         >
           <option value="">Select course</option>
 
-          {courses.map((course) => (
+          {availableCourses.map((course) => (
             <option key={course} value={course}>
               {course}
             </option>
@@ -1169,10 +1344,18 @@ export default function OnlineClassesPage() {
           min="1"
           value={newCapacity}
           onChange={(event) => setNewCapacity(event.target.value)}
+          readOnly={Boolean(newBatch && typeof getLinkedDetails(newBatch).capacity === "number")}
           placeholder="60"
           className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
         />
       </div>
+
+      {newBatch && (
+        <div className="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-600">
+          Linked enrollment: {getLinkedDetails(newBatch, newDate, newTime).students} students from the selected batch.
+          If a matching Schedule entry exists, this class will also retain its schedule link.
+        </div>
+      )}
 
       <div className="md:col-span-2">
         <label className="mb-2 block text-sm font-bold text-slate-800">
@@ -1719,7 +1902,7 @@ export default function OnlineClassesPage() {
           =================================================== */}
 
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-200 p-5">
+            <div className="border-b border-slate-200 bg-slate-50/60 p-5">
               <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-slate-950">
@@ -1806,7 +1989,7 @@ export default function OnlineClassesPage() {
                 >
                   <option value="All">All courses</option>
 
-                  {courses.map((course) => (
+                  {availableCourses.map((course) => (
                     <option key={course} value={course}>
                       {course}
                     </option>
@@ -1835,7 +2018,7 @@ export default function OnlineClassesPage() {
                 >
                   <option value="All">All teachers</option>
 
-                  {teachers.map((teacher) => (
+                  {availableTeachers.map((teacher) => (
                     <option key={teacher} value={teacher}>
                       {teacher}
                     </option>
@@ -1998,7 +2181,7 @@ export default function OnlineClassesPage() {
                  LIST VIEW
               ================================================= */
 
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-b-2xl">
                 {filteredClasses.length === 0 ? (
                   <div className="px-6 py-16 text-center">
                     <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
@@ -2022,7 +2205,7 @@ export default function OnlineClassesPage() {
                   </div>
                 ) : (
                   <table className="w-full min-w-[1200px]">
-                    <thead className="bg-slate-50">
+                    <thead className="bg-gradient-to-r from-slate-50 via-white to-slate-50">
                       <tr className="border-b border-slate-200 text-left">
                         <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wide text-slate-500">
                           Class
@@ -2067,7 +2250,7 @@ export default function OnlineClassesPage() {
                         return (
                           <tr
                             key={item.id}
-                            className="group transition hover:bg-blue-50/30"
+                            className="group transition-all duration-200 hover:bg-blue-50/40"
                           >
                             <td className="px-6 py-5">
                               <div className="flex items-center gap-3">
@@ -2520,7 +2703,7 @@ export default function OnlineClassesPage() {
 
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+          <div className="max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <div className="flex items-center gap-2">
@@ -2580,7 +2763,7 @@ export default function OnlineClassesPage() {
 
       {showEditModal && editingClass && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+          <div className="max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <div className="flex items-center gap-2">
