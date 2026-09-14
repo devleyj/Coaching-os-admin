@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import {
   AlertTriangle,
@@ -30,6 +30,11 @@ import {
 } from "lucide-react";
 
 import Slidebar from "../components/Slidebar";
+import {
+  getCollection,
+  setCollection,
+  subscribeToStore,
+} from "../data/store";
 
 type CourseStatus = "Active" | "Inactive";
 
@@ -258,7 +263,24 @@ const colorClasses: Record<
 };
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>(initialCourses);
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  useEffect(() => {
+    const storedCourses = getCollection<Course>("courses");
+
+    if (storedCourses.length > 0) {
+      setCourses(storedCourses);
+    } else {
+      setCollection("courses", initialCourses);
+      setCourses(initialCourses);
+    }
+
+    const unsubscribe = subscribeToStore(() => {
+      setCourses(getCollection<Course>("courses"));
+    });
+
+    return unsubscribe;
+  }, []);
 
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [showEditCourse, setShowEditCourse] = useState(false);
@@ -538,7 +560,9 @@ export default function CoursesPage() {
       color: "blue",
     };
 
-    setCourses((currentCourses) => [...currentCourses, newCourse]);
+    const nextCourses = [...courses, newCourse];
+    setCollection("courses", nextCourses);
+    setCourses(nextCourses);
     setCurrentPage(1);
     setShowAddCourse(false);
     resetAddForm();
@@ -580,24 +604,25 @@ export default function CoursesPage() {
       .map((subject) => subject.trim())
       .filter(Boolean);
 
-    setCourses((currentCourses) =>
-      currentCourses.map((course) =>
-        course.id === selectedCourse.id
-          ? {
-              ...course,
-              name: editCourseName.trim(),
-              category: editCourseCategory.trim(),
-              duration: editCourseDuration.trim(),
-              fees: Number(editCourseFees),
-              subjects,
-              capacity: Number(editCourseCapacity),
-              startDate: editCourseStartDate || course.startDate,
-              description: editCourseDescription.trim() || course.description,
-              status: editCourseStatus,
-            }
-          : course,
-      ),
+    const nextCourses = courses.map((course) =>
+      course.id === selectedCourse.id
+        ? {
+            ...course,
+            name: editCourseName.trim(),
+            category: editCourseCategory.trim(),
+            duration: editCourseDuration.trim(),
+            fees: Number(editCourseFees),
+            subjects,
+            capacity: Number(editCourseCapacity),
+            startDate: editCourseStartDate || course.startDate,
+            description: editCourseDescription.trim() || course.description,
+            status: editCourseStatus,
+          }
+        : course,
     );
+
+    setCollection("courses", nextCourses);
+    setCourses(nextCourses);
 
     setShowEditCourse(false);
     setSelectedCourse(null);
@@ -615,9 +640,12 @@ export default function CoursesPage() {
 
     if (!confirmed) return;
 
-    setCourses((currentCourses) =>
-      currentCourses.filter((item) => item.id !== course.id),
+    const nextCourses = courses.filter(
+      (item) => item.id !== course.id,
     );
+
+    setCollection("courses", nextCourses);
+    setCourses(nextCourses);
 
     setSelectedCourse(null);
 
@@ -638,7 +666,9 @@ export default function CoursesPage() {
       teachers: 0,
     };
 
-    setCourses((currentCourses) => [...currentCourses, duplicate]);
+    const nextCourses = [...courses, duplicate];
+    setCollection("courses", nextCourses);
+    setCourses(nextCourses);
     setOpenActionMenu(null);
     setCurrentPage(1);
 
@@ -646,16 +676,17 @@ export default function CoursesPage() {
   };
 
   const toggleCourseStatus = (course: Course) => {
-    setCourses((currentCourses) =>
-      currentCourses.map((item) =>
-        item.id === course.id
-          ? {
-              ...item,
-              status: item.status === "Active" ? "Inactive" : "Active",
-            }
-          : item,
-      ),
+    const nextCourses = courses.map((item) =>
+      item.id === course.id
+        ? {
+            ...item,
+            status: item.status === "Active" ? "Inactive" : "Active",
+          }
+        : item,
     );
+
+    setCollection("courses", nextCourses);
+    setCourses(nextCourses);
 
     setOpenActionMenu(null);
 
