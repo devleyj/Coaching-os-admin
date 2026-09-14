@@ -16,7 +16,8 @@ export type StoreCollection =
   | "schedule"
   | "onlineClasses"
   | "notifications"
-  | "reports";
+  | "reports"
+  | "settings";
 
 export type AppStoreData = Record<StoreCollection, unknown[]>;
 
@@ -34,6 +35,7 @@ const emptyStore: AppStoreData = {
   onlineClasses: [],
   notifications: [],
   reports: [],
+  settings: [],
 };
 
 function isBrowser() {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Slidebar from "../components/Slidebar";
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
 import PageHeader from "../components/PageHeader";
 import {
   Activity,
@@ -936,6 +937,289 @@ export default function SettingsPage() {
   const currentRole =
     roles.find((role) => role.id === selectedRoleId) || roles[0];
 
+  /* ------------------------------------------------------------------------
+     SHARED SETTINGS PERSISTENCE
+     ------------------------------------------------------------------------ */
+
+  type PersistedSettings = {
+    id: string;
+    general: Record<string, unknown>;
+    profile: Record<string, unknown>;
+    appearance: Record<string, unknown>;
+    academic: Record<string, unknown>;
+    attendance: Record<string, unknown>;
+    fees: Record<string, unknown>;
+    exams: Record<string, unknown>;
+    notifications: Record<string, unknown>;
+    whatsapp: Record<string, unknown>;
+    email: Record<string, unknown>;
+    security: Record<string, unknown>;
+    branding: Record<string, unknown>;
+    apps: Record<string, unknown>;
+    roles: Role[];
+    permissions: typeof permissionState;
+    integrations: Integration[];
+    backup: Record<string, unknown>;
+    privacy: Record<string, unknown>;
+  };
+
+  const createSettingsSnapshot = (): PersistedSettings => ({
+    id: "main",
+    general: {
+      instituteName, instituteCode, instituteEmail, institutePhone, website,
+      address, timezone, currency, dateFormat, timeFormat, businessStart, businessEnd,
+    },
+    profile: { adminName, adminEmail, adminPhone, jobTitle },
+    appearance: {
+      theme, accent, density, sidebarCollapsed, animations, compactTables,
+      showBreadcrumbs, stickyHeaders,
+    },
+    academic: {
+      academicYear, weekStart, gradingSystem, defaultClassDuration,
+      maxStudentsPerBatch, defaultBreakDuration, workingDays,
+      autoGenerateStudentId, autoGenerateBatchId,
+    },
+    attendance: {
+      lateAfter, attendanceRequired, autoAbsent, faceScan, rfid, fingerprint,
+      attendanceWhatsapp, lowAttendanceAlert, attendanceDigest, allowManualOverride,
+    },
+    fees: {
+      lateFeeEnabled, lateFeeAmount, lateFeeType, receiptPrefix, invoicePrefix,
+      paymentReminderDays, overdueReminderDays, onlinePayments, partialPayments,
+      autoReceipt, feeWhatsapp, feeEmail,
+    },
+    exams: {
+      defaultPassingPercentage, negativeMarking, negativeMarksValue, autoPublishResults,
+      examNotifications, resultNotifications, showRank, showPercentile, allowRevaluation,
+    },
+    notifications: {
+      notifyNewStudent, notifyPayment, notifyAttendance, notifyExam, notifyInquiry,
+      notifySystem, notifyTeacher, notifyBatch, quietHours, quietStart, quietEnd,
+      criticalOverride, dailyDigest, pushNotifications,
+    },
+    whatsapp: {
+      whatsappEnabled, whatsappProvider, whatsappPhone, whatsappBusinessId,
+      whatsappAutoInquiry, whatsappAttendance, whatsappFeeReminder, whatsappExam,
+      whatsappResults, whatsappTemplates,
+    },
+    email: {
+      emailEnabled, emailProvider, smtpHost, smtpPort, smtpUsername,
+      emailSenderName, emailSenderAddress, emailReplyTo, emailNotifications, emailReceipts,
+    },
+    security: {
+      twoFactor, loginAlerts, sessionTimeout, maxLoginAttempts, passwordExpiry,
+      forceStrongPasswords, singleSession, ipRestriction, apiSecurity,
+    },
+    branding: {
+      brandName, primaryColor, secondaryColor, favicon, logoText, showPoweredBy,
+      customDomain, loginMessage,
+    },
+    apps: {
+      studentAppEnabled, teacherAppEnabled, parentAppEnabled, maintenanceMode,
+      publicWebsite, allowSelfRegistration, enableStudentPortal, enableParentPortal,
+      enableTeacherPortal,
+    },
+    roles,
+    permissions: permissionState,
+    integrations,
+    backup: {
+      autoBackup, backupFrequency, backupRetention, cloudBackup,
+      backupEncryption, backupBeforeUpdates,
+    },
+    privacy: {
+      analytics, errorTracking, dataEncryption, maskSensitiveData, privacyMode,
+      activityTracking, dataRetention,
+    },
+  });
+
+  const applySettingsSnapshot = (settings: PersistedSettings) => {
+    const g = settings.general || {};
+    const profile = settings.profile || {};
+    const appearance = settings.appearance || {};
+    const academic = settings.academic || {};
+    const attendance = settings.attendance || {};
+    const fees = settings.fees || {};
+    const exams = settings.exams || {};
+    const notifications = settings.notifications || {};
+    const whatsapp = settings.whatsapp || {};
+    const email = settings.email || {};
+    const security = settings.security || {};
+    const branding = settings.branding || {};
+    const apps = settings.apps || {};
+    const backup = settings.backup || {};
+    const privacy = settings.privacy || {};
+
+    if (typeof g.instituteName === "string") setInstituteName(g.instituteName);
+    if (typeof g.instituteCode === "string") setInstituteCode(g.instituteCode);
+    if (typeof g.instituteEmail === "string") setInstituteEmail(g.instituteEmail);
+    if (typeof g.institutePhone === "string") setInstitutePhone(g.institutePhone);
+    if (typeof g.website === "string") setWebsite(g.website);
+    if (typeof g.address === "string") setAddress(g.address);
+    if (typeof g.timezone === "string") setTimezone(g.timezone);
+    if (typeof g.currency === "string") setCurrency(g.currency);
+    if (typeof g.dateFormat === "string") setDateFormat(g.dateFormat);
+    if (typeof g.timeFormat === "string") setTimeFormat(g.timeFormat);
+    if (typeof g.businessStart === "string") setBusinessStart(g.businessStart);
+    if (typeof g.businessEnd === "string") setBusinessEnd(g.businessEnd);
+
+    if (typeof profile.adminName === "string") setAdminName(profile.adminName);
+    if (typeof profile.adminEmail === "string") setAdminEmail(profile.adminEmail);
+    if (typeof profile.adminPhone === "string") setAdminPhone(profile.adminPhone);
+    if (typeof profile.jobTitle === "string") setJobTitle(profile.jobTitle);
+
+    if (typeof appearance.theme === "string") setTheme(appearance.theme);
+    if (typeof appearance.accent === "string") setAccent(appearance.accent);
+    if (typeof appearance.density === "string") setDensity(appearance.density);
+    if (typeof appearance.sidebarCollapsed === "boolean") setSidebarCollapsed(appearance.sidebarCollapsed);
+    if (typeof appearance.animations === "boolean") setAnimations(appearance.animations);
+    if (typeof appearance.compactTables === "boolean") setCompactTables(appearance.compactTables);
+    if (typeof appearance.showBreadcrumbs === "boolean") setShowBreadcrumbs(appearance.showBreadcrumbs);
+    if (typeof appearance.stickyHeaders === "boolean") setStickyHeaders(appearance.stickyHeaders);
+
+    if (typeof academic.academicYear === "string") setAcademicYear(academic.academicYear);
+    if (typeof academic.weekStart === "string") setWeekStart(academic.weekStart);
+    if (typeof academic.gradingSystem === "string") setGradingSystem(academic.gradingSystem);
+    if (typeof academic.defaultClassDuration === "string") setDefaultClassDuration(academic.defaultClassDuration);
+    if (typeof academic.maxStudentsPerBatch === "string") setMaxStudentsPerBatch(academic.maxStudentsPerBatch);
+    if (typeof academic.defaultBreakDuration === "string") setDefaultBreakDuration(academic.defaultBreakDuration);
+    if (typeof academic.workingDays === "string") setWorkingDays(academic.workingDays);
+    if (typeof academic.autoGenerateStudentId === "boolean") setAutoGenerateStudentId(academic.autoGenerateStudentId);
+    if (typeof academic.autoGenerateBatchId === "boolean") setAutoGenerateBatchId(academic.autoGenerateBatchId);
+
+    if (typeof attendance.lateAfter === "string") setLateAfter(attendance.lateAfter);
+    if (typeof attendance.attendanceRequired === "string") setAttendanceRequired(attendance.attendanceRequired);
+    if (typeof attendance.autoAbsent === "boolean") setAutoAbsent(attendance.autoAbsent);
+    if (typeof attendance.faceScan === "boolean") setFaceScan(attendance.faceScan);
+    if (typeof attendance.rfid === "boolean") setRfid(attendance.rfid);
+    if (typeof attendance.fingerprint === "boolean") setFingerprint(attendance.fingerprint);
+    if (typeof attendance.attendanceWhatsapp === "boolean") setAttendanceWhatsapp(attendance.attendanceWhatsapp);
+    if (typeof attendance.lowAttendanceAlert === "boolean") setLowAttendanceAlert(attendance.lowAttendanceAlert);
+    if (typeof attendance.attendanceDigest === "boolean") setAttendanceDigest(attendance.attendanceDigest);
+    if (typeof attendance.allowManualOverride === "boolean") setAllowManualOverride(attendance.allowManualOverride);
+
+    if (typeof fees.lateFeeEnabled === "boolean") setLateFeeEnabled(fees.lateFeeEnabled);
+    if (typeof fees.lateFeeAmount === "string") setLateFeeAmount(fees.lateFeeAmount);
+    if (typeof fees.lateFeeType === "string") setLateFeeType(fees.lateFeeType);
+    if (typeof fees.receiptPrefix === "string") setReceiptPrefix(fees.receiptPrefix);
+    if (typeof fees.invoicePrefix === "string") setInvoicePrefix(fees.invoicePrefix);
+    if (typeof fees.paymentReminderDays === "string") setPaymentReminderDays(fees.paymentReminderDays);
+    if (typeof fees.overdueReminderDays === "string") setOverdueReminderDays(fees.overdueReminderDays);
+    if (typeof fees.onlinePayments === "boolean") setOnlinePayments(fees.onlinePayments);
+    if (typeof fees.partialPayments === "boolean") setPartialPayments(fees.partialPayments);
+    if (typeof fees.autoReceipt === "boolean") setAutoReceipt(fees.autoReceipt);
+    if (typeof fees.feeWhatsapp === "boolean") setFeeWhatsapp(fees.feeWhatsapp);
+    if (typeof fees.feeEmail === "boolean") setFeeEmail(fees.feeEmail);
+
+    if (typeof exams.defaultPassingPercentage === "string") setDefaultPassingPercentage(exams.defaultPassingPercentage);
+    if (typeof exams.negativeMarking === "boolean") setNegativeMarking(exams.negativeMarking);
+    if (typeof exams.negativeMarksValue === "string") setNegativeMarksValue(exams.negativeMarksValue);
+    if (typeof exams.autoPublishResults === "boolean") setAutoPublishResults(exams.autoPublishResults);
+    if (typeof exams.examNotifications === "boolean") setExamNotifications(exams.examNotifications);
+    if (typeof exams.resultNotifications === "boolean") setResultNotifications(exams.resultNotifications);
+    if (typeof exams.showRank === "boolean") setShowRank(exams.showRank);
+    if (typeof exams.showPercentile === "boolean") setShowPercentile(exams.showPercentile);
+    if (typeof exams.allowRevaluation === "boolean") setAllowRevaluation(exams.allowRevaluation);
+
+    if (typeof notifications.notifyNewStudent === "boolean") setNotifyNewStudent(notifications.notifyNewStudent);
+    if (typeof notifications.notifyPayment === "boolean") setNotifyPayment(notifications.notifyPayment);
+    if (typeof notifications.notifyAttendance === "boolean") setNotifyAttendance(notifications.notifyAttendance);
+    if (typeof notifications.notifyExam === "boolean") setNotifyExam(notifications.notifyExam);
+    if (typeof notifications.notifyInquiry === "boolean") setNotifyInquiry(notifications.notifyInquiry);
+    if (typeof notifications.notifySystem === "boolean") setNotifySystem(notifications.notifySystem);
+    if (typeof notifications.notifyTeacher === "boolean") setNotifyTeacher(notifications.notifyTeacher);
+    if (typeof notifications.notifyBatch === "boolean") setNotifyBatch(notifications.notifyBatch);
+    if (typeof notifications.quietHours === "boolean") setQuietHours(notifications.quietHours);
+    if (typeof notifications.quietStart === "string") setQuietStart(notifications.quietStart);
+    if (typeof notifications.quietEnd === "string") setQuietEnd(notifications.quietEnd);
+    if (typeof notifications.criticalOverride === "boolean") setCriticalOverride(notifications.criticalOverride);
+    if (typeof notifications.dailyDigest === "boolean") setDailyDigest(notifications.dailyDigest);
+    if (typeof notifications.pushNotifications === "boolean") setPushNotifications(notifications.pushNotifications);
+
+    if (typeof whatsapp.whatsappEnabled === "boolean") setWhatsappEnabled(whatsapp.whatsappEnabled);
+    if (typeof whatsapp.whatsappProvider === "string") setWhatsappProvider(whatsapp.whatsappProvider);
+    if (typeof whatsapp.whatsappPhone === "string") setWhatsappPhone(whatsapp.whatsappPhone);
+    if (typeof whatsapp.whatsappBusinessId === "string") setWhatsappBusinessId(whatsapp.whatsappBusinessId);
+    if (typeof whatsapp.whatsappAutoInquiry === "boolean") setWhatsappAutoInquiry(whatsapp.whatsappAutoInquiry);
+    if (typeof whatsapp.whatsappAttendance === "boolean") setWhatsappAttendance(whatsapp.whatsappAttendance);
+    if (typeof whatsapp.whatsappFeeReminder === "boolean") setWhatsappFeeReminder(whatsapp.whatsappFeeReminder);
+    if (typeof whatsapp.whatsappExam === "boolean") setWhatsappExam(whatsapp.whatsappExam);
+    if (typeof whatsapp.whatsappResults === "boolean") setWhatsappResults(whatsapp.whatsappResults);
+    if (typeof whatsapp.whatsappTemplates === "boolean") setWhatsappTemplates(whatsapp.whatsappTemplates);
+
+    if (typeof email.emailEnabled === "boolean") setEmailEnabled(email.emailEnabled);
+    if (typeof email.emailProvider === "string") setEmailProvider(email.emailProvider);
+    if (typeof email.smtpHost === "string") setSmtpHost(email.smtpHost);
+    if (typeof email.smtpPort === "string") setSmtpPort(email.smtpPort);
+    if (typeof email.smtpUsername === "string") setSmtpUsername(email.smtpUsername);
+    if (typeof email.emailSenderName === "string") setEmailSenderName(email.emailSenderName);
+    if (typeof email.emailSenderAddress === "string") setEmailSenderAddress(email.emailSenderAddress);
+    if (typeof email.emailReplyTo === "string") setEmailReplyTo(email.emailReplyTo);
+    if (typeof email.emailNotifications === "boolean") setEmailNotifications(email.emailNotifications);
+    if (typeof email.emailReceipts === "boolean") setEmailReceipts(email.emailReceipts);
+
+    if (typeof security.twoFactor === "boolean") setTwoFactor(security.twoFactor);
+    if (typeof security.loginAlerts === "boolean") setLoginAlerts(security.loginAlerts);
+    if (typeof security.sessionTimeout === "string") setSessionTimeout(security.sessionTimeout);
+    if (typeof security.maxLoginAttempts === "string") setMaxLoginAttempts(security.maxLoginAttempts);
+    if (typeof security.passwordExpiry === "string") setPasswordExpiry(security.passwordExpiry);
+    if (typeof security.forceStrongPasswords === "boolean") setForceStrongPasswords(security.forceStrongPasswords);
+    if (typeof security.singleSession === "boolean") setSingleSession(security.singleSession);
+    if (typeof security.ipRestriction === "boolean") setIpRestriction(security.ipRestriction);
+    if (typeof security.apiSecurity === "boolean") setApiSecurity(security.apiSecurity);
+
+    if (typeof branding.brandName === "string") setBrandName(branding.brandName);
+    if (typeof branding.primaryColor === "string") setPrimaryColor(branding.primaryColor);
+    if (typeof branding.secondaryColor === "string") setSecondaryColor(branding.secondaryColor);
+    if (typeof branding.favicon === "string") setFavicon(branding.favicon);
+    if (typeof branding.logoText === "string") setLogoText(branding.logoText);
+    if (typeof branding.showPoweredBy === "boolean") setShowPoweredBy(branding.showPoweredBy);
+    if (typeof branding.customDomain === "string") setCustomDomain(branding.customDomain);
+    if (typeof branding.loginMessage === "string") setLoginMessage(branding.loginMessage);
+
+    if (typeof apps.studentAppEnabled === "boolean") setStudentAppEnabled(apps.studentAppEnabled);
+    if (typeof apps.teacherAppEnabled === "boolean") setTeacherAppEnabled(apps.teacherAppEnabled);
+    if (typeof apps.parentAppEnabled === "boolean") setParentAppEnabled(apps.parentAppEnabled);
+    if (typeof apps.maintenanceMode === "boolean") setMaintenanceMode(apps.maintenanceMode);
+    if (typeof apps.publicWebsite === "boolean") setPublicWebsite(apps.publicWebsite);
+    if (typeof apps.allowSelfRegistration === "boolean") setAllowSelfRegistration(apps.allowSelfRegistration);
+    if (typeof apps.enableStudentPortal === "boolean") setEnableStudentPortal(apps.enableStudentPortal);
+    if (typeof apps.enableParentPortal === "boolean") setEnableParentPortal(apps.enableParentPortal);
+    if (typeof apps.enableTeacherPortal === "boolean") setEnableTeacherPortal(apps.enableTeacherPortal);
+
+    if (Array.isArray(settings.roles)) setRoles(settings.roles);
+    if (settings.permissions) setPermissionState(settings.permissions);
+    if (Array.isArray(settings.integrations)) setIntegrations(settings.integrations);
+
+    if (typeof backup.autoBackup === "boolean") setAutoBackup(backup.autoBackup);
+    if (typeof backup.backupFrequency === "string") setBackupFrequency(backup.backupFrequency);
+    if (typeof backup.backupRetention === "string") setBackupRetention(backup.backupRetention);
+    if (typeof backup.cloudBackup === "boolean") setCloudBackup(backup.cloudBackup);
+    if (typeof backup.backupEncryption === "boolean") setBackupEncryption(backup.backupEncryption);
+    if (typeof backup.backupBeforeUpdates === "boolean") setBackupBeforeUpdates(backup.backupBeforeUpdates);
+
+    if (typeof privacy.analytics === "boolean") setAnalytics(privacy.analytics);
+    if (typeof privacy.errorTracking === "boolean") setErrorTracking(privacy.errorTracking);
+    if (typeof privacy.dataEncryption === "boolean") setDataEncryption(privacy.dataEncryption);
+    if (typeof privacy.maskSensitiveData === "boolean") setMaskSensitiveData(privacy.maskSensitiveData);
+    if (typeof privacy.privacyMode === "boolean") setPrivacyMode(privacy.privacyMode);
+    if (typeof privacy.activityTracking === "boolean") setActivityTracking(privacy.activityTracking);
+    if (typeof privacy.dataRetention === "string") setDataRetention(privacy.dataRetention);
+  };
+
+  useEffect(() => {
+    const loadSettings = () => {
+      const records = getCollection<PersistedSettings>("reports");
+      const savedSettings = records.find((record) => record.id === "__settings__");
+      if (savedSettings) {
+        applySettingsSnapshot(savedSettings);
+        setSaved(true);
+      }
+    };
+
+    loadSettings();
+    return subscribeToStore(loadSettings);
+  }, []);
+
   /* ==========================================================================
      UI HELPERS
      ========================================================================== */
@@ -971,6 +1255,13 @@ export default function SettingsPage() {
   };
 
   const saveSettings = () => {
+    const snapshot = createSettingsSnapshot();
+    const records = getCollection<PersistedSettings>("settings");
+    setCollection("settings", [
+      ...records.filter((record) => record.id !== "__settings__"),
+      { ...snapshot, id: "__settings__" },
+    ]);
+
     setSaved(true);
     setShowSaveConfirm(false);
 
