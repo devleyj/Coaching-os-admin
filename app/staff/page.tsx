@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import {
   Search,
@@ -47,6 +47,7 @@ import {
   Zap,
 } from "lucide-react";
 import Slidebar from "../components/Slidebar";
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
 
 type StaffStatus = "Active" | "On Leave" | "Inactive";
 
@@ -389,7 +390,22 @@ const downloadCsv = (staff: StaffMember[]) => {
 };
 
 export default function StaffPage() {
-  const [staffList, setStaffList] = useState<StaffMember[]>(initialStaff);
+  const [staffList, setStaffList] = useState<StaffMember[]>([]);
+
+  useEffect(() => {
+    const storedStaff = getCollection<StaffMember>("staff");
+
+    if (storedStaff.length > 0) {
+      setStaffList(storedStaff);
+    } else {
+      setCollection("staff", initialStaff);
+      setStaffList(initialStaff);
+    }
+
+    return subscribeToStore(() => {
+      setStaffList(getCollection<StaffMember>("staff"));
+    });
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("All");
@@ -706,27 +722,28 @@ export default function StaffPage() {
     }
 
     if (editingId) {
-      setStaffList((current) =>
-        current.map((staff) =>
-          staff.id === editingId
-            ? {
-                ...staff,
-                name,
-                role,
-                department,
-                phone,
-                email,
-                joiningDate: form.joiningDate,
-                employmentType: form.employmentType,
-                status: form.status,
-                salary,
-                emergencyContact: form.emergencyContact.trim(),
-                address: form.address.trim(),
-                notes: form.notes.trim(),
-              }
-            : staff,
-        ),
+      const nextStaff = staffList.map((staff) =>
+        staff.id === editingId
+          ? {
+              ...staff,
+              name,
+              role,
+              department,
+              phone,
+              email,
+              joiningDate: form.joiningDate,
+              employmentType: form.employmentType,
+              status: form.status,
+              salary,
+              emergencyContact: form.emergencyContact.trim(),
+              address: form.address.trim(),
+              notes: form.notes.trim(),
+            }
+          : staff,
       );
+
+      setCollection("staff", nextStaff);
+      setStaffList(nextStaff);
 
       showToast("Staff profile updated successfully.");
     } else {
@@ -756,7 +773,10 @@ export default function StaffPage() {
         notes: form.notes.trim(),
       };
 
-      setStaffList((current) => [newStaff, ...current]);
+      const nextStaff = [newStaff, ...staffList];
+
+      setCollection("staff", nextStaff);
+      setStaffList(nextStaff);
 
       setPage(1);
 
@@ -777,7 +797,10 @@ export default function StaffPage() {
 
     if (!confirmed) return;
 
-    setStaffList((current) => current.filter((item) => item.id !== id));
+    const nextStaff = staffList.filter((item) => item.id !== id);
+
+    setCollection("staff", nextStaff);
+    setStaffList(nextStaff);
 
     setOpenActionMenu(null);
     setViewingStaff(null);
@@ -788,9 +811,12 @@ export default function StaffPage() {
   const updateStatus = (id: string, status: StaffStatus) => {
     const staff = staffList.find((item) => item.id === id);
 
-    setStaffList((current) =>
-      current.map((item) => (item.id === id ? { ...item, status } : item)),
+    const nextStaff = staffList.map((item) =>
+      item.id === id ? { ...item, status } : item,
     );
+
+    setCollection("staff", nextStaff);
+    setStaffList(nextStaff);
 
     setOpenActionMenu(null);
 
