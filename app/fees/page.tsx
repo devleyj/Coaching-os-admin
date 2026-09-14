@@ -311,28 +311,41 @@ function numberToWords(num: number): string {
 export default function FeesPage() {
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
 
-  const [paymentHistory, setPaymentHistory] = useState<Payment[]>(() => {
-    if (typeof window === "undefined") return initialPayments;
-
-    try {
-      const raw = window.localStorage.getItem(PAYMENTS_STORAGE_KEY);
-      if (!raw) return initialPayments;
-
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? (parsed as Payment[]) : initialPayments;
-    } catch {
-      return initialPayments;
-    }
-  });
+  const [paymentHistory, setPaymentHistory] = useState<Payment[]>([]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const loadPayments = () => {
+      let payments = getCollection<Payment>("fees");
 
-    window.localStorage.setItem(
-      PAYMENTS_STORAGE_KEY,
-      JSON.stringify(paymentHistory),
-    );
-  }, [paymentHistory]);
+      // One-time migration from the old Fees-only localStorage key.
+      // After migration, the shared app store becomes the single source of truth.
+      if (payments.length === 0) {
+        try {
+          const raw = window.localStorage.getItem(PAYMENTS_STORAGE_KEY);
+          const parsed = raw ? JSON.parse(raw) : null;
+
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            payments = parsed as Payment[];
+          }
+        } catch {
+          payments = [];
+        }
+
+        if (payments.length === 0) {
+          payments = initialPayments;
+        }
+
+        setCollection("fees", payments);
+      }
+
+      setPaymentHistory(payments);
+    };
+
+    loadPayments();
+
+    return subscribeToStore(loadPayments);
+  }, []);
+
 
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
@@ -557,10 +570,12 @@ export default function FeesPage() {
 
     setCollection("students", updatedStudents);
 
-    // Update the local fee view immediately as well as the shared Students data.
+    // Keep the fee view and payment ledger synchronized through the shared app store.
     setFeeRecords(buildFeeRecords(updatedStudents));
 
-    setPaymentHistory((history) => [newPayment, ...history]);
+    const nextPayments = [newPayment, ...getCollection<Payment>("fees")];
+    setCollection("fees", nextPayments);
+    setPaymentHistory(nextPayments);
 
     setSelectedPayment(newPayment);
     setShowPaymentForm(false);

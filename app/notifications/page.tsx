@@ -1160,6 +1160,32 @@ export default function NotificationsPage() {
   ========================================================= */
 
   const handleMarkAsRead = (id: string) => {
+    const target = notifications.find((notification) => notification.id === id);
+
+    if (!target) return;
+
+    // Attendance notifications use the shared notification record created
+    // by the Attendance module. Persist the read state there so it survives
+    // navigation and refresh instead of being changed only in local UI state.
+    if (target.type === "Attendance" && target.createdBy === "Attendance System") {
+      const shared = getCollection<
+        SharedAttendanceNotification | Notification
+      >("notifications");
+
+      const nextShared = shared.map((item) => {
+        if (item?.type !== "attendance" || String(item.id) !== id) {
+          return item;
+        }
+
+        return {
+          ...item,
+          read: true,
+        };
+      });
+
+      setCollection("notifications", nextShared);
+    }
+
     setNotifications((current) =>
       current.map((notification) => {
         if (notification.id !== id) {
