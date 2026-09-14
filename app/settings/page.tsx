@@ -120,9 +120,20 @@ type Integration = {
   name: string;
   description: string;
   icon: any;
+  iconKey: string;
   connected: boolean;
   category: string;
 };
+
+type PersistedIntegration = {
+  name: string;
+  description: string;
+  iconKey: string;
+  connected: boolean;
+  category: string;
+};
+
+const SETTINGS_STORAGE_KEY = "coaching-os-settings-v0.1.36";
 
 type Recommendation = {
   id: number;
@@ -137,7 +148,7 @@ type Recommendation = {
    DATA
    ========================================================================== */
 
-const APP_VERSION = "v0.1.20";
+const APP_VERSION = "v0.1.36";
 
 const settingsMenu: {
   id: SettingsSection;
@@ -438,6 +449,7 @@ const initialIntegrations: Integration[] = [
     name: "Google Calendar",
     description: "Sync classes, exams and institute events.",
     icon: CalendarDays,
+    iconKey: "CalendarDays",
     connected: false,
     category: "Productivity",
   },
@@ -445,6 +457,7 @@ const initialIntegrations: Integration[] = [
     name: "Google Drive",
     description: "Store educational documents and files.",
     icon: Cloud,
+    iconKey: "Cloud",
     connected: false,
     category: "Storage",
   },
@@ -452,6 +465,7 @@ const initialIntegrations: Integration[] = [
     name: "Payment Gateway",
     description: "Accept online student and parent payments.",
     icon: Wallet,
+    iconKey: "Wallet",
     connected: false,
     category: "Finance",
   },
@@ -459,6 +473,7 @@ const initialIntegrations: Integration[] = [
     name: "Firebase",
     description: "Push notifications and mobile infrastructure.",
     icon: Smartphone,
+    iconKey: "Smartphone",
     connected: false,
     category: "Mobile",
   },
@@ -466,6 +481,7 @@ const initialIntegrations: Integration[] = [
     name: "Cloud Storage",
     description: "S3-compatible storage for application files.",
     icon: HardDrive,
+    iconKey: "HardDrive",
     connected: false,
     category: "Storage",
   },
@@ -473,10 +489,32 @@ const initialIntegrations: Integration[] = [
     name: "Webhooks",
     description: "Send platform events to external systems.",
     icon: Webhook,
+    iconKey: "Webhook",
     connected: false,
     category: "Developer",
   },
 ];
+
+const integrationIconMap: Record<string, any> = {
+  CalendarDays,
+  Cloud,
+  Wallet,
+  Smartphone,
+  HardDrive,
+  Webhook,
+};
+
+const getIntegrationIcon = (iconKey: unknown, integrationName: string) => {
+  if (typeof iconKey === "string" && integrationIconMap[iconKey]) {
+    return integrationIconMap[iconKey];
+  }
+
+  const fallback = initialIntegrations.find(
+    (integration) => integration.name === integrationName,
+  );
+
+  return fallback?.icon ?? Zap;
+};
 
 /* ==========================================================================
    HELPERS
@@ -507,6 +545,222 @@ const priorityClasses = (priority: Recommendation["priority"]) => {
 
   return "bg-emerald-50 text-emerald-700 border-emerald-100";
 };
+
+/* ==========================================================================
+   STABLE UI COMPONENTS
+   ========================================================================== */
+
+const Toggle = ({
+  enabled,
+  onChange,
+  label,
+  onMarkChanged,
+}: {
+  enabled: boolean;
+  onChange: (value: boolean) => void;
+  label?: string;
+  onMarkChanged?: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={() => {
+      onChange(!enabled);
+      onMarkChanged?.();
+    }}
+    className={cn(
+      "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition",
+      enabled ? "bg-blue-600" : "bg-slate-300",
+    )}
+    aria-label={label || "Toggle setting"}
+    aria-pressed={enabled}
+  >
+    <span
+      className={cn(
+        "inline-block h-6 w-6 rounded-full bg-white shadow-md transition",
+        enabled ? "translate-x-5" : "translate-x-0.5",
+      )}
+    />
+  </button>
+);
+
+const Field = ({
+  label,
+  children,
+  hint,
+}: {
+  label: string;
+  children: ReactNode;
+  hint?: string;
+}) => (
+  <div>
+    <label className="mb-2 block text-sm font-bold text-slate-700">
+      {label}
+    </label>
+    {children}
+    {hint && (
+      <p className="mt-1.5 text-xs leading-5 text-slate-400">{hint}</p>
+    )}
+  </div>
+);
+
+const Card = ({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
+  <div
+    className={cn(
+      "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm",
+      className,
+    )}
+  >
+    {children}
+  </div>
+);
+
+const SectionHeader = ({
+  icon: Icon,
+  title,
+  description,
+  badge,
+  onAIHelp,
+}: {
+  icon: any;
+  title: string;
+  description: string;
+  badge?: string;
+  onAIHelp: () => void;
+}) => (
+  <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div className="flex items-start gap-4">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+        <Icon size={22} />
+      </div>
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-xl font-black text-slate-900">{title}</h2>
+          {badge && (
+            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700">
+              {badge}
+            </span>
+          )}
+        </div>
+        <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+          {description}
+        </p>
+      </div>
+    </div>
+    <button
+      type="button"
+      onClick={onAIHelp}
+      className="flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-xs font-black text-violet-700 transition hover:bg-violet-100"
+    >
+      <Sparkles size={15} />
+      AI Help
+    </button>
+  </div>
+);
+
+const SettingRow = ({
+  icon: Icon,
+  title,
+  description,
+  enabled,
+  onChange,
+  danger = false,
+  onMarkChanged,
+}: {
+  icon: any;
+  title: string;
+  description: string;
+  enabled: boolean;
+  onChange: (value: boolean) => void;
+  danger?: boolean;
+  onMarkChanged?: () => void;
+}) => (
+  <div className="flex items-center justify-between gap-5 border-b border-slate-100 py-5 last:border-b-0">
+    <div className="flex min-w-0 items-start gap-3">
+      <div
+        className={cn(
+          "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+          danger ? "bg-red-50 text-red-600" : "bg-slate-100 text-slate-600",
+        )}
+      >
+        <Icon size={17} />
+      </div>
+      <div className="min-w-0">
+        <p
+          className={cn(
+            "text-sm font-black",
+            danger ? "text-red-800" : "text-slate-800",
+          )}
+        >
+          {title}
+        </p>
+        <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-500">
+          {description}
+        </p>
+      </div>
+    </div>
+    <Toggle
+      enabled={enabled}
+      onChange={onChange}
+      label={title}
+      onMarkChanged={onMarkChanged}
+    />
+  </div>
+);
+
+const SaveBar = ({
+  saved,
+  onReset,
+  onSave,
+}: {
+  saved: boolean;
+  onReset: () => void;
+  onSave: () => void;
+}) => (
+  <div className="sticky bottom-4 z-30 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-xl backdrop-blur">
+    <div className="flex items-center gap-2">
+      {saved ? (
+        <>
+          <CheckCircle2 size={18} className="text-emerald-500" />
+          <div>
+            <p className="text-sm font-bold text-slate-700">All changes saved</p>
+            <p className="text-[11px] text-slate-400">Your current configuration is up to date.</p>
+          </div>
+        </>
+      ) : (
+        <>
+          <AlertTriangle size={18} className="text-amber-500" />
+          <div>
+            <p className="text-sm font-bold text-amber-700">Unsaved changes</p>
+            <p className="text-[11px] text-amber-600">Save before leaving this section.</p>
+          </div>
+        </>
+      )}
+    </div>
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onReset}
+        className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
+      >
+        Reset
+      </button>
+      <button
+        type="button"
+        onClick={onSave}
+        className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:bg-blue-700"
+      >
+        <Save size={16} />
+        Save Changes
+      </button>
+    </div>
+  </div>
+);
 
 /* ==========================================================================
    MAIN COMPONENT
@@ -958,7 +1212,7 @@ export default function SettingsPage() {
     apps: Record<string, unknown>;
     roles: Role[];
     permissions: typeof permissionState;
-    integrations: Integration[];
+    integrations: PersistedIntegration[];
     backup: Record<string, unknown>;
     privacy: Record<string, unknown>;
   };
@@ -1021,7 +1275,13 @@ export default function SettingsPage() {
     },
     roles,
     permissions: permissionState,
-    integrations,
+    integrations: integrations.map(({ name, description, iconKey, connected, category }) => ({
+      name,
+      description,
+      iconKey,
+      connected,
+      category,
+    })),
     backup: {
       autoBackup, backupFrequency, backupRetention, cloudBackup,
       backupEncryption, backupBeforeUpdates,
@@ -1188,7 +1448,17 @@ export default function SettingsPage() {
 
     if (Array.isArray(settings.roles)) setRoles(settings.roles);
     if (settings.permissions) setPermissionState(settings.permissions);
-    if (Array.isArray(settings.integrations)) setIntegrations(settings.integrations);
+    if (Array.isArray(settings.integrations)) {
+      const hydratedIntegrations: Integration[] = settings.integrations.map((item) => ({
+        name: typeof item.name === "string" ? item.name : "Integration",
+        description: typeof item.description === "string" ? item.description : "",
+        iconKey: typeof item.iconKey === "string" ? item.iconKey : "Zap",
+        icon: getIntegrationIcon(item.iconKey, item.name),
+        connected: Boolean(item.connected),
+        category: typeof item.category === "string" ? item.category : "Other",
+      }));
+      setIntegrations(hydratedIntegrations);
+    }
 
     if (typeof backup.autoBackup === "boolean") setAutoBackup(backup.autoBackup);
     if (typeof backup.backupFrequency === "string") setBackupFrequency(backup.backupFrequency);
@@ -1208,8 +1478,20 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const loadSettings = () => {
-      const records = getCollection<PersistedSettings>("reports");
-      const savedSettings = records.find((record) => record.id === "__settings__");
+      let savedSettings: PersistedSettings | null = null;
+
+      try {
+        const raw = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as PersistedSettings;
+          if (parsed && typeof parsed === "object") {
+            savedSettings = parsed;
+          }
+        }
+      } catch {
+        savedSettings = null;
+      }
+
       if (savedSettings) {
         applySettingsSnapshot(savedSettings);
         setSaved(true);
@@ -1256,11 +1538,29 @@ export default function SettingsPage() {
 
   const saveSettings = () => {
     const snapshot = createSettingsSnapshot();
-    const records = getCollection<PersistedSettings>("settings");
-    setCollection("settings", [
-      ...records.filter((record) => record.id !== "__settings__"),
-      { ...snapshot, id: "__settings__" },
-    ]);
+    const persistedSnapshot: PersistedSettings = {
+      ...snapshot,
+      id: "__settings__",
+      integrations: snapshot.integrations.map((integration) => ({
+        name: integration.name,
+        description: integration.description,
+        iconKey: integration.iconKey,
+        connected: Boolean(integration.connected),
+        category: integration.category,
+      })),
+    };
+
+    // Primary settings persistence. This is deliberately independent of the
+    // generic app-store collection so Settings survives even if the shared
+    // store schema changes in a future version.
+    try {
+      window.localStorage.setItem(
+        SETTINGS_STORAGE_KEY,
+        JSON.stringify(persistedSnapshot),
+      );
+    } catch {
+      // The shared store below remains as a fallback.
+    }
 
     setSaved(true);
     setShowSaveConfirm(false);
@@ -1277,25 +1577,42 @@ export default function SettingsPage() {
   };
 
   const requestSave = () => {
-    if (!saved) {
-      setShowSaveConfirm(true);
-      return;
-    }
-
-    showToast("Everything is already saved");
+    // Save immediately. The button is the explicit user action, so we do not
+    // require a second confirmation click that could leave changes unsaved.
+    saveSettings();
   };
 
   const resetSettings = () => {
     if (
       !window.confirm(
-        "Reset the current settings section to its saved configuration? Demo state will be refreshed.",
+        "Reset the current settings section to its saved configuration?",
       )
     ) {
       return;
     }
 
+    let savedSettings: PersistedSettings | null = null;
+
+    try {
+      const raw = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as PersistedSettings;
+        if (parsed && typeof parsed === "object") {
+          savedSettings = parsed;
+        }
+      }
+    } catch {
+      savedSettings = null;
+    }
+
+    if (!savedSettings) {
+      showToast("No saved settings were found to restore");
+      return;
+    }
+
+    applySettingsSnapshot(savedSettings);
     setSaved(true);
-    showToast("Current settings reset");
+    showToast("Saved settings restored");
   };
 
   const selectSection = (section: SettingsSection) => {
@@ -1307,242 +1624,6 @@ export default function SettingsPage() {
     setAIAction(action);
     setShowAI(true);
   };
-
-  /* ==========================================================================
-     TOGGLE COMPONENT
-     ========================================================================== */
-
-  const Toggle = ({
-    enabled,
-    onChange,
-    label,
-  }: {
-    enabled: boolean;
-    onChange: (value: boolean) => void;
-    label?: string;
-  }) => (
-    <button
-      type="button"
-      onClick={() => {
-        onChange(!enabled);
-        markChanged();
-      }}
-      className={cn(
-        "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition",
-        enabled ? "bg-blue-600" : "bg-slate-300",
-      )}
-      aria-label={label || "Toggle setting"}
-      aria-pressed={enabled}
-    >
-      <span
-        className={cn(
-          "inline-block h-6 w-6 rounded-full bg-white shadow-md transition",
-          enabled ? "translate-x-5" : "translate-x-0.5",
-        )}
-      />
-    </button>
-  );
-
-  /* ==========================================================================
-     FIELD
-     ========================================================================== */
-
-  const Field = ({
-    label,
-    children,
-    hint,
-  }: {
-    label: string;
-    children: ReactNode;
-    hint?: string;
-  }) => (
-    <div>
-      <label className="mb-2 block text-sm font-bold text-slate-700">
-        {label}
-      </label>
-
-      {children}
-
-      {hint && (
-        <p className="mt-1.5 text-xs leading-5 text-slate-400">{hint}</p>
-      )}
-    </div>
-  );
-
-  /* ==========================================================================
-     CARD
-     ========================================================================== */
-
-  const Card = ({
-    children,
-    className = "",
-  }: {
-    children: ReactNode;
-    className?: string;
-  }) => (
-    <div
-      className={cn(
-        "rounded-2xl border border-slate-200 bg-white p-6 shadow-sm",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-
-  /* ==========================================================================
-     SECTION HEADER
-     ========================================================================== */
-
-  const SectionHeader = ({
-    icon: Icon,
-    title,
-    description,
-    badge,
-  }: {
-    icon: any;
-    title: string;
-    description: string;
-    badge?: string;
-  }) => (
-    <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-      <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-          <Icon size={22} />
-        </div>
-
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-black text-slate-900">{title}</h2>
-
-            {badge && (
-              <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700">
-                {badge}
-              </span>
-            )}
-          </div>
-
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-            {description}
-          </p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => openAI("overview")}
-        className="flex items-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-xs font-black text-violet-700 transition hover:bg-violet-100"
-      >
-        <Sparkles size={15} />
-        AI Help
-      </button>
-    </div>
-  );
-
-  /* ==========================================================================
-     SETTING ROW
-     ========================================================================== */
-
-  const SettingRow = ({
-    icon: Icon,
-    title,
-    description,
-    enabled,
-    onChange,
-    danger = false,
-  }: {
-    icon: any;
-    title: string;
-    description: string;
-    enabled: boolean;
-    onChange: (value: boolean) => void;
-    danger?: boolean;
-  }) => (
-    <div className="flex items-center justify-between gap-5 border-b border-slate-100 py-5 last:border-b-0">
-      <div className="flex min-w-0 items-start gap-3">
-        <div
-          className={cn(
-            "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-            danger ? "bg-red-50 text-red-600" : "bg-slate-100 text-slate-600",
-          )}
-        >
-          <Icon size={17} />
-        </div>
-
-        <div className="min-w-0">
-          <p
-            className={cn(
-              "text-sm font-black",
-              danger ? "text-red-800" : "text-slate-800",
-            )}
-          >
-            {title}
-          </p>
-
-          <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-500">
-            {description}
-          </p>
-        </div>
-      </div>
-
-      <Toggle enabled={enabled} onChange={onChange} label={title} />
-    </div>
-  );
-
-  /* ==========================================================================
-     SAVE BAR
-     ========================================================================== */
-
-  const SaveBar = () => (
-    <div className="sticky bottom-4 z-30 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-xl backdrop-blur">
-      <div className="flex items-center gap-2">
-        {saved ? (
-          <>
-            <CheckCircle2 size={18} className="text-emerald-500" />
-            <div>
-              <p className="text-sm font-bold text-slate-700">
-                All changes saved
-              </p>
-              <p className="text-[11px] text-slate-400">
-                Your current configuration is up to date.
-              </p>
-            </div>
-          </>
-        ) : (
-          <>
-            <AlertTriangle size={18} className="text-amber-500" />
-            <div>
-              <p className="text-sm font-bold text-amber-700">
-                Unsaved changes
-              </p>
-              <p className="text-[11px] text-amber-600">
-                Save before leaving this section.
-              </p>
-            </div>
-          </>
-        )}
-      </div>
-
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={resetSettings}
-          className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
-        >
-          Reset
-        </button>
-
-        <button
-          type="button"
-          onClick={requestSave}
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:bg-blue-700"
-        >
-          <Save size={16} />
-          Save Changes
-        </button>
-      </div>
-    </div>
-  );
 
   /* ==========================================================================
      EXPORT SETTINGS
@@ -2199,6 +2280,7 @@ export default function SettingsPage() {
         title="Institute Profile"
         description="Manage the organization information used throughout the Coaching OS platform."
         badge="Core"
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -2386,7 +2468,7 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -2400,6 +2482,7 @@ export default function SettingsPage() {
         icon={User}
         title="Admin Profile"
         description="Manage your administrator identity, contact information and authentication."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -2536,7 +2619,7 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -2550,6 +2633,7 @@ export default function SettingsPage() {
         icon={Palette}
         title="Appearance"
         description="Customize the visual experience of the Coaching OS administration console."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -2681,6 +2765,7 @@ export default function SettingsPage() {
             description="Use a compact navigation sidebar."
             enabled={sidebarCollapsed}
             onChange={setSidebarCollapsed}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2689,6 +2774,7 @@ export default function SettingsPage() {
             description="Enable smooth interface transitions."
             enabled={animations}
             onChange={setAnimations}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2697,6 +2783,7 @@ export default function SettingsPage() {
             description="Reduce table row height."
             enabled={compactTables}
             onChange={setCompactTables}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2705,6 +2792,7 @@ export default function SettingsPage() {
             description="Show contextual navigation breadcrumbs."
             enabled={showBreadcrumbs}
             onChange={setShowBreadcrumbs}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2713,11 +2801,12 @@ export default function SettingsPage() {
             description="Keep important table headers visible while scrolling."
             enabled={stickyHeaders}
             onChange={setStickyHeaders}
+          onMarkChanged={markChanged}
           />
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -2731,6 +2820,7 @@ export default function SettingsPage() {
         icon={GraduationCap}
         title="Academic Settings"
         description="Configure the academic structure, timetable defaults and automatic identifiers."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -2839,6 +2929,7 @@ export default function SettingsPage() {
             description="Automatically create unique IDs when students are registered."
             enabled={autoGenerateStudentId}
             onChange={setAutoGenerateStudentId}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2847,11 +2938,12 @@ export default function SettingsPage() {
             description="Automatically create unique batch identifiers."
             enabled={autoGenerateBatchId}
             onChange={setAutoGenerateBatchId}
+          onMarkChanged={markChanged}
           />
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -2865,6 +2957,7 @@ export default function SettingsPage() {
         icon={ClipboardCheck}
         title="Attendance"
         description="Configure attendance rules, biometric methods and automated communication."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -2901,6 +2994,7 @@ export default function SettingsPage() {
             description="Automatically mark students absent when attendance is not recorded."
             enabled={autoAbsent}
             onChange={setAutoAbsent}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2909,6 +3003,7 @@ export default function SettingsPage() {
             description="Allow supported attendance devices to use facial recognition."
             enabled={faceScan}
             onChange={setFaceScan}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2917,6 +3012,7 @@ export default function SettingsPage() {
             description="Allow attendance through supported cards or NFC devices."
             enabled={rfid}
             onChange={setRfid}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2925,6 +3021,7 @@ export default function SettingsPage() {
             description="Allow biometric thumb/fingerprint attendance."
             enabled={fingerprint}
             onChange={setFingerprint}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2933,6 +3030,7 @@ export default function SettingsPage() {
             description="Notify parents or students about attendance events."
             enabled={attendanceWhatsapp}
             onChange={setAttendanceWhatsapp}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2941,6 +3039,7 @@ export default function SettingsPage() {
             description="Alert parents and administrators when attendance drops below the configured threshold."
             enabled={lowAttendanceAlert}
             onChange={setLowAttendanceAlert}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2949,6 +3048,7 @@ export default function SettingsPage() {
             description="Generate periodic attendance summaries for administrators."
             enabled={attendanceDigest}
             onChange={setAttendanceDigest}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -2957,6 +3057,7 @@ export default function SettingsPage() {
             description="Allow authorized staff to correct attendance records."
             enabled={allowManualOverride}
             onChange={setAllowManualOverride}
+          onMarkChanged={markChanged}
           />
         </div>
       </Card>
@@ -2987,7 +3088,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -3001,6 +3102,7 @@ export default function SettingsPage() {
         icon={Wallet}
         title="Fees & Payments"
         description="Configure fee collection, payment reminders, receipts and online payment behavior."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -3085,6 +3187,7 @@ export default function SettingsPage() {
             description="Automatically apply late charges to overdue payments."
             enabled={lateFeeEnabled}
             onChange={setLateFeeEnabled}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3093,6 +3196,7 @@ export default function SettingsPage() {
             description="Allow students and parents to pay fees online."
             enabled={onlinePayments}
             onChange={setOnlinePayments}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3101,6 +3205,7 @@ export default function SettingsPage() {
             description="Allow students to make payments in installments."
             enabled={partialPayments}
             onChange={setPartialPayments}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3109,6 +3214,7 @@ export default function SettingsPage() {
             description="Generate receipts automatically after successful payments."
             enabled={autoReceipt}
             onChange={setAutoReceipt}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3117,6 +3223,7 @@ export default function SettingsPage() {
             description="Send fee reminders through WhatsApp."
             enabled={feeWhatsapp}
             onChange={setFeeWhatsapp}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3125,6 +3232,7 @@ export default function SettingsPage() {
             description="Send fee reminders through email."
             enabled={feeEmail}
             onChange={setFeeEmail}
+          onMarkChanged={markChanged}
           />
         </div>
       </Card>
@@ -3159,7 +3267,7 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -3173,6 +3281,7 @@ export default function SettingsPage() {
         icon={FileText}
         title="Exam Settings"
         description="Configure default exam rules, result publishing and student-facing performance information."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -3210,6 +3319,7 @@ export default function SettingsPage() {
             description="Enable negative marks as a default exam option."
             enabled={negativeMarking}
             onChange={setNegativeMarking}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3218,6 +3328,7 @@ export default function SettingsPage() {
             description="Automatically publish results after an exam is completed."
             enabled={autoPublishResults}
             onChange={setAutoPublishResults}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3226,6 +3337,7 @@ export default function SettingsPage() {
             description="Notify students and parents about upcoming exams."
             enabled={examNotifications}
             onChange={setExamNotifications}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3234,6 +3346,7 @@ export default function SettingsPage() {
             description="Notify students and parents when results are published."
             enabled={resultNotifications}
             onChange={setResultNotifications}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3242,6 +3355,7 @@ export default function SettingsPage() {
             description="Display rank in supported result reports."
             enabled={showRank}
             onChange={setShowRank}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3250,6 +3364,7 @@ export default function SettingsPage() {
             description="Display percentile information in results."
             enabled={showPercentile}
             onChange={setShowPercentile}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3258,11 +3373,12 @@ export default function SettingsPage() {
             description="Allow authorized staff to initiate result revaluation workflows."
             enabled={allowRevaluation}
             onChange={setAllowRevaluation}
+          onMarkChanged={markChanged}
           />
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -3276,6 +3392,7 @@ export default function SettingsPage() {
         icon={Bell}
         title="Notification Preferences"
         description="Control system alerts, event notifications, quiet hours and communication behavior."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -3306,6 +3423,7 @@ export default function SettingsPage() {
             description="Notify administrators when a new student is registered."
             enabled={notifyNewStudent}
             onChange={setNotifyNewStudent}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3314,6 +3432,7 @@ export default function SettingsPage() {
             description="Notify administrators when a payment is recorded."
             enabled={notifyPayment}
             onChange={setNotifyPayment}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3322,6 +3441,7 @@ export default function SettingsPage() {
             description="Notify administrators about attendance events."
             enabled={notifyAttendance}
             onChange={setNotifyAttendance}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3330,6 +3450,7 @@ export default function SettingsPage() {
             description="Notify administrators about exam events."
             enabled={notifyExam}
             onChange={setNotifyExam}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3338,6 +3459,7 @@ export default function SettingsPage() {
             description="Notify counsellors when a new inquiry is received."
             enabled={notifyInquiry}
             onChange={setNotifyInquiry}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3346,6 +3468,7 @@ export default function SettingsPage() {
             description="Notify administrators about important teacher events."
             enabled={notifyTeacher}
             onChange={setNotifyTeacher}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3354,6 +3477,7 @@ export default function SettingsPage() {
             description="Notify administrators about important batch changes."
             enabled={notifyBatch}
             onChange={setNotifyBatch}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3362,6 +3486,7 @@ export default function SettingsPage() {
             description="Receive important technical and system notifications."
             enabled={notifySystem}
             onChange={setNotifySystem}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3370,6 +3495,7 @@ export default function SettingsPage() {
             description="Enable browser and mobile push notifications."
             enabled={pushNotifications}
             onChange={setPushNotifications}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3378,6 +3504,7 @@ export default function SettingsPage() {
             description="Pause non-critical notifications during selected hours."
             enabled={quietHours}
             onChange={setQuietHours}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3386,6 +3513,7 @@ export default function SettingsPage() {
             description="Allow critical alerts to bypass quiet hours."
             enabled={criticalOverride}
             onChange={setCriticalOverride}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3394,6 +3522,7 @@ export default function SettingsPage() {
             description="Combine non-critical administrative notifications into a digest."
             enabled={dailyDigest}
             onChange={setDailyDigest}
+          onMarkChanged={markChanged}
           />
         </div>
 
@@ -3454,7 +3583,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -3469,6 +3598,7 @@ export default function SettingsPage() {
         title="WhatsApp Business"
         description="Configure WhatsApp communication for inquiries, attendance, fees, exams and results."
         badge={whatsappEnabled ? "Active" : "Setup Required"}
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -3577,6 +3707,7 @@ export default function SettingsPage() {
             description="Send WhatsApp follow-ups to inquiry leads."
             enabled={whatsappAutoInquiry}
             onChange={setWhatsappAutoInquiry}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3585,6 +3716,7 @@ export default function SettingsPage() {
             description="Send attendance notifications."
             enabled={whatsappAttendance}
             onChange={setWhatsappAttendance}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3593,6 +3725,7 @@ export default function SettingsPage() {
             description="Send automatic fee reminders."
             enabled={whatsappFeeReminder}
             onChange={setWhatsappFeeReminder}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3601,6 +3734,7 @@ export default function SettingsPage() {
             description="Send exam reminders."
             enabled={whatsappExam}
             onChange={setWhatsappExam}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3609,6 +3743,7 @@ export default function SettingsPage() {
             description="Send result publication notifications."
             enabled={whatsappResults}
             onChange={setWhatsappResults}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3617,6 +3752,7 @@ export default function SettingsPage() {
             description="Require approved WhatsApp templates for automated outbound messages."
             enabled={whatsappTemplates}
             onChange={setWhatsappTemplates}
+          onMarkChanged={markChanged}
           />
         </div>
 
@@ -3643,7 +3779,7 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -3657,6 +3793,7 @@ export default function SettingsPage() {
         icon={Mail}
         title="Email Delivery"
         description="Configure transactional and administrative email delivery."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -3783,6 +3920,7 @@ export default function SettingsPage() {
             description="Send administrative system notifications through email."
             enabled={emailNotifications}
             onChange={setEmailNotifications}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -3791,6 +3929,7 @@ export default function SettingsPage() {
             description="Send payment receipts to configured recipients."
             enabled={emailReceipts}
             onChange={setEmailReceipts}
+          onMarkChanged={markChanged}
           />
         </div>
 
@@ -3806,7 +3945,7 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -3820,6 +3959,7 @@ export default function SettingsPage() {
         icon={Shield}
         title="Roles & Permissions"
         description="Control access across students, teachers, finance, attendance, exams, reports and AI."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card className="mb-6">
@@ -3972,7 +4112,7 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -3987,6 +4127,7 @@ export default function SettingsPage() {
         title="Security"
         description="Protect administrator accounts, sessions, APIs and authentication."
         badge={`${securityScore}% secure`}
+        onAIHelp={() => openAI("overview")}
       />
 
       <div className="mb-6 grid gap-5 md:grid-cols-3">
@@ -4045,6 +4186,7 @@ export default function SettingsPage() {
           description="Require a second verification step for administrator accounts."
           enabled={twoFactor}
           onChange={setTwoFactor}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4053,6 +4195,7 @@ export default function SettingsPage() {
           description="Notify administrators about new account logins."
           enabled={loginAlerts}
           onChange={setLoginAlerts}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4061,6 +4204,7 @@ export default function SettingsPage() {
           description="Require stronger passwords for staff accounts."
           enabled={forceStrongPasswords}
           onChange={setForceStrongPasswords}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4069,6 +4213,7 @@ export default function SettingsPage() {
           description="Limit an account to one active session at a time."
           enabled={singleSession}
           onChange={setSingleSession}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4077,6 +4222,7 @@ export default function SettingsPage() {
           description="Restrict administrative access to approved IP ranges."
           enabled={ipRestriction}
           onChange={setIpRestriction}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4085,6 +4231,7 @@ export default function SettingsPage() {
           description="Apply authentication and security requirements to API access."
           enabled={apiSecurity}
           onChange={setApiSecurity}
+          onMarkChanged={markChanged}
         />
 
         <div className="mt-6 grid gap-5 border-t border-slate-100 pt-6 md:grid-cols-3">
@@ -4144,7 +4291,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -4158,6 +4305,7 @@ export default function SettingsPage() {
         icon={Palette}
         title="Branding"
         description="Customize the identity customers and students see across your platform."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -4279,6 +4427,7 @@ export default function SettingsPage() {
             description="Display Coaching OS branding on public-facing pages."
             enabled={showPoweredBy}
             onChange={setShowPoweredBy}
+          onMarkChanged={markChanged}
           />
         </div>
 
@@ -4318,7 +4467,7 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -4332,6 +4481,7 @@ export default function SettingsPage() {
         icon={AppWindow}
         title="Website & Apps"
         description="Control the availability of student, parent, teacher and public applications."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -4341,6 +4491,7 @@ export default function SettingsPage() {
           description="Enable the student mobile application."
           enabled={studentAppEnabled}
           onChange={setStudentAppEnabled}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4349,6 +4500,7 @@ export default function SettingsPage() {
           description="Enable the teacher mobile application."
           enabled={teacherAppEnabled}
           onChange={setTeacherAppEnabled}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4357,6 +4509,7 @@ export default function SettingsPage() {
           description="Enable the parent mobile application."
           enabled={parentAppEnabled}
           onChange={setParentAppEnabled}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4365,6 +4518,7 @@ export default function SettingsPage() {
           description="Allow students to access the web portal."
           enabled={enableStudentPortal}
           onChange={setEnableStudentPortal}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4373,6 +4527,7 @@ export default function SettingsPage() {
           description="Allow parents to access the web portal."
           enabled={enableParentPortal}
           onChange={setEnableParentPortal}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4381,6 +4536,7 @@ export default function SettingsPage() {
           description="Allow teachers to access the web portal."
           enabled={enableTeacherPortal}
           onChange={setEnableTeacherPortal}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4389,6 +4545,7 @@ export default function SettingsPage() {
           description="Allow your public-facing website to remain accessible."
           enabled={publicWebsite}
           onChange={setPublicWebsite}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4397,6 +4554,7 @@ export default function SettingsPage() {
           description="Allow students or parents to submit registration requests."
           enabled={allowSelfRegistration}
           onChange={setAllowSelfRegistration}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4405,6 +4563,7 @@ export default function SettingsPage() {
           description="Temporarily restrict platform access while maintenance is performed."
           enabled={maintenanceMode}
           onChange={setMaintenanceMode}
+          onMarkChanged={markChanged}
         />
       </Card>
 
@@ -4427,7 +4586,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -4442,11 +4601,12 @@ export default function SettingsPage() {
         title="Integrations"
         description="Connect external services to extend Coaching OS."
         badge={`${connectedIntegrations}/${integrations.length} connected`}
+        onAIHelp={() => openAI("overview")}
       />
 
       <div className="grid gap-5 md:grid-cols-2">
         {integrations.map((integration) => {
-          const Icon = integration.icon;
+          const Icon = getIntegrationIcon(integration.iconKey, integration.name);
 
           return (
             <Card key={integration.name}>
@@ -4525,7 +4685,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -4539,6 +4699,7 @@ export default function SettingsPage() {
         icon={Database}
         title="Data & Backup"
         description="Protect configuration and prepare your platform for reliable disaster recovery."
+        onAIHelp={() => openAI("overview")}
       />
 
       <div className="mb-6 grid gap-5 md:grid-cols-3">
@@ -4586,6 +4747,7 @@ export default function SettingsPage() {
           description="Automatically create scheduled backups."
           enabled={autoBackup}
           onChange={setAutoBackup}
+          onMarkChanged={markChanged}
         />
 
         <div className="mt-5 grid gap-5 md:grid-cols-2">
@@ -4625,6 +4787,7 @@ export default function SettingsPage() {
             description="Store backups in connected cloud storage."
             enabled={cloudBackup}
             onChange={setCloudBackup}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -4633,6 +4796,7 @@ export default function SettingsPage() {
             description="Encrypt backup data before storage."
             enabled={backupEncryption}
             onChange={setBackupEncryption}
+          onMarkChanged={markChanged}
           />
 
           <SettingRow
@@ -4641,6 +4805,7 @@ export default function SettingsPage() {
             description="Create a backup before important application updates."
             enabled={backupBeforeUpdates}
             onChange={setBackupBeforeUpdates}
+          onMarkChanged={markChanged}
           />
         </div>
       </Card>
@@ -4690,7 +4855,7 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -4704,6 +4869,7 @@ export default function SettingsPage() {
         icon={Activity}
         title="Audit Logs"
         description="Review important administrative actions performed inside Coaching OS."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -4802,6 +4968,7 @@ export default function SettingsPage() {
         icon={Eye}
         title="Privacy & Data"
         description="Control analytics, data protection, sensitive information and retention behavior."
+        onAIHelp={() => openAI("overview")}
       />
 
       <Card>
@@ -4811,6 +4978,7 @@ export default function SettingsPage() {
           description="Collect anonymous product usage analytics."
           enabled={analytics}
           onChange={setAnalytics}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4819,6 +4987,7 @@ export default function SettingsPage() {
           description="Collect application errors for debugging."
           enabled={errorTracking}
           onChange={setErrorTracking}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4827,6 +4996,7 @@ export default function SettingsPage() {
           description="Enable encryption for sensitive application data."
           enabled={dataEncryption}
           onChange={setDataEncryption}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4835,6 +5005,7 @@ export default function SettingsPage() {
           description="Hide sensitive information from standard administrative views."
           enabled={maskSensitiveData}
           onChange={setMaskSensitiveData}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4843,6 +5014,7 @@ export default function SettingsPage() {
           description="Apply stricter privacy defaults across the platform."
           enabled={privacyMode}
           onChange={setPrivacyMode}
+          onMarkChanged={markChanged}
         />
 
         <SettingRow
@@ -4851,6 +5023,7 @@ export default function SettingsPage() {
           description="Maintain administrative activity history for accountability."
           enabled={activityTracking}
           onChange={setActivityTracking}
+          onMarkChanged={markChanged}
         />
 
         <div className="mt-6 border-t border-slate-100 pt-6">
@@ -4887,7 +5060,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <SaveBar />
+      <SaveBar saved={saved} onReset={resetSettings} onSave={requestSave} />
     </>
   );
 
@@ -4901,6 +5074,7 @@ export default function SettingsPage() {
         icon={AlertTriangle}
         title="Danger Zone"
         description="Actions in this section can affect important system data."
+        onAIHelp={() => openAI("overview")}
       />
 
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
