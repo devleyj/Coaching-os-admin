@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Slidebar from "../components/Slidebar";
 import PageHeader from "../components/PageHeader";
-import { getCollection, subscribeToStore } from "../data/store";
+import { getCollection, setCollection, subscribeToStore } from "../data/store";
 import {
   Bell,
   Search,
@@ -567,18 +567,48 @@ const mapAttendanceNotification = (
 });
 
 const mergeSharedNotifications = (current: Notification[]) => {
-  const shared = getCollection<SharedAttendanceNotification>("notifications");
+  const shared = getCollection<
+    SharedAttendanceNotification | Notification
+  >("notifications");
 
   const attendanceNotifications = shared
     .filter((item) => item?.type === "attendance")
-    .map(mapAttendanceNotification);
+    .map((item) =>
+      mapAttendanceNotification(item as SharedAttendanceNotification),
+    );
 
-  const attendanceIds = new Set(attendanceNotifications.map((item) => item.id));
+  const manualNotifications = shared.filter(
+    (item) => item && item.type !== "attendance",
+  ) as Notification[];
 
-  return [
-    ...attendanceNotifications,
-    ...current.filter((item) => !attendanceIds.has(item.id)),
-  ];
+  const existingManualNotifications = current.filter(
+    (item) => item.type !== "Attendance" || item.createdBy !== "Attendance System",
+  );
+
+  const manual = manualNotifications.length
+    ? manualNotifications
+    : existingManualNotifications;
+
+  return [...attendanceNotifications, ...manual];
+};
+
+const persistNotifications = (records: Notification[]) => {
+  const shared = getCollection<
+    SharedAttendanceNotification | Notification
+  >("notifications");
+
+  const attendanceRecords = shared.filter(
+    (item) => item?.type === "attendance",
+  );
+
+  const manualRecords = records.filter(
+    (item) => item.type !== "Attendance" || item.createdBy !== "Attendance System",
+  );
+
+  setCollection("notifications", [
+    ...attendanceRecords,
+    ...manualRecords,
+  ]);
 };
 
 /* =========================================================
@@ -588,14 +618,47 @@ const mergeSharedNotifications = (current: Notification[]) => {
 export default function NotificationsPage() {
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
+  const [storeHydrated, setStoreHydrated] = useState(false);
+  const lastPersistedManualKey = useRef("");
 
   useEffect(() => {
-    setNotifications((current) => mergeSharedNotifications(current));
+    const shared = getCollection<
+      SharedAttendanceNotification | Notification
+    >("notifications");
+
+    if (shared.length > 0) {
+      setNotifications((current) => mergeSharedNotifications(current));
+    } else {
+      persistNotifications(initialNotifications);
+      setNotifications(initialNotifications);
+    }
+
+    setStoreHydrated(true);
 
     return subscribeToStore(() => {
       setNotifications((current) => mergeSharedNotifications(current));
     });
   }, []);
+
+  useEffect(() => {
+    if (!storeHydrated) return;
+
+    const manualRecords = notifications.filter(
+      (item) =>
+        item.type !== "Attendance" || item.createdBy !== "Attendance System",
+    );
+
+    const manualKey = JSON.stringify(manualRecords);
+
+    // setCollection() broadcasts a store update, which causes this page to
+    // receive the update and create a new notifications array. Without this
+    // guard, the persistence effect would write -> subscribe -> setState ->
+    // effect -> write forever.
+    if (manualKey === lastPersistedManualKey.current) return;
+
+    lastPersistedManualKey.current = manualKey;
+    persistNotifications(notifications);
+  }, [notifications, storeHydrated]);
 
   const [templates] = useState<Template[]>(initialTemplates);
 
